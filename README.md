@@ -5,7 +5,7 @@
 <h1 align="center">Jaspreet Bhatia - Personal Portfolio</h1>
 
 <p align="center">
-  A sleek, modern, and highly responsive personal portfolio website showcasing my engineering projects, cloud architectures, and AI frameworks under the <strong>JB AI</strong> brand.
+  A sleek, modern, and highly responsive personal portfolio website showcasing my engineering projects, cloud architectures, and AI frameworks under the <strong>JBSI</strong> brand.
 </p>
 
 ---
@@ -31,18 +31,18 @@ The portfolio actively showcases top-tier projects highlighting my expertise acr
 2. **ML Algorithm Visualizer**
    - *Stack:* HTML/JS, D3.js
    - *Details:* An interactive web tool visualizing over 150 machine learning algorithms across multiple paradigms.
-3. **Curator by JB AI**
+3. **Curator by JBSI**
    - *Stack:* React, FastAPI, Groq AI, yt-dlp
    - *Details:* An autonomous AI media curator that dynamically generates structured educational roadmaps and curated music playlists via RAG (Real-Time Internet Search).
 
 ## 🌍 Connect With Me
 
-- **LinkedIn:** [linkedin.com/in/jaspreet-bhatia-ai](https://linkedin.com/in/jaspreet-bhatia-ai)
+- **LinkedIn:** [linkedin.com/in/jaspreet-bhatia-si](https://linkedin.com/in/jaspreet-bhatia-si)
 - **Email:** [bhatiajaspreet161@gmail.com](mailto:bhatiajaspreet161@gmail.com)
-- **GitHub:** [@Jaspreet-Bhatia-AI](https://github.com/Jaspreet-Bhatia-AI)
+- **GitHub:** [@Jaspreet-Bhatia-SI](https://github.com/Jaspreet-Bhatia-SI)
 
 <br/>
 
 <div align="center">
-  <i>© 2026 JB AI Technologies. All rights reserved.</i>
+  <i>© 2026 JBSI Technologies. All rights reserved.</i>
 </div>
