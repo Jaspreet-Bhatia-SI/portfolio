@@ -148,7 +148,13 @@
             { id: 'contact-insta', type: 'Uplink', x: 110, z: -50, tx: 90, tz: -50, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', desc: 'Behind the scenes hardware operations and daily tech logs. @jass_bhatia.si', tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' },
 
             { id: 'about-hq', type: 'Safehouse', x: 0, z: -120, tx: 0, tz: -100, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'The Church (HQ)', desc: 'Welcome to the core safehouse of JBSI. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' }
-        ];
+    
+        // NEW BUILDINGS
+        { id: 'skill-frontend', type: 'Skill', x: -35, z: 150, tx: -15, tz: 150, color: 0x0ea5e9, icon: 'solar:laptop-linear', title: 'Frontend Engineering', desc: 'Expert in React, Vue, Three.js, and modern CSS frameworks like Tailwind.', tech: ['React', 'Three.js', 'Tailwind'], link: '#', linkText: 'Acknowledge' },
+        { id: 'skill-backend', type: 'Skill', x: 35, z: 150, tx: 15, tz: 150, color: 0xef4444, icon: 'solar:server-linear', title: 'Backend & Cloud', desc: 'Building scalable microservices with Python (FastAPI/Django), Node.js, and deploying via Docker to AWS/GCP.', tech: ['Python', 'Docker', 'AWS'], link: '#', linkText: 'Acknowledge' },
+        { id: 'skill-mobile', type: 'Skill', x: -35, z: -150, tx: -15, tz: -150, color: 0x8b5cf6, icon: 'solar:smartphone-linear', title: 'Mobile Development', desc: 'Cross-platform app development using Flutter and React Native for iOS and Android.', tech: ['Flutter', 'React Native'], link: '#', linkText: 'Acknowledge' },
+        { id: 'skill-db', type: 'Skill', x: 35, z: -150, tx: 15, tz: -150, color: 0xeab308, icon: 'solar:database-linear', title: 'Database Architecture', desc: 'Designing optimized schemas and complex queries in PostgreSQL, MongoDB, and Redis.', tech: ['PostgreSQL', 'MongoDB', 'Redis'], link: '#', linkText: 'Acknowledge' },
+    ];
 
         // --- STATE MACHINE ---
         const state = {
@@ -209,6 +215,9 @@
         const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, 400), roadMat); mainRoad.rotation.x = -Math.PI/2; mainRoad.position.set(0, 0.05, 0); mainRoad.receiveShadow = true; envGroup.add(mainRoad);
         const crossRoad1 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad1.rotation.x = -Math.PI/2; crossRoad1.position.set(0, 0.06, -50); crossRoad1.receiveShadow = true; envGroup.add(crossRoad1);
         const crossRoad2 = new THREE.Mesh(new THREE.PlaneGeometry(200, 12), dirtMat); crossRoad2.rotation.x = -Math.PI/2; crossRoad2.position.set(0, 0.06, 50); crossRoad2.receiveShadow = true; envGroup.add(crossRoad2);
+        const crossRoad3 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad3.rotation.x = -Math.PI/2; crossRoad3.position.set(0, 0.06, 150); crossRoad3.receiveShadow = true; envGroup.add(crossRoad3);
+        const crossRoad4 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad4.rotation.x = -Math.PI/2; crossRoad4.position.set(0, 0.06, -150); crossRoad4.receiveShadow = true; envGroup.add(crossRoad4);
+
 
         // Dynamic Poster Generator
         function createPosterTexture(title, type) {
@@ -317,6 +326,62 @@
             const h = new THREE.Mesh(hayGeo, hayMat); h.position.set((Math.random()-0.5)*300, 1.2, (Math.random()-0.5)*300);
             if (Math.abs(h.position.x) > 12) { h.rotation.y = Math.random() * Math.PI; h.castShadow = true; envGroup.add(h); }
         }
+        
+        // --- VENDORS, WELLS, NPCs ---
+        function createTubeWell(x, z) {
+            const wellGrp = new THREE.Group();
+            const concMat = new THREE.MeshStandardMaterial({color: 0x888888, roughness: 0.9});
+            const metalMat = new THREE.MeshStandardMaterial({color: 0x444444, metalness: 0.8, roughness: 0.4});
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.5, 16), concMat); base.position.y = 0.25; base.castShadow = true; base.receiveShadow = true;
+            const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3.0, 8), metalMat); pipe.position.set(0, 1.5, 0); pipe.castShadow = true;
+            const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.0, 8), metalMat); spout.rotation.x = Math.PI/2; spout.position.set(0, 2.5, 0.5); spout.castShadow = true;
+            const trough = new THREE.Mesh(new THREE.BoxGeometry(2, 0.6, 1.5), concMat); trough.position.set(0, 0.3, 1.5); trough.castShadow = true; trough.receiveShadow = true;
+            wellGrp.add(base, pipe, spout, trough); wellGrp.position.set(x, 0, z); envGroup.add(wellGrp);
+        }
+        createTubeWell(-20, 120);
+
+        function createVendorStall(x, z, angle) {
+            const stallGrp = new THREE.Group();
+            const woodMat = new THREE.MeshStandardMaterial({color: 0x6b4c3a, roughness: 0.9});
+            const clothMat = new THREE.MeshStandardMaterial({color: 0xeab308, roughness: 1.0, side: THREE.DoubleSide});
+            const crateMat = new THREE.MeshStandardMaterial({color: 0x8b5a2b, roughness: 0.9});
+            const table = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 2), woodMat); table.position.y = 1.0; table.castShadow = true; stallGrp.add(table);
+            const legGeo = new THREE.BoxGeometry(0.2, 1.0, 0.2); const poleGeo = new THREE.CylinderGeometry(0.05, 0.05, 2.0, 4);
+            for(let i=0; i<4; i++) {
+                const leg = new THREE.Mesh(legGeo, woodMat); leg.position.set(i%2===0?1.8:-1.8, 0.5, i<2?0.8:-0.8); stallGrp.add(leg);
+                const pole = new THREE.Mesh(poleGeo, woodMat); pole.position.set(i%2===0?1.8:-1.8, 2.0, i<2?0.8:-0.8); stallGrp.add(pole);
+            }
+            const canopy = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 2.5), clothMat); canopy.rotation.x = -Math.PI/2; canopy.position.y = 3.0; canopy.castShadow = true; stallGrp.add(canopy);
+            const crateGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+            const crate1 = new THREE.Mesh(crateGeo, crateMat); crate1.position.set(-1, 1.5, 0); crate1.castShadow = true;
+            const crate2 = new THREE.Mesh(crateGeo, crateMat); crate2.position.set(0, 1.5, 0.2); crate2.castShadow = true;
+            const crate3 = new THREE.Mesh(crateGeo, crateMat); crate3.position.set(1.2, 1.5, -0.2); crate3.castShadow = true;
+            stallGrp.add(crate1, crate2, crate3); stallGrp.rotation.y = angle; stallGrp.position.set(x, 0, z); envGroup.add(stallGrp);
+        }
+        createVendorStall(12, 100, -Math.PI/2);
+        createVendorStall(-12, 110, Math.PI/2);
+        createVendorStall(12, -120, -Math.PI/2);
+
+        const npcs = [];
+        function createNPC(x, z, color, patrolRadius) {
+            const npcGrp = new THREE.Group();
+            const skinMat = new THREE.MeshStandardMaterial({color: 0xffccaa});
+            const shirtMat = new THREE.MeshStandardMaterial({color: color});
+            const pantsMat = new THREE.MeshStandardMaterial({color: 0x333333});
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat); head.position.y = 2.0; head.castShadow = true;
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.0, 0.4), shirtMat); torso.position.y = 1.25; torso.castShadow = true;
+            const lArm = new THREE.Group(); lArm.position.set(-0.5, 1.6, 0); const lArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), skinMat); lArmMesh.position.y = -0.3; lArmMesh.castShadow = true; lArm.add(lArmMesh);
+            const rArm = new THREE.Group(); rArm.position.set(0.5, 1.6, 0); const rArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), skinMat); rArmMesh.position.y = -0.3; rArmMesh.castShadow = true; rArm.add(rArmMesh);
+            const lLeg = new THREE.Group(); lLeg.position.set(-0.2, 0.75, 0); const lLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat); lLegMesh.position.y = -0.375; lLegMesh.castShadow = true; lLeg.add(lLegMesh);
+            const rLeg = new THREE.Group(); rLeg.position.set(0.2, 0.75, 0); const rLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat); rLegMesh.position.y = -0.375; rLegMesh.castShadow = true; rLeg.add(rLegMesh);
+            npcGrp.add(head, torso, lArm, rArm, lLeg, rLeg); npcGrp.position.set(x, 0, z); scene.add(npcGrp);
+            npcs.push({ grp: npcGrp, lArm, rArm, lLeg, rLeg, basex: x, basez: z, targetx: x, targetz: z, radius: patrolRadius, speed: 0.04, state: 'idle', timer: 0 });
+        }
+        createNPC(14, 102, 0xef4444, 4);
+        createNPC(-14, 108, 0x3b82f6, 6);
+        createNPC(-18, 122, 0x10b981, 3);
+        createNPC(10, -118, 0xf59e0b, 5);
+
         const treeGeo = new THREE.ConeGeometry(2.5, 12, 7); const treeMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 1.0 }); 
         const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 4); const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f }); 
         for(let i=0; i<400; i++) {
@@ -599,6 +664,8 @@
 
             minimapCtx.fillStyle = '#3d3d3d'; minimapCtx.fillRect(-8, -400, 16, 800);
             minimapCtx.fillStyle = '#594a36'; minimapCtx.fillRect(-150, -56, 300, 12); minimapCtx.fillRect(-100, 44, 200, 12);
+            minimapCtx.fillRect(-150, 144, 300, 12); minimapCtx.fillRect(-150, -156, 300, 12);
+
 
             buildings.forEach(b => {
                 const isHQ = b.id === 'about-hq';
@@ -641,7 +708,36 @@
                 if (inputX !== 0 && inputY !== 0) { inputX *= 0.707; inputY *= 0.707; }
             }
 
-            if (state.mode === 'DRIVING') {
+            
+            // NPC Logic
+            npcs.forEach(npc => {
+                npc.timer -= 1;
+                if (npc.timer <= 0) {
+                    if (npc.state === 'idle') {
+                        npc.state = 'walk'; npc.timer = 60 + Math.random() * 120;
+                        npc.targetx = npc.basex + (Math.random() - 0.5) * 2 * npc.radius;
+                        npc.targetz = npc.basez + (Math.random() - 0.5) * 2 * npc.radius;
+                    } else {
+                        npc.state = 'idle'; npc.timer = 120 + Math.random() * 200;
+                    }
+                }
+                
+                if (npc.state === 'walk') {
+                    const dx = npc.targetx - npc.grp.position.x; const dz = npc.targetz - npc.grp.position.z;
+                    const dist = Math.sqrt(dx*dx + dz*dz);
+                    if (dist > 0.1) {
+                        npc.grp.position.x += (dx/dist) * npc.speed; npc.grp.position.z += (dz/dist) * npc.speed;
+                        npc.grp.rotation.y = Math.atan2(dx, dz);
+                        const time = Date.now() * 0.01;
+                        npc.lArm.rotation.x = Math.sin(time) * 0.5; npc.rArm.rotation.x = -Math.sin(time) * 0.5;
+                        npc.lLeg.rotation.x = -Math.sin(time) * 0.5; npc.rLeg.rotation.x = Math.sin(time) * 0.5;
+                    } else { npc.state = 'idle'; }
+                } else {
+                    npc.lArm.rotation.x *= 0.9; npc.rArm.rotation.x *= 0.9;
+                    npc.lLeg.rotation.x *= 0.9; npc.rLeg.rotation.x *= 0.9;
+                }
+            });
+if (state.mode === 'DRIVING') {
                 if (inputY < 0) state.speed += ACCELERATION; if (inputY > 0) state.speed -= ACCELERATION;
                 state.speed *= FRICTION; state.speed = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, state.speed));
 
