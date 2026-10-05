@@ -145,7 +145,7 @@
         };
 
         let camTheta = Math.PI, camPhi = 1.2, camRadius = 18;
-        let inputX = 0, inputY = 0, isPointerLocked = false, isSitting = false;
+        let inputX = 0, inputY = 0, isPointerLocked = false, isSitting = false, lastLookTime = 0;
 
         // --- SURVIVAL TIME CYCLES ---
         const timeModes = [
@@ -381,7 +381,7 @@
         document.addEventListener('pointerlockchange', () => { isPointerLocked = (document.pointerLockElement === document.body); });
         document.addEventListener('mousemove', (e) => {
             if (!isPointerLocked || state.mode === 'TRANSITION' || isSitting) return;
-            camTheta -= e.movementX * 0.003; camPhi -= e.movementY * 0.003;
+            camTheta -= e.movementX * 0.003; camPhi -= e.movementY * 0.003; lastLookTime = Date.now();
             camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi));
         });
 
@@ -441,7 +441,7 @@
                 } else if (t.identifier === lookTouchId) {
                     if(state.mode !== 'TRANSITION' && !isSitting) {
                         const dx = t.clientX - lastLookX; const dy = t.clientY - lastLookY;
-                        camTheta -= dx * 0.005; camPhi -= dy * 0.005; camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi));
+                        camTheta -= dx * 0.005; camPhi -= dy * 0.005; camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi)); lastLookTime = Date.now();
                     }
                     lastLookX = t.clientX; lastLookY = t.clientY;
                 }
@@ -577,7 +577,17 @@
 
                 if (Math.abs(state.speed) > 0.01) {
                     const direction = state.speed > 0 ? 1 : -1;
-                    state.angle -= inputX * ROTATION_SPEED * direction;
+                    const turn = inputX * ROTATION_SPEED * direction;
+                    state.angle -= turn;
+                    camTheta -= turn;
+                }
+
+                if (Date.now() - lastLookTime > 1500 && Math.abs(state.speed) > 0.05) {
+                    let diff = (state.angle - camTheta) % (Math.PI * 2);
+                    if (diff < -Math.PI) diff += Math.PI * 2;
+                    if (diff > Math.PI) diff -= Math.PI * 2;
+                    camTheta += diff * 0.05;
+                    camPhi += ((Math.PI / 3) - camPhi) * 0.05;
                 }
 
                 carGroup.rotation.y = state.angle;
