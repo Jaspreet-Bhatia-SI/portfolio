@@ -1,45 +1,71 @@
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=7b2cbf&height=200&section=header&text=JB%20AI%20Portfolio&fontSize=50&fontAlignY=30&desc=Full-Stack%20AI%20Developer%20%7C%20Cloud%20Engineer" width="100%" />
+  <h1>🎮 JBSI 3D Portfolio Experience</h1>
+  <p><strong>A fully playable WebGL survival-game portfolio built with Three.js.</strong></p>
 </div>
 
-<h1 align="center">Jaspreet Bhatia - Personal Portfolio</h1>
-
 <p align="center">
-  A sleek, modern, and highly responsive personal portfolio website showcasing my engineering projects, cloud architectures, and AI frameworks under the <strong>JBSI</strong> brand.
+  <img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" />
 </p>
 
 ---
 
-## 🚀 About the Portfolio
+## 🚀 Overview
 
-This repository contains the source code for my personal developer portfolio. Built with an emphasis on performance and clean UI/UX, the site features modern web aesthetics (glassmorphism, subtle CSS animations, dark mode) to present my technical identity effectively.
+Welcome to my developer portfolio—reimagined as an interactive 3D WebGL game! 
 
-## 🛠️ Built With
+Instead of scrolling through a standard webpage, you are dropped into a virtual town inspired by Erangel. You can drive a Ferrari supercar, explore the village, dynamically toggle between Day, Evening, and Night modes, and walk into buildings to read about my software engineering projects and technical skills.
 
-- **HTML5 & CSS3:** Semantic structure and modern styling.
-- **JavaScript:** Custom scroll reveal animations and responsive mobile menu toggling.
-- **Tailwind CSS (via CDN or custom classes):** Utility-first styling for rapid, responsive UI design.
-- **FontAwesome:** Scalable vector icons.
+## ✨ Features
 
-## 🌟 Featured Projects
+- **🏎️ Dynamic Vehicle Physics:** Drive a 3D supercar with acceleration, friction, and responsive steering mechanics.
+- **🏃‍♂️ 3rd Person Character Controller:** Get out of your car and explore the town on foot. Features custom walking/running animations and interactions.
+- **🏠 Interactive Buildings:** Enter different houses across the map. Each house represents a specific project or skill (Frontend, Backend, AI, Mobile Dev).
+- **📖 In-Game UI Overlays:** Sit on the couch inside a building and read magazines that pull up interactive HTML/CSS overlays containing detailed project specs.
+- **🗺️ Live Minimap:** Real-time 2D Canvas minimap that tracks your coordinates, rotation, and surrounding architecture.
+- **🌅 Dynamic Day/Night Cycle:** Seamlessly transition between bright daylight, a pinkish evening sunset, and a moonlit starry night.
+- **📱 Responsive Mobile Support:** Includes virtual joysticks and touch buttons so the game is fully playable on phones and tablets.
 
-The portfolio actively showcases top-tier projects highlighting my expertise across mobile development, full-stack architectures, and AI:
+## 🕹️ Controls
 
-1. **Food E-Commerce Platform**
-   - *Stack:* Flutter, FastAPI, PostgreSQL, Redis
-   - *Details:* A production-grade mobile app deployed on Railway with Razorpay integration and Firebase FCM push notifications.
-2. **ML Algorithm Visualizer**
-   - *Stack:* HTML/JS, D3.js
-   - *Details:* An interactive web tool visualizing over 150 machine learning algorithms across multiple paradigms.
-3. **Curator by JBSI**
-   - *Stack:* React, FastAPI, Groq AI, yt-dlp
-   - *Details:* An autonomous AI media curator that dynamically generates structured educational roadmaps and curated music playlists via RAG (Real-Time Internet Search).
+| Action | PC (Keyboard & Mouse) | Mobile (Touch) |
+| :--- | :--- | :--- |
+| **Move / Drive** | `W`, `A`, `S`, `D` | Left Virtual Joystick |
+| **Look Around** | `Mouse Move` | Right Screen Drag |
+| **Enter/Exit Car or House** | `F` | On-screen "Loot" button |
+| **Read Magazine / Sit** | `E` | On-screen "Read" button |
+
+## 🛠️ Architecture
+
+This project is built to run entirely in the browser using a lightweight stack, served natively via Docker.
+- **Rendering Engine:** [Three.js](https://threejs.org/)
+- **UI Framework:** [Tailwind CSS](https://tailwindcss.com/)
+- **Icons:** [Iconify (Solar Icons)](https://iconify.design/)
+- **Deployment:** Dockerized Nginx Alpine server deployed on AWS EC2.
+
+## 🐳 Running Locally (Docker)
+
+If you'd like to run the portfolio locally, you can use the provided Docker configuration.
+
+```bash
+# Clone the repository
+git clone https://github.com/Jaspreet-Bhatia-SI/portfolio.git
+
+# Navigate to the directory
+cd portfolio
+
+# Build and run the container in detached mode
+docker-compose up -d --build
+```
+The game will be running on `http://localhost:8086`.
 
 ## 🌍 Connect With Me
 
 - **LinkedIn:** [linkedin.com/in/jaspreet-bhatia-si](https://linkedin.com/in/jaspreet-bhatia-si)
 - **Email:** [bhatiajaspreet161@gmail.com](mailto:bhatiajaspreet161@gmail.com)
 - **GitHub:** [@Jaspreet-Bhatia-SI](https://github.com/Jaspreet-Bhatia-SI)
+- **Instagram:** [@jass_bhatia.si](https://instagram.com/jass_bhatia.si)
 
 <br/>
 
