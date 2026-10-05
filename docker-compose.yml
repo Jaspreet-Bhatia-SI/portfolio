@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  portfolio-web:
+    build: .
+    container_name: jbsi-portfolio
+    ports:
+      - "8086:80"
+    restart: unless-stopped
