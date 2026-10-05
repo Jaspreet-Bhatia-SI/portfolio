@@ -1,358 +1,771 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jaspreet Bhatia — Full-Stack AI Engineer</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { mono: ['JetBrains Mono', 'monospace'], sans: ['Inter', 'sans-serif'] },
-          colors: {
-            bg: { base: '#fafaf9', surface: '#ffffff', card: '#ffffff', elevated: '#f5f5f4' },
-            slate: { border: 'rgba(0,0,0,0.06)' }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jaspreet Bhatia | AI & Cloud Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050505;
+            overflow: hidden;
+            touch-action: none;
         }
-      }
-    }
-  </script>
-
-  <style>
-    body { background-color: #fafaf9; color: #1c1917; overflow-x: hidden; }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .glass-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(20, 184, 166, 0.3);
-      box-shadow: 0 10px 30px rgba(20, 184, 166, 0.1);
-    }
-    .text-gradient {
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-image: linear-gradient(90deg, #14b8a6, #10b981);
-    }
-    .vfx-border { position: relative; }
-    .vfx-border::before {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: inherit;
-      background: linear-gradient(45deg, #14b8a6, #10b981, #34d399);
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .vfx-border:hover::before { opacity: 1; filter: blur(12px); }
-    #vanta-canvas { position: absolute; z-index: 0; top: 0; left: 0; width: 100%; height: 100%; }
-  </style>
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .modal-panel {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(16px);
+        }
+        .key-cap {
+            box-shadow: 0 4px 0 #18181b;
+            transition: all 0.1s;
+        }
+        .key-cap:active, .key-cap.pressed {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #18181b;
+        }
+        .world-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+        /* Custom scrollbar for modals */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+    </style>
 </head>
-<body class="antialiased selection:bg-teal-500/20 selection:text-teal-900">
+<body class="bg-black text-zinc-300 antialiased h-screen w-screen overflow-hidden">
 
-  <nav class="fixed w-full z-50 top-0 border-b border-black/5 bg-white/70 backdrop-blur-md transition-all duration-300" id="navbar">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <a href="#" class="font-bold text-xl tracking-tighter flex items-center gap-2 text-stone-900">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white text-sm">JB</div>
-        Jaspreet Bhatia
-      </a>
-      <div class="hidden md:flex gap-8 text-sm font-medium text-stone-500">
-        <a href="#about" class="hover:text-teal-600 transition-colors">About</a>
-        <a href="#skills" class="hover:text-teal-600 transition-colors">Skills</a>
-        <a href="#projects" class="hover:text-teal-600 transition-colors">Projects</a>
-        <a href="#contact" class="hover:text-teal-600 transition-colors">Contact</a>
-      </div>
-      <a href="#contact" class="hidden md:flex items-center justify-center px-5 py-2.5 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 text-stone-900 text-sm font-medium transition-colors">
-        Let's Talk
-      </a>
-    </div>
-  </nav>
-
-  <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-    <div id="vanta-canvas"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-bg-base/80 to-bg-base z-10 pointer-events-none"></div>
-    
-    <div class="relative z-20 max-w-5xl mx-auto px-6 text-center" data-aos="fade-up" data-aos-duration="1000">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-600 text-xs font-mono mb-8">
-        <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span> Available for new opportunities
-      </div>
-      <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight text-stone-900">
-        Architecting the future with <br class="hidden md:block"/>
-        <span class="text-gradient">Artificial Intelligence</span>
-      </h1>
-      <p class="text-lg md:text-xl text-stone-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-        I am a Full-Stack AI Engineer & Cloud Architect. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions under my studio brand, JBSI.
-      </p>
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="#projects" class="w-full sm:w-auto px-8 py-4 rounded-full bg-stone-900 text-white font-semibold hover:bg-stone-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-stone-900/10">
-          View My Work <i class="fa-solid fa-arrow-down"></i>
-        </a>
-        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="relative z-20 w-full sm:w-auto px-8 py-4 rounded-full bg-white border border-stone-200 text-stone-700 font-medium hover:bg-stone-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
-          <i class="fa-brands fa-github text-lg"></i> GitHub
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section id="skills" class="py-24 relative z-20 bg-bg-base">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="text-center mb-16" data-aos="fade-up">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-stone-900">Technical <span class="text-teal-500">Arsenal</span></h2>
-        <p class="text-stone-500 max-w-2xl mx-auto">The tools, languages, and frameworks I use to bring ideas to life.</p>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="glass-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="100">
-          <i class="fa-solid fa-brain text-emerald-500 text-3xl mb-4"></i>
-          <h3 class="font-bold text-stone-800 mb-2">AI & Machine Learning</h3>
-          <p class="text-sm text-stone-500">TensorFlow, PyTorch, LangChain, RAG Systems, OpenAI & Groq APIs.</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="200">
-          <i class="fa-solid fa-server text-teal-500 text-3xl mb-4"></i>
-          <h3 class="font-bold text-stone-800 mb-2">Backend Architecture</h3>
-          <p class="text-sm text-stone-500">Python, FastAPI, Node.js, Express, Microservices, REST & GraphQL.</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="300">
-          <i class="fa-brands fa-react text-sky-500 text-3xl mb-4"></i>
-          <h3 class="font-bold text-stone-800 mb-2">Frontend Engineering</h3>
-          <p class="text-sm text-stone-500">React, Next.js, Tailwind CSS, Framer Motion, Flutter.</p>
-        </div>
-        <div class="glass-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="400">
-          <i class="fa-brands fa-aws text-orange-500 text-3xl mb-4"></i>
-          <h3 class="font-bold text-stone-800 mb-2">Cloud & DevOps</h3>
-          <p class="text-sm text-stone-500">AWS (EC2, S3), Docker, Nginx, CI/CD pipelines, Linux Admin.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="projects" class="py-24 relative z-20">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6" data-aos="fade-up">
-        <div>
-          <h2 class="text-3xl md:text-5xl font-bold mb-4 text-stone-900">Featured <span class="text-emerald-500">Projects</span></h2>
-          <p class="text-stone-500 max-w-xl">A curated selection of my production-grade applications, AI agents, and visualizers.</p>
-        </div>
-        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="relative z-20 text-teal-600 hover:text-teal-700 font-medium flex items-center gap-2 group">
-          View all on GitHub <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-        </a>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- UI LAYER -->
+    <div class="fixed inset-0 z-50 pointer-events-none flex flex-col justify-between p-6 sm:p-8">
         
-        <!-- Curator AI (LIVE) -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="100">
-          <a href="https://curator.foodzie.store" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit Curator AI"></a>
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-teal-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6 pointer-events-auto">
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white shadow-sm">
-                <i class="fa-solid fa-robot text-xl"></i>
-              </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/CuratorAI" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
-                <i class="fa-brands fa-github"></i>
-              </a>
+        <!-- Header -->
+        <div class="flex justify-between items-start w-full">
+            <div class="flex flex-col gap-1 pointer-events-auto">
+                <div class="flex items-center gap-2 bg-black/50 p-2 rounded-lg backdrop-blur border border-white/5">
+                    <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+                    <h1 class="text-xs font-bold tracking-widest text-white uppercase font-mono">JBSI [NEURAL_NET_VIEWER]</h1>
+                </div>
+                <div class="text-[10px] text-zinc-400 tracking-wider font-mono bg-black/50 px-2 py-1 rounded w-max border border-white/5 mt-1" id="coords">SEC: 0, 0</div>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">Curator AI <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
-            <p class="text-stone-500 text-sm mb-6 flex-1">An autonomous AI media curator using Groq LLMs & DuckDuckGo RAG to generate educational roadmaps and bypass anti-bot systems for media extraction.</p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">FastAPI</span>
-              <span class="px-3 py-1 rounded-full bg-emerald-50 text-xs font-mono text-emerald-700 border border-emerald-100">React</span>
-              <span class="px-3 py-1 rounded-full bg-stone-100 text-xs font-mono text-stone-700 border border-stone-200">Docker</span>
+
+            <!-- Hint -->
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
+                <p class="text-[10px] uppercase text-zinc-400 tracking-widest mb-2 font-mono font-bold">Override Controls</p>
+                <div class="flex justify-end gap-1 mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-xs font-bold text-zinc-300 key-cap" id="key-w">W</div>
+                </div>
+                <div class="flex justify-end gap-1">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-xs font-bold text-zinc-300 key-cap" id="key-a">A</div>
+                    <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-xs font-bold text-zinc-300 key-cap" id="key-s">S</div>
+                    <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-xs font-bold text-zinc-300 key-cap" id="key-d">D</div>
+                </div>
             </div>
-          </div>
         </div>
 
-        <!-- Foodzie (LIVE) -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="200">
-          <a href="https://foodzie.store" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit Foodzie"></a>
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6 pointer-events-auto">
-              <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-500 border border-orange-200 flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-burger text-xl"></i>
-              </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/foodzie" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
-                <i class="fa-brands fa-github"></i>
-              </a>
+        <!-- Proximity Action -->
+        <div id="proximity-alert" class="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 transform scale-90 pointer-events-none flex flex-col items-center">
+            <div class="bg-white text-black px-5 py-3 rounded-full text-xs font-bold tracking-widest uppercase flex items-center gap-3 shadow-[0_0_40px_rgba(255,255,255,0.4)]">
+                <iconify-icon icon="solar:round-alt-arrow-down-linear" width="16" class="animate-bounce"></iconify-icon>
+                Press ENTER to Access
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">Foodzie Platform <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
-            <p class="text-stone-500 text-sm mb-6 flex-1">A massive full-stack E-Commerce ecosystem. Includes a Flutter mobile app, Python backend, PostgreSQL database, and integrated Razorpay payments.</p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span class="px-3 py-1 rounded-full bg-sky-50 text-xs font-mono text-sky-700 border border-sky-100">Flutter</span>
-              <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">Python</span>
-              <span class="px-3 py-1 rounded-full bg-orange-50 text-xs font-mono text-orange-700 border border-orange-100">PostgreSQL</span>
-            </div>
-          </div>
         </div>
 
-        <!-- Stark AI (GITHUB) -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="300">
-          <a href="https://github.com/Jaspreet-Bhatia-SI/stark-ai" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="View on Github"></a>
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6 pointer-events-auto">
-              <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-microchip text-xl"></i>
-              </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/stark-ai" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
-                <i class="fa-brands fa-github"></i>
-              </a>
+        <!-- Mobile Controls -->
+        <div class="md:hidden flex justify-between items-end w-full pb-4 pointer-events-auto">
+            <div class="flex gap-3">
+                <button id="btn-left" class="w-16 h-16 rounded-full bg-zinc-900/90 border border-white/10 active:bg-white/20 backdrop-blur flex items-center justify-center">
+                    <iconify-icon icon="solar:alt-arrow-left-linear" width="24" class="text-white"></iconify-icon>
+                </button>
+                <button id="btn-right" class="w-16 h-16 rounded-full bg-zinc-900/90 border border-white/10 active:bg-white/20 backdrop-blur flex items-center justify-center">
+                    <iconify-icon icon="solar:alt-arrow-right-linear" width="24" class="text-white"></iconify-icon>
+                </button>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">Stark AI Assistant <span class="text-xs ml-2 px-2 py-1 bg-stone-100 text-stone-600 rounded-full font-mono align-middle"><i class="fa-brands fa-github"></i> GITHUB</span></h3>
-            <p class="text-stone-500 text-sm mb-6 flex-1">An intelligent desktop voice assistant capable of automating system tasks, fetching live intelligence, and executing natural language commands.</p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span class="px-3 py-1 rounded-full bg-emerald-50 text-xs font-mono text-emerald-700 border border-emerald-100">NLP</span>
-              <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">Python</span>
+            <div class="flex flex-col gap-3">
+                 <button id="btn-gas" class="w-16 h-16 rounded-full bg-zinc-900/90 border border-white/10 active:bg-white/20 backdrop-blur flex items-center justify-center">
+                    <iconify-icon icon="solar:alt-arrow-up-linear" width="24" class="text-white"></iconify-icon>
+                </button>
+                <button id="btn-brake" class="w-16 h-16 rounded-full bg-zinc-900/90 border border-white/10 active:bg-white/20 backdrop-blur flex items-center justify-center">
+                    <iconify-icon icon="solar:alt-arrow-down-linear" width="24" class="text-white"></iconify-icon>
+                </button>
             </div>
-          </div>
         </div>
-
-        <!-- ML Tree (GITHUB) -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="400">
-          <a href="https://jaspreet-bhatia-si.github.io/ml-tree" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit ML Tree"></a>
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6 pointer-events-auto">
-              <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 border border-emerald-200 flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-network-wired text-xl"></i>
-              </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/ml-tree" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
-                <i class="fa-brands fa-github"></i>
-              </a>
-            </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">ML Tree Visualizer <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
-            <p class="text-stone-500 text-sm mb-6 flex-1">An interactive node-based architecture mapping 150+ machine learning algorithms, bridging the gap between theoretical data science and practical application.</p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span class="px-3 py-1 rounded-full bg-orange-50 text-xs font-mono text-orange-700 border border-orange-100">D3.js</span>
-              <span class="px-3 py-1 rounded-full bg-emerald-50 text-xs font-mono text-emerald-700 border border-emerald-100">Data Science</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Secure Password Generator (GITHUB) -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="500">
-          <a href="https://jaspreet-bhatia-si.github.io/secure-password-generator" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit Generator"></a>
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-rose-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6 pointer-events-auto">
-              <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-500 border border-rose-200 flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-shield-halved text-xl"></i>
-              </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/secure-password-generator" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
-                <i class="fa-brands fa-github"></i>
-              </a>
-            </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">CryptoAuth Generator <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
-            <p class="text-stone-500 text-sm mb-6 flex-1">A highly secure cryptographic tool for generating unbreakable passwords using entropy algorithms and strict policy enforcements.</p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span class="px-3 py-1 rounded-full bg-stone-100 text-xs font-mono text-stone-700 border border-stone-200">Cryptography</span>
-              <span class="px-3 py-1 rounded-full bg-red-50 text-xs font-mono text-red-700 border border-red-100">Security</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ResQ AI (GITHUB) -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="600">
-          <a href="https://github.com/Jaspreet-Bhatia-SI/ResQ-AI" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit ResQ AI"></a>
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6 pointer-events-auto">
-              <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 border border-amber-200 flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-truck-medical text-xl"></i>
-              </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/ResQ-AI" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
-                <i class="fa-brands fa-github"></i>
-              </a>
-            </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">ResQ AI <span class="text-xs ml-2 px-2 py-1 bg-stone-100 text-stone-600 rounded-full font-mono align-middle"><i class="fa-brands fa-github"></i> GITHUB</span></h3>
-            <p class="text-stone-500 text-sm mb-6 flex-1">A machine learning driven emergency response orchestration platform. Optimizes routing and resource allocation for critical situations in real-time.</p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">AI Routing</span>
-              <span class="px-3 py-1 rounded-full bg-emerald-50 text-xs font-mono text-emerald-700 border border-emerald-100">Python</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
     </div>
-  </section>
 
-  <section id="contact" class="py-24 relative z-20">
-    <div class="max-w-4xl mx-auto px-6 text-center" data-aos="fade-up">
-      <div class="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 mx-auto mb-8 p-1 shadow-sm">
-        <div class="w-full h-full bg-white rounded-full flex items-center justify-center">
-          <i class="fa-solid fa-envelope text-2xl text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500"></i>
-        </div>
-      </div>
-      <h2 class="text-4xl md:text-5xl font-bold mb-6 text-stone-900">Ready to <span class="text-gradient">Collaborate?</span></h2>
-      <p class="text-xl text-stone-500 mb-10 max-w-2xl mx-auto">Whether you have a massive AI infrastructure project or need an intelligent web application, my inbox is always open.</p>
-      
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="mailto:bhatiajaspreet161@gmail.com" class="relative z-20 px-8 py-4 rounded-full bg-stone-900 text-white font-bold hover:bg-stone-800 transition-colors flex items-center gap-2 shadow-lg shadow-stone-900/10">
-          Say Hello <i class="fa-solid fa-paper-plane"></i>
-        </a>
-      </div>
-      
-      <div class="flex justify-center gap-6 mt-16 border-t border-black/5 pt-10 relative z-20">
-        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="w-12 h-12 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all hover:-translate-y-1">
-          <i class="fa-brands fa-github text-xl"></i>
-        </a>
-        <a href="https://linkedin.com/in/jaspreet-bhatia-si" target="_blank" class="w-12 h-12 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 flex items-center justify-center text-stone-600 hover:text-teal-600 transition-all hover:-translate-y-1">
-          <i class="fa-brands fa-linkedin text-xl"></i>
-        </a>
-        <a href="https://instagram.com/jass_bhatia.si" target="_blank" class="w-12 h-12 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 flex items-center justify-center text-stone-600 hover:text-pink-600 transition-all hover:-translate-y-1">
-          <i class="fa-brands fa-instagram text-xl"></i>
-        </a>
-      </div>
+    <!-- 3D CANVAS -->
+    <div id="canvas-container" class="relative z-0"></div>
+
+    <!-- LABELS -->
+    <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10">
+        <!-- Generated by JS -->
     </div>
-  </section>
 
-  <footer class="py-8 text-center text-stone-400 text-sm border-t border-black/5 relative z-20 bg-white">
-    <p>&copy; 2026 Jaspreet Bhatia (JBSI). Engineered with precision.</p>
-  </footer>
+    <!-- MODALS -->
+    <div id="modal-container" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl hidden flex items-center justify-center p-4">
+        
+        <!-- ABOUT MODAL -->
+        <div id="modal-about" class="modal-panel w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden hidden transform scale-95 opacity-0">
+            <div class="h-1 w-full bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600"></div>
+            <div class="p-8">
+                <div class="flex items-start justify-between mb-8">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/20">JB</div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white tracking-tight">Jaspreet Bhatia</h2>
+                            <p class="text-xs text-purple-400 mt-1 uppercase tracking-widest font-mono">Full-Stack AI Engineer</p>
+                        </div>
+                    </div>
+                    <button class="close-modal text-zinc-500 hover:text-white transition-colors">
+                        <iconify-icon icon="solar:close-circle-bold" width="28"></iconify-icon>
+                    </button>
+                </div>
+                <div class="space-y-6">
+                    <p class="text-zinc-300 leading-relaxed text-sm">
+                        I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions. With a deep focus on neural architectures and highly performant full-stack environments, I architect the systems of tomorrow under my studio brand, <strong class="text-white">JBSI</strong>.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                            <iconify-icon icon="solar:global-linear" class="text-purple-400 mb-2" width="20"></iconify-icon>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-1">Location</h4>
+                            <p class="text-xs text-zinc-400">Global / Remote</p>
+                        </div>
+                        <div class="bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                            <iconify-icon icon="solar:buildings-2-linear" class="text-purple-400 mb-2" width="20"></iconify-icon>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-1">Entity</h4>
+                            <p class="text-xs text-zinc-400">JBSI Cloud Systems</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  
-  <script>
-    AOS.init({ once: true, offset: 50, duration: 800, easing: 'ease-out-cubic' });
-    VANTA.NET({
-      el: "#vanta-canvas",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x14b8a6,
-      backgroundColor: 0xfafaf9,
-      points: 12.00,
-      maxDistance: 22.00,
-      spacing: 18.00,
-      showDots: true
-    });
-    window.addEventListener('scroll', () => {
-      const nav = document.getElementById('navbar');
-      if (window.scrollY > 50) {
-        nav.classList.add('shadow-sm', 'bg-white/90');
-      } else {
-        nav.classList.remove('shadow-sm', 'bg-white/90');
-      }
-    });
-  </script>
+        <!-- SKILLS MODAL -->
+        <div id="modal-skills" class="modal-panel w-full max-w-3xl bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden hidden transform scale-95 opacity-0">
+            <div class="h-1 w-full bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500"></div>
+            <div class="p-8">
+                <div class="flex items-start justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Technical Arsenal</h2>
+                        <p class="text-xs text-blue-400 mt-1 uppercase tracking-widest font-mono">System Capabilities</p>
+                    </div>
+                    <button class="close-modal text-zinc-500 hover:text-white transition-colors">
+                        <iconify-icon icon="solar:close-circle-bold" width="28"></iconify-icon>
+                    </button>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="bg-zinc-900/50 p-5 rounded-xl border border-white/5 hover:border-blue-500/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400"><iconify-icon icon="solar:brain-linear" width="18"></iconify-icon></div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">AI & ML</h3>
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed font-mono">TensorFlow, PyTorch, LangChain, RAG Systems, OpenAI, Groq, LLM Ops</p>
+                    </div>
+                    <div class="bg-zinc-900/50 p-5 rounded-xl border border-white/5 hover:border-blue-500/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400"><iconify-icon icon="solar:server-square-linear" width="18"></iconify-icon></div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Backend</h3>
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed font-mono">Python, FastAPI, Node.js, Express, Microservices, PostgreSQL</p>
+                    </div>
+                    <div class="bg-zinc-900/50 p-5 rounded-xl border border-white/5 hover:border-blue-500/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400"><iconify-icon icon="solar:monitor-smartphone-linear" width="18"></iconify-icon></div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Frontend</h3>
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed font-mono">React, Next.js, Tailwind CSS, Framer Motion, Flutter, Three.js</p>
+                    </div>
+                    <div class="bg-zinc-900/50 p-5 rounded-xl border border-white/5 hover:border-blue-500/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400"><iconify-icon icon="solar:cloud-storage-linear" width="18"></iconify-icon></div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Cloud</h3>
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed font-mono">AWS (EC2, S3), Docker, Nginx, CI/CD, GitHub Actions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROJECTS MODAL -->
+        <div id="modal-projects" class="modal-panel w-full max-w-4xl bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden hidden transform scale-95 opacity-0 max-h-[90vh] flex flex-col">
+            <div class="h-1 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 shrink-0"></div>
+            <div class="p-8 pb-4 shrink-0 flex items-start justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">Active Datasets</h2>
+                    <p class="text-xs text-emerald-400 mt-1 uppercase tracking-widest font-mono">Production Environment</p>
+                </div>
+                <button class="close-modal text-zinc-500 hover:text-white transition-colors">
+                    <iconify-icon icon="solar:close-circle-bold" width="28"></iconify-icon>
+                </button>
+            </div>
+            <div class="p-8 pt-0 overflow-y-auto">
+                <div class="grid sm:grid-cols-2 gap-4">
+                    
+                    <!-- Curator AI -->
+                    <a href="https://curator.foodzie.store" target="_blank" class="group bg-zinc-900/40 rounded-xl border border-white/5 p-5 hover:border-emerald-500/50 transition-all hover:bg-zinc-900 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full"></div>
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><iconify-icon icon="solar:robot-linear" width="20"></iconify-icon></div>
+                            <span class="text-[10px] font-mono px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded">LIVE</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 relative z-10">Curator AI</h3>
+                        <p class="text-xs text-zinc-400 mb-4 flex-1 relative z-10">Autonomous AI media curator using Groq LLMs & DuckDuckGo RAG to bypass anti-bot systems.</p>
+                        <div class="flex gap-2 relative z-10">
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">FastAPI</span>
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">React</span>
+                        </div>
+                    </a>
+
+                    <!-- Foodzie -->
+                    <a href="https://foodzie.store" target="_blank" class="group bg-zinc-900/40 rounded-xl border border-white/5 p-5 hover:border-emerald-500/50 transition-all hover:bg-zinc-900 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full"></div>
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center"><iconify-icon icon="solar:cart-linear" width="20"></iconify-icon></div>
+                            <span class="text-[10px] font-mono px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded">LIVE</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 relative z-10">Foodzie Platform</h3>
+                        <p class="text-xs text-zinc-400 mb-4 flex-1 relative z-10">Massive full-stack ecosystem with Flutter mobile app, Python backend, and Postgres.</p>
+                        <div class="flex gap-2 relative z-10">
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">Flutter</span>
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">Python</span>
+                        </div>
+                    </a>
+
+                    <!-- Stark AI -->
+                    <a href="https://github.com/Jaspreet-Bhatia-SI/stark-ai" target="_blank" class="group bg-zinc-900/40 rounded-xl border border-white/5 p-5 hover:border-emerald-500/50 transition-all hover:bg-zinc-900 flex flex-col relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center"><iconify-icon icon="solar:microchip-linear" width="20"></iconify-icon></div>
+                            <span class="text-[10px] font-mono px-2 py-1 bg-zinc-800 text-zinc-400 rounded flex items-center gap-1"><iconify-icon icon="mdi:github"></iconify-icon> GITHUB</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 relative z-10">Stark AI Assistant</h3>
+                        <p class="text-xs text-zinc-400 mb-4 flex-1 relative z-10">Intelligent desktop voice assistant automating system tasks and NLP commands.</p>
+                        <div class="flex gap-2 relative z-10">
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">NLP</span>
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">Python</span>
+                        </div>
+                    </a>
+
+                    <!-- ML Tree -->
+                    <a href="https://github.com/Jaspreet-Bhatia-SI/ml-tree" target="_blank" class="group bg-zinc-900/40 rounded-xl border border-white/5 p-5 hover:border-emerald-500/50 transition-all hover:bg-zinc-900 flex flex-col relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="w-10 h-10 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center"><iconify-icon icon="solar:network-linear" width="20"></iconify-icon></div>
+                            <span class="text-[10px] font-mono px-2 py-1 bg-zinc-800 text-zinc-400 rounded flex items-center gap-1"><iconify-icon icon="mdi:github"></iconify-icon> GITHUB</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 relative z-10">ML Tree Visualizer</h3>
+                        <p class="text-xs text-zinc-400 mb-4 flex-1 relative z-10">Interactive node architecture mapping 150+ ML algorithms via D3.js.</p>
+                        <div class="flex gap-2 relative z-10">
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">D3.js</span>
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">Data Science</span>
+                        </div>
+                    </a>
+
+                    <!-- CryptoAuth -->
+                    <a href="https://github.com/Jaspreet-Bhatia-SI/secure-password-generator" target="_blank" class="group bg-zinc-900/40 rounded-xl border border-white/5 p-5 hover:border-emerald-500/50 transition-all hover:bg-zinc-900 flex flex-col relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center"><iconify-icon icon="solar:shield-keyhole-linear" width="20"></iconify-icon></div>
+                            <span class="text-[10px] font-mono px-2 py-1 bg-zinc-800 text-zinc-400 rounded flex items-center gap-1"><iconify-icon icon="mdi:github"></iconify-icon> GITHUB</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 relative z-10">CryptoAuth</h3>
+                        <p class="text-xs text-zinc-400 mb-4 flex-1 relative z-10">Highly secure cryptographic generator using entropy algorithms.</p>
+                        <div class="flex gap-2 relative z-10">
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">Security</span>
+                        </div>
+                    </a>
+
+                    <!-- ResQ AI -->
+                    <a href="https://github.com/Jaspreet-Bhatia-SI/ResQ-AI" target="_blank" class="group bg-zinc-900/40 rounded-xl border border-white/5 p-5 hover:border-emerald-500/50 transition-all hover:bg-zinc-900 flex flex-col relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="w-10 h-10 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center"><iconify-icon icon="solar:routing-2-linear" width="20"></iconify-icon></div>
+                            <span class="text-[10px] font-mono px-2 py-1 bg-zinc-800 text-zinc-400 rounded flex items-center gap-1"><iconify-icon icon="mdi:github"></iconify-icon> GITHUB</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 relative z-10">ResQ AI</h3>
+                        <p class="text-xs text-zinc-400 mb-4 flex-1 relative z-10">ML-driven emergency response orchestration for optimal routing.</p>
+                        <div class="flex gap-2 relative z-10">
+                            <span class="text-[9px] font-mono text-zinc-500 border border-white/10 px-2 py-0.5 rounded">Python</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT MODAL -->
+        <div id="modal-contact" class="modal-panel w-full max-w-lg bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden hidden transform scale-95 opacity-0">
+            <div class="h-1 w-full bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500"></div>
+            <div class="p-8">
+                <div class="flex items-start justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Establish Uplink</h2>
+                        <p class="text-xs text-rose-400 mt-1 uppercase tracking-widest font-mono">Comms Channel</p>
+                    </div>
+                    <button class="close-modal text-zinc-500 hover:text-white transition-colors">
+                        <iconify-icon icon="solar:close-circle-bold" width="28"></iconify-icon>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <a href="mailto:bhatiajaspreet161@gmail.com" class="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-rose-500/50 hover:bg-zinc-900 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors"><iconify-icon icon="solar:letter-linear" width="20"></iconify-icon></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Email</h4>
+                            <p class="text-xs text-zinc-500 font-mono mt-0.5">bhatiajaspreet161@gmail.com</p>
+                        </div>
+                    </a>
+                    <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-zinc-500/50 hover:bg-zinc-900 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-zinc-800 text-zinc-300 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors"><iconify-icon icon="mdi:github" width="22"></iconify-icon></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">GitHub</h4>
+                            <p class="text-xs text-zinc-500 font-mono mt-0.5">Jaspreet-Bhatia-SI</p>
+                        </div>
+                    </a>
+                    <a href="https://linkedin.com/in/jaspreet-bhatia-si" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-blue-500/50 hover:bg-zinc-900 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">LinkedIn</h4>
+                            <p class="text-xs text-zinc-500 font-mono mt-0.5">in/jaspreet-bhatia-si</p>
+                        </div>
+                    </a>
+                    <a href="https://instagram.com/jass_bhatia.si" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-pink-500/50 hover:bg-zinc-900 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-pink-500/10 text-pink-400 flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-colors"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Instagram</h4>
+                            <p class="text-xs text-zinc-500 font-mono mt-0.5">@jass_bhatia.si</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- THREE.JS SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const fogColor = new THREE.Color('#050505');
+        scene.background = fogColor;
+        scene.fog = new THREE.FogExp2(fogColor, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // --- LIGHTING ---
+        const ambientLight = new THREE.HemisphereLight(0x3b82f6, 0x050505, 0.2); // Blueish ambient
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(50, 100, 50);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 200;
+        dirLight.shadow.camera.left = -100;
+        dirLight.shadow.camera.right = 100;
+        dirLight.shadow.camera.top = 100;
+        dirLight.shadow.camera.bottom = -100;
+        scene.add(dirLight);
+
+        // Grid Helper for Cyberpunk feel
+        const gridHelper = new THREE.GridHelper(400, 100, 0x18181b, 0x0a0a0c);
+        gridHelper.position.y = 0.01;
+        scene.add(gridHelper);
+
+        // Floor
+        const planeGeometry = new THREE.PlaneGeometry(500, 500);
+        const planeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x050505,
+            roughness: 0.2,
+            metalness: 0.8
+        });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        const envGroup = new THREE.Group();
+        scene.add(envGroup);
+
+        const zones = [
+            { id: 'about', x: -40, z: -40, color: 0xa855f7, icon: 'solar:user-bold', title: 'IDENTITY' }, // Purple
+            { id: 'skills', x: 40, z: -40, color: 0x3b82f6, icon: 'solar:cpu-bold', title: 'SYSTEMS' }, // Blue
+            { id: 'projects', x: 0, z: 50, color: 0x10b981, icon: 'solar:server-square-bold', title: 'DATASETS' }, // Emerald
+            { id: 'contact', x: 0, z: -70, color: 0xf43f5e, icon: 'solar:letter-bold', title: 'UPLINK' } // Rose
+        ];
+
+        function isSafeZone(x, z) {
+            return zones.some(zone => Math.hypot(x - zone.x, z - zone.z) < 18) || Math.hypot(x, z) < 15; // Include spawn 0,0
+        }
+
+        // Generate Server Towers (Cyberpunk Monoliths)
+        const towerGeo = new THREE.BoxGeometry(1, 1, 1);
+        const matDark = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.4, metalness: 0.8 });
+        
+        for (let i = 0; i < 200; i++) {
+            const x = (Math.random() - 0.5) * 250;
+            const z = (Math.random() - 0.5) * 250;
+
+            if (isSafeZone(x, z)) continue;
+
+            // Align to grid
+            const gridX = Math.round(x / 12) * 12;
+            const gridZ = Math.round(z / 12) * 12;
+            
+            const width = 3 + Math.random() * 4;
+            const depth = 3 + Math.random() * 4;
+            const height = 10 + Math.random() * 40; 
+
+            const towerGroup = new THREE.Group();
+            towerGroup.position.set(gridX, 0, gridZ);
+
+            const tower = new THREE.Mesh(towerGeo, matDark);
+            tower.scale.set(width, height, depth);
+            tower.position.y = height / 2;
+            tower.castShadow = true;
+            tower.receiveShadow = true;
+            towerGroup.add(tower);
+
+            // Add glowing neon strips to some towers
+            if (Math.random() > 0.5) {
+                const stripGeo = new THREE.BoxGeometry(width + 0.1, Math.random() * 20 + 5, 0.1);
+                const colors = [0x3b82f6, 0xa855f7, 0x10b981, 0xef4444];
+                const glowColor = colors[Math.floor(Math.random() * colors.length)];
+                const stripMat = new THREE.MeshBasicMaterial({ color: glowColor, transparent: true, opacity: 0.8 });
+                const strip = new THREE.Mesh(stripGeo, stripMat);
+                strip.position.set(0, height/2, depth/2);
+                towerGroup.add(strip);
+            }
+
+            envGroup.add(towerGroup);
+        }
+
+        // --- CAR SETUP (Cyber Vehicle) ---
+        const carGroup = new THREE.Group();
+
+        // Chassis
+        const chassisGeo = new THREE.BoxGeometry(1.8, 0.5, 3.5);
+        const chassisMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.2, metalness: 0.9 });
+        const carChassis = new THREE.Mesh(chassisGeo, chassisMat);
+        carChassis.position.y = 0.5;
+        carChassis.castShadow = true;
+        carGroup.add(carChassis);
+
+        // Canopy
+        const canopyGeo = new THREE.BoxGeometry(1.4, 0.4, 1.6);
+        const canopyMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.0, metalness: 1.0 });
+        const canopy = new THREE.Mesh(canopyGeo, canopyMat);
+        canopy.position.set(0, 0.9, -0.2);
+        carGroup.add(canopy);
+
+        // Tron Glow Strips
+        const stripGeo = new THREE.BoxGeometry(1.85, 0.05, 3.55);
+        const stripMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 }); // Cyan glow
+        const sideStrips = new THREE.Mesh(stripGeo, stripMat);
+        sideStrips.position.y = 0.3;
+        carGroup.add(sideStrips);
+
+        // Tail lights
+        const tailGeo = new THREE.BoxGeometry(1.4, 0.1, 0.05);
+        const tailMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+        const tailLight = new THREE.Mesh(tailGeo, tailMat);
+        tailLight.position.set(0, 0.6, 1.76);
+        carGroup.add(tailLight);
+        
+        // Headlights
+        const carSpotL = new THREE.SpotLight(0xffffff, 4, 40, 0.4, 0.5, 1);
+        carSpotL.position.set(-0.6, 0.5, -1.7);
+        carSpotL.target.position.set(-0.6, 0, -20);
+        carGroup.add(carSpotL);
+        carGroup.add(carSpotL.target);
+
+        const carSpotR = new THREE.SpotLight(0xffffff, 4, 40, 0.4, 0.5, 1);
+        carSpotR.position.set(0.6, 0.5, -1.7);
+        carSpotR.target.position.set(0.6, 0, -20);
+        carGroup.add(carSpotR);
+        carGroup.add(carSpotR.target);
+
+        // Wheels
+        const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.4, 16);
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.9 });
+        wheelGeo.rotateZ(Math.PI / 2);
+
+        const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.0, 0.35, 1.2);
+        const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.0, 0.35, 1.2);
+        const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.0, 0.35, -1.2);
+        const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.0, 0.35, -1.2);
+        carGroup.add(w1, w2, w3, w4);
+
+        scene.add(carGroup);
+
+        // --- ZONES RENDERING & LABELS ---
+        const labelsContainer = document.getElementById('labels-container');
+
+        zones.forEach(zone => {
+            // Ground Ring
+            const geo = new THREE.RingGeometry(4, 4.5, 32);
+            const mat = new THREE.MeshBasicMaterial({ color: zone.color, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+            const ring = new THREE.Mesh(geo, mat);
+            ring.rotation.x = -Math.PI / 2;
+            ring.position.set(zone.x, 0.1, zone.z);
+            scene.add(ring);
+
+            // Digital Hologram Column
+            const beaconGeo = new THREE.CylinderGeometry(4, 4, 30, 16);
+            const beaconMat = new THREE.MeshBasicMaterial({ color: zone.color, transparent: true, opacity: 0.1, side: THREE.DoubleSide, wireframe: true });
+            const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+            beacon.position.set(zone.x, 15, zone.z);
+            scene.add(beacon);
+
+            const pLight = new THREE.PointLight(zone.color, 2, 20);
+            pLight.position.set(zone.x, 2, zone.z);
+            scene.add(pLight);
+
+            // Create HTML Label
+            const labelDiv = document.createElement('div');
+            labelDiv.id = `label-${zone.id}`;
+            labelDiv.className = 'world-label flex flex-col items-center gap-3 opacity-0';
+            labelDiv.innerHTML = `
+                <div class="relative group">
+                    <div class="absolute -inset-2 rounded-full blur-md animate-pulse" style="background-color: #${zone.color.toString(16)}60"></div>
+                    <div class="w-14 h-14 bg-black border rounded-full flex items-center justify-center relative z-10" style="border-color: #${zone.color.toString(16)}80">
+                        <iconify-icon icon="${zone.icon}" width="24" style="color: #${zone.color.toString(16)}"></iconify-icon>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="bg-black/80 backdrop-blur px-3 py-1.5 rounded border border-white/10">
+                        <div class="text-[10px] font-bold text-white tracking-widest uppercase font-mono">${zone.title}</div>
+                    </div>
+                    <div class="w-0.5 h-10 mx-auto mt-1" style="background: linear-gradient(to bottom, #${zone.color.toString(16)}, transparent)"></div>
+                </div>
+            `;
+            labelsContainer.appendChild(labelDiv);
+        });
+
+        // --- GAME LOGIC ---
+        const state = {
+            speed: 0,
+            angle: Math.PI, 
+            keys: { w: false, a: false, s: false, d: false },
+            activeZone: null,
+            modalOpen: false
+        };
+
+        const ACCELERATION = 0.025;
+        const FRICTION = 0.95;
+        const MAX_SPEED = 0.8;
+        const ROTATION_SPEED = 0.045;
+
+        // UI Refs
+        const alertEl = document.getElementById('proximity-alert');
+        const coordsEl = document.getElementById('coords');
+        const modalContainer = document.getElementById('modal-container');
+
+        window.addEventListener('keydown', (e) => {
+            if (state.modalOpen) {
+                if(e.key === 'Escape') closeModal();
+                return;
+            }
+            const k = e.key.toLowerCase();
+            if (state.keys.hasOwnProperty(k)) state.keys[k] = true;
+            const keyEl = document.getElementById(`key-${k}`);
+            if(keyEl) keyEl.classList.add('pressed');
+
+            if (e.key === 'Enter' && state.activeZone) {
+                openModal(state.activeZone);
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const k = e.key.toLowerCase();
+            if (state.keys.hasOwnProperty(k)) state.keys[k] = false;
+            const keyEl = document.getElementById(`key-${k}`);
+            if(keyEl) keyEl.classList.remove('pressed');
+        });
+
+        const btnMap = { 'btn-gas': 'w', 'btn-brake': 's', 'btn-left': 'a', 'btn-right': 'd' };
+        Object.entries(btnMap).forEach(([btnId, key]) => {
+            const btn = document.getElementById(btnId);
+            if(btn) {
+                const press = (e) => { e.preventDefault(); state.keys[key] = true; };
+                const release = (e) => { e.preventDefault(); state.keys[key] = false; };
+                btn.addEventListener('touchstart', press, {passive: false});
+                btn.addEventListener('touchend', release, {passive: false});
+                btn.addEventListener('mousedown', press);
+                btn.addEventListener('mouseup', release);
+                btn.addEventListener('mouseleave', release);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function updateLabels() {
+            zones.forEach(zone => {
+                const el = document.getElementById(`label-${zone.id}`);
+                if (!el) return;
+
+                const pos = new THREE.Vector3(zone.x, 5, zone.z);
+                pos.project(camera);
+
+                const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (-(pos.y * 0.5) + 0.5) * window.innerHeight;
+
+                const dist = carGroup.position.distanceTo(new THREE.Vector3(zone.x, 0, zone.z));
+                const maxDist = 60;
+
+                if (pos.z < 1 && dist < maxDist) {
+                    el.style.left = `${x}px`;
+                    el.style.top = `${y}px`;
+                    el.classList.remove('opacity-0');
+                    const scale = Math.max(0.6, 1 - dist/maxDist);
+                    el.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                } else {
+                    el.classList.add('opacity-0');
+                }
+            });
+        }
+
+        // --- ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (!state.modalOpen) {
+                // Physics
+                if (state.keys.w) state.speed += ACCELERATION;
+                if (state.keys.s) state.speed -= ACCELERATION;
+                
+                state.speed *= FRICTION;
+                state.speed = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, state.speed));
+
+                // Steering
+                if (Math.abs(state.speed) > 0.01) {
+                    const direction = state.speed > 0 ? 1 : -1;
+                    if (state.keys.a) state.angle += ROTATION_SPEED * direction;
+                    if (state.keys.d) state.angle -= ROTATION_SPEED * direction;
+                }
+
+                // Move Car
+                carGroup.rotation.y = state.angle;
+                carGroup.position.x -= Math.sin(state.angle) * state.speed;
+                carGroup.position.z -= Math.cos(state.angle) * state.speed;
+
+                // Restrict Bounds
+                carGroup.position.x = Math.max(-120, Math.min(120, carGroup.position.x));
+                carGroup.position.z = Math.max(-120, Math.min(120, carGroup.position.z));
+
+                // Chase Camera
+                const idealOffset = new THREE.Vector3(0, 8, 14); // Higher and further back
+                idealOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle);
+                idealOffset.add(carGroup.position);
+
+                camera.position.lerp(idealOffset, 0.1);
+                
+                const lookAtPos = new THREE.Vector3(0, 0, -10);
+                lookAtPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle);
+                lookAtPos.add(carGroup.position);
+                camera.lookAt(lookAtPos);
+            }
+
+            // Proximity Check
+            let nearbyZone = null;
+            zones.forEach(zone => {
+                const dist = Math.hypot(carGroup.position.x - zone.x, carGroup.position.z - zone.z);
+                if (dist < 6) nearbyZone = zone.id;
+            });
+
+            if (nearbyZone !== state.activeZone) {
+                state.activeZone = nearbyZone;
+                if (nearbyZone) {
+                    alertEl.classList.remove('opacity-0', 'scale-90', 'translate-y-4');
+                    alertEl.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                } else {
+                    alertEl.classList.add('opacity-0', 'scale-90', 'translate-y-4');
+                    alertEl.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                }
+            }
+
+            coordsEl.innerText = `LOC: ${Math.round(carGroup.position.x)}, ${Math.round(carGroup.position.z)}`;
+            updateLabels();
+
+            // Rotate wheels
+            if (Math.abs(state.speed) > 0.01) {
+                const wheelRot = state.speed * 0.2;
+                carGroup.children[4].rotation.x += wheelRot;
+                carGroup.children[5].rotation.x += wheelRot;
+                carGroup.children[6].rotation.x += wheelRot;
+                carGroup.children[7].rotation.x += wheelRot;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Modal Handlers
+        function openModal(zoneId) {
+            state.modalOpen = true;
+            state.speed = 0; // stop car
+            
+            // Re-apply friction hard stop
+            state.keys = { w: false, a: false, s: false, d: false };
+            document.querySelectorAll('.key-cap').forEach(el => el.classList.remove('pressed'));
+
+            modalContainer.classList.remove('hidden');
+            
+            document.querySelectorAll('.modal-panel').forEach(p => {
+                p.classList.add('hidden', 'opacity-0', 'scale-95');
+            });
+
+            const panel = document.getElementById(`modal-${zoneId}`);
+            if (panel) {
+                panel.classList.remove('hidden');
+                setTimeout(() => {
+                    panel.classList.remove('opacity-0', 'scale-95');
+                    panel.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            }
+        }
+
+        function closeModal() {
+            const panels = document.querySelectorAll('.modal-panel:not(.hidden)');
+            panels.forEach(p => {
+                p.classList.remove('opacity-100', 'scale-100');
+                p.classList.add('opacity-0', 'scale-95');
+            });
+
+            setTimeout(() => {
+                modalContainer.classList.add('hidden');
+                state.modalOpen = false;
+            }, 300); // Wait for transition
+        }
+
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+
+        // Click on proximity alert also opens modal
+        alertEl.addEventListener('click', () => {
+            if (state.activeZone && !state.modalOpen) {
+                openModal(state.activeZone);
+            }
+        });
+
+        // Start
+        animate();
+
+    </script>
 </body>
 </html>
