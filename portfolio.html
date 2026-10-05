@@ -712,7 +712,7 @@
                 } else if (step.type === 'done_in') {
                     state.mode = 'WALKING'; modeText.innerText = 'SURVIVOR [INDOORS]';
                     state.playerAngle = state.activeBuilding.angle + Math.PI; playerGroup.rotation.y = state.playerAngle;
-                    btnExitHouse.classList.remove('hidden'); camTheta = state.playerAngle; camPhi = Math.PI / 3;
+                    btnExitHouse.classList.remove('hidden'); camTheta = state.playerAngle + Math.PI; camPhi = Math.PI / 3;
                 } else if (step.type === 'done_out') {
                     state.mode = 'DRIVING'; modeText.innerText = 'SURVIVOR [DRIVING]';
                     playerGroup.visible = false; state.activeBuilding = null; camTheta = state.angle; camPhi = Math.PI / 3;
