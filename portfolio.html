@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JBSI | Interactive 3D Town</title>
+    <title>JBSI | Pochinki Survival</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #87CEEB; overflow: hidden; touch-action: none; }
+        body { font-family: 'Inter', sans-serif; background-color: #7b8b70; overflow: hidden; touch-action: none; }
         #canvas-container { width: 100%; height: 100%; display: block; }
         .key-cap { box-shadow: 0 4px 0 #0f172a; transition: all 0.1s; }
         .key-cap:active, .key-cap.pressed { transform: translateY(4px); box-shadow: 0 0 0 #0f172a; }
@@ -21,7 +21,7 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-sky-300 text-slate-300 antialiased h-screen w-screen overflow-hidden">
+<body class="bg-[#7b8b70] text-slate-300 antialiased h-screen w-screen overflow-hidden">
 
     <!-- UI LAYER (Dashboard) -->
     <div class="fixed inset-0 z-50 pointer-events-none flex flex-col justify-between p-4 sm:p-8">
@@ -29,39 +29,38 @@
         <!-- Header -->
         <div class="flex justify-between items-start w-full">
             <div class="flex flex-col gap-1 pointer-events-auto">
-                <div class="flex items-center gap-2 bg-slate-900/80 p-2.5 rounded-lg backdrop-blur border border-white/10 shadow-lg">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <h1 class="text-xs font-bold tracking-widest text-white uppercase font-mono" id="mode-text">JBSI [DRIVING_MODE]</h1>
+                <div class="flex items-center gap-2 bg-[#1c221a]/90 p-2.5 rounded-lg backdrop-blur border border-white/10 shadow-lg">
+                    <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+                    <h1 class="text-xs font-bold tracking-widest text-orange-400 uppercase font-mono" id="mode-text">SURVIVOR [DRIVING]</h1>
                 </div>
-                <div class="text-[10px] text-slate-400 tracking-wider font-mono bg-slate-900/80 px-2 py-1 rounded w-max border border-white/5 mt-1 shadow" id="coords">LOC: 0, 0</div>
+                <div class="text-[10px] text-slate-400 tracking-wider font-mono bg-[#1c221a]/90 px-2 py-1 rounded w-max border border-white/5 mt-1 shadow" id="coords">GRID: 0, 0</div>
             </div>
 
-            <!-- Time Cycle Button (Center Top) -->
-            <button id="btn-time-cycle" class="pointer-events-auto absolute top-6 left-1/2 -translate-x-1/2 bg-slate-900/80 backdrop-blur border border-white/10 px-5 py-2.5 rounded-full shadow-2xl text-white hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95">
+            <!-- Time Cycle Button -->
+            <button id="btn-time-cycle" class="pointer-events-auto absolute top-6 left-1/2 -translate-x-1/2 bg-[#1c221a]/90 backdrop-blur border border-white/10 px-5 py-2.5 rounded-full shadow-2xl text-white hover:bg-[#2c352a] transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95">
                 <iconify-icon id="icon-time" icon="solar:sun-bold" width="20" class="text-amber-400 group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
                 <span class="text-[10px] font-bold tracking-widest uppercase" id="time-text">Day</span>
             </button>
 
             <!-- Controls Hint -->
-            <div class="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
-                <p class="text-[10px] uppercase text-slate-400 tracking-widest mb-2 font-mono font-bold">Movement</p>
+            <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
+                <p class="text-[10px] uppercase text-orange-400/80 tracking-widest mb-2 font-mono font-bold">Movement</p>
                 <div class="flex justify-end gap-1 mb-1">
-                    <div class="w-8 h-8 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-w">W</div>
+                    <div class="w-8 h-8 rounded-lg bg-[#2c352a] border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-w">W</div>
                 </div>
                 <div class="flex justify-end gap-1">
-                    <div class="w-8 h-8 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-a">A</div>
-                    <div class="w-8 h-8 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-s">S</div>
-                    <div class="w-8 h-8 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-d">D</div>
+                    <div class="w-8 h-8 rounded-lg bg-[#2c352a] border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-a">A</div>
+                    <div class="w-8 h-8 rounded-lg bg-[#2c352a] border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-s">S</div>
+                    <div class="w-8 h-8 rounded-lg bg-[#2c352a] border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-d">D</div>
                 </div>
             </div>
         </div>
 
         <!-- Center Action Buttons -->
         <div class="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 pointer-events-none w-full">
-            <!-- Enter Button -->
-            <button id="btn-enter-house" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-white text-slate-900 px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 cursor-pointer">
-                <iconify-icon icon="solar:door-open-linear" width="22" class="text-emerald-600 animate-pulse"></iconify-icon>
-                <span id="enter-text">Enter House</span>
+            <button id="btn-enter-house" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-orange-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(234,88,12,0.4)] hover:bg-orange-500 active:scale-95 cursor-pointer border border-orange-400/50">
+                <iconify-icon icon="solar:door-open-linear" width="22" class="animate-pulse"></iconify-icon>
+                <span id="enter-text">Loot House</span>
             </button>
         </div>
 
@@ -69,28 +68,27 @@
         <div class="flex justify-between items-end w-full pb-4 pointer-events-none">
             <!-- Mobile Controls -->
             <div class="md:hidden flex gap-3 pointer-events-auto">
-                <button id="btn-left" class="w-16 h-16 rounded-full bg-slate-900/90 border border-white/10 active:bg-slate-700 backdrop-blur flex items-center justify-center shadow-xl">
+                <button id="btn-left" class="w-16 h-16 rounded-full bg-[#1c221a]/90 border border-white/10 active:bg-slate-700 backdrop-blur flex items-center justify-center shadow-xl">
                     <iconify-icon icon="solar:alt-arrow-left-linear" width="28" class="text-white"></iconify-icon>
                 </button>
-                <button id="btn-right" class="w-16 h-16 rounded-full bg-slate-900/90 border border-white/10 active:bg-slate-700 backdrop-blur flex items-center justify-center shadow-xl">
+                <button id="btn-right" class="w-16 h-16 rounded-full bg-[#1c221a]/90 border border-white/10 active:bg-slate-700 backdrop-blur flex items-center justify-center shadow-xl">
                     <iconify-icon icon="solar:alt-arrow-right-linear" width="28" class="text-white"></iconify-icon>
                 </button>
             </div>
             
-            <!-- Exit House Button (Visible only when inside) -->
             <div class="pointer-events-auto mx-auto md:mx-0 absolute bottom-8 left-1/2 -translate-x-1/2 md:translate-x-0 md:static">
-                <button id="btn-exit-house" class="hidden bg-rose-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-xl hover:bg-rose-700 transition-colors">
+                <button id="btn-exit-house" class="hidden bg-[#1c221a]/90 border border-white/20 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-xl hover:bg-slate-800 transition-colors">
                     <iconify-icon icon="solar:exit-linear" width="20"></iconify-icon>
-                    Exit to Street
+                    Exit to Village
                 </button>
             </div>
 
             <!-- Mobile Controls Gas/Brake -->
             <div class="md:hidden flex flex-col gap-3 pointer-events-auto">
-                 <button id="btn-gas" class="w-16 h-16 rounded-full bg-slate-900/90 border border-white/10 active:bg-emerald-600 backdrop-blur flex items-center justify-center shadow-xl">
+                 <button id="btn-gas" class="w-16 h-16 rounded-full bg-[#1c221a]/90 border border-white/10 active:bg-orange-600 backdrop-blur flex items-center justify-center shadow-xl">
                     <iconify-icon icon="solar:alt-arrow-up-linear" width="28" class="text-white"></iconify-icon>
                 </button>
-                <button id="btn-brake" class="w-16 h-16 rounded-full bg-slate-900/90 border border-white/10 active:bg-rose-600 backdrop-blur flex items-center justify-center shadow-xl">
+                <button id="btn-brake" class="w-16 h-16 rounded-full bg-[#1c221a]/90 border border-white/10 active:bg-rose-600 backdrop-blur flex items-center justify-center shadow-xl">
                     <iconify-icon icon="solar:alt-arrow-down-linear" width="28" class="text-white"></iconify-icon>
                 </button>
             </div>
@@ -99,30 +97,28 @@
 
     <!-- 3D CANVAS -->
     <div id="canvas-container" class="relative z-0"></div>
-
-    <!-- WORLD LABELS -->
     <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
 
     <!-- DYNAMIC INFO BOARD (INSIDE HOUSE) -->
-    <div id="board-ui" class="board-ui w-[600px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        <div id="board-top-bar" class="h-2 w-full bg-emerald-500 shrink-0"></div>
+    <div id="board-ui" class="board-ui w-[600px] bg-[#1a1c18] border border-[#3e4235] rounded-xl shadow-2xl overflow-hidden flex flex-col">
+        <div id="board-top-bar" class="h-2 w-full bg-orange-500 shrink-0"></div>
         <div class="p-8 pb-4 shrink-0 flex items-start gap-4">
-            <div id="board-icon-bg" class="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-white text-3xl border border-slate-700">
+            <div id="board-icon-bg" class="w-14 h-14 bg-[#2b2e25] rounded-xl flex items-center justify-center text-white text-3xl border border-[#3e4235]">
                 <iconify-icon id="board-icon" icon="solar:box-linear"></iconify-icon>
             </div>
             <div>
                 <h2 id="board-title" class="text-3xl font-bold text-white tracking-tight">Title</h2>
-                <p id="board-subtitle" class="text-xs text-emerald-400 mt-1 uppercase tracking-widest font-mono font-bold">Subtitle</p>
+                <p id="board-subtitle" class="text-xs text-orange-400 mt-1 uppercase tracking-widest font-mono font-bold">Subtitle</p>
             </div>
         </div>
         <div class="p-8 pt-0">
-            <p id="board-desc" class="text-slate-300 leading-relaxed text-sm bg-slate-800/50 p-5 rounded-xl border border-slate-700"></p>
+            <p id="board-desc" class="text-slate-300 leading-relaxed text-sm bg-[#22251e] p-5 rounded border border-[#3e4235] font-mono"></p>
             <div id="board-tech-container" class="mt-6 hidden">
                 <div id="board-tech" class="flex flex-wrap gap-2"></div>
             </div>
             <div class="mt-8">
-                <a id="board-link" href="#" target="_blank" class="hidden w-max px-8 py-4 rounded-xl font-bold text-white shadow-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-3">
-                    <span id="board-link-text">Visit Project</span>
+                <a id="board-link" href="#" target="_blank" class="hidden w-max px-8 py-4 rounded font-bold text-white shadow-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-3">
+                    <span id="board-link-text">Execute Link</span>
                     <iconify-icon icon="solar:alt-arrow-right-linear" width="22"></iconify-icon>
                 </a>
             </div>
@@ -130,98 +126,62 @@
     </div>
 
     <script>
-        // --- DATA ARCHITECTURE ---
+        // --- POCHINKI ARCHITECTURE (Erangel Layout) ---
+        // Tight linear cluster around central road (Z-axis)
         const buildings = [
-            // PROJECTS (North)
-            { id: 'proj-curator', type: 'Project', x: -25, z: 35, tx: -10, tz: 35, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', 
-              desc: 'Autonomous AI media curator using Groq LLMs & DuckDuckGo RAG to generate educational roadmaps and bypass anti-bot systems for media extraction.', 
-              tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
-            { id: 'proj-foodzie', type: 'Project', x: 25, z: 35, tx: 10, tz: 35, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', 
-              desc: 'Massive full-stack E-Commerce ecosystem. Includes a Flutter mobile app, Python backend, PostgreSQL database, and Razorpay payments.', 
-              tech: ['Flutter', 'Python', 'PostgreSQL'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
-            { id: 'proj-stark', type: 'Project', x: -25, z: 65, tx: -10, tz: 65, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', 
-              desc: 'Intelligent desktop voice assistant capable of automating system tasks, fetching live intelligence, and executing natural language commands.', 
-              tech: ['Python', 'NLP', 'Voice Recognition'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
-            { id: 'proj-mltree', type: 'Project', x: 25, z: 65, tx: 10, tz: 65, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', 
-              desc: 'Interactive node-based architecture mapping 150+ machine learning algorithms, bridging theoretical data science and practical application.', 
-              tech: ['D3.js', 'Data Science', 'HTML5'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
-            { id: 'proj-crypto', type: 'Project', x: -25, z: 95, tx: -10, tz: 95, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', 
-              desc: 'Highly secure cryptographic tool for generating unbreakable passwords using entropy algorithms and strict policy enforcements.', 
-              tech: ['Cryptography', 'Security', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
-            { id: 'proj-resq', type: 'Project', x: 25, z: 95, tx: 10, tz: 95, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', 
-              desc: 'Machine learning driven emergency response orchestration platform. Optimizes routing and resource allocation for critical situations in real-time.', 
-              tech: ['Python', 'AI Routing', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
+            { id: 'proj-curator', type: 'Project', x: -25, z: -80, tx: -10, tz: -80, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
+            { id: 'proj-foodzie', type: 'Project', x: 25, z: -70, tx: 10, tz: -70, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', desc: 'E-Commerce ecosystem. Flutter mobile, Python backend, PostgreSQL.', tech: ['Flutter', 'Python', 'Postgres'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
+            { id: 'proj-stark', type: 'Project', x: -25, z: -50, tx: -10, tz: -50, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', desc: 'Desktop voice assistant automating OS tasks.', tech: ['Python', 'NLP'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
+            { id: 'proj-mltree', type: 'Project', x: 25, z: -40, tx: 10, tz: -40, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', desc: 'Interactive node-based architecture mapping ML algorithms.', tech: ['D3.js', 'Data Science'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
+            { id: 'proj-crypto', type: 'Project', x: -25, z: -20, tx: -10, tz: -20, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', desc: 'Cryptographic tool for secure password generation.', tech: ['Cryptography', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
+            { id: 'proj-resq', type: 'Project', x: 25, z: -10, tx: 10, tz: -10, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', desc: 'ML emergency response optimization routing.', tech: ['Python', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
+            
+            { id: 'skill-ai', type: 'Skill Domain', x: -25, z: 20, tx: -10, tz: 20, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', desc: 'Neural networks, LLM pipelines, autonomous agents.', tech: [], link: null },
+            { id: 'skill-backend', type: 'Skill Domain', x: 25, z: 30, tx: 10, tz: 30, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', desc: 'Scalable server-side infrastructure. Python, FastAPI, Node.js.', tech: [], link: null },
+            { id: 'skill-frontend', type: 'Skill Domain', x: -25, z: 50, tx: -10, tz: 50, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', desc: 'React, Next.js, Tailwind, Flutter, WebGL.', tech: [], link: null },
+            { id: 'skill-cloud', type: 'Skill Domain', x: 25, z: 60, tx: 10, tz: 60, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', desc: 'AWS, Docker, CI/CD, Linux.', tech: [], link: null },
 
-            // SKILLS (East)
-            { id: 'skill-ai', type: 'Skill Domain', x: 35, z: -25, tx: 35, tz: -10, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', 
-              desc: 'Deep expertise in building neural networks, LLM pipelines, and autonomous agents.<br><br><b>Stack:</b> TensorFlow, PyTorch, LangChain, RAG Systems, OpenAI & Groq APIs.', 
-              tech: [], link: null },
-            { id: 'skill-backend', type: 'Skill Domain', x: 35, z: 25, tx: 35, tz: 10, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', 
-              desc: 'Architecting scalable, resilient server-side infrastructure and microservices.<br><br><b>Stack:</b> Python, FastAPI, Node.js, Express, REST & GraphQL.', 
-              tech: [], link: null },
-            { id: 'skill-frontend', type: 'Skill Domain', x: 65, z: -25, tx: 65, tz: -10, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', 
-              desc: 'Crafting highly interactive, performant, and beautiful user interfaces across web and mobile.<br><br><b>Stack:</b> React, Next.js, Tailwind CSS, Framer Motion, Flutter, WebGL.', 
-              tech: [], link: null },
-            { id: 'skill-cloud', type: 'Skill Domain', x: 65, z: 25, tx: 65, tz: 10, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', 
-              desc: 'Deploying and maintaining zero-downtime production environments.<br><br><b>Stack:</b> AWS (EC2, S3), Docker, Nginx, CI/CD pipelines, Linux Administration.', 
-              tech: [], link: null },
+            { id: 'contact-email', type: 'Uplink', x: -25, z: 80, tx: -10, tz: 80, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', desc: 'bhatiajaspreet161@gmail.com', tech: [], link: 'mailto:bhatiajaspreet161@gmail.com', linkText: 'Send Email' },
+            { id: 'contact-github', type: 'Uplink', x: 25, z: 90, tx: 10, tz: 90, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', desc: '@Jaspreet-Bhatia-SI', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
+            { id: 'contact-linkedin', type: 'Uplink', x: -25, z: 110, tx: -10, tz: 110, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', desc: 'Connect professionally.', tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect' },
+            { id: 'contact-insta', type: 'Uplink', x: 25, z: 120, tx: 10, tz: 120, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', desc: '@jass_bhatia.si', tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' },
 
-            // HQ (South)
-            { id: 'about-hq', type: 'Headquarters', x: 0, z: -50, tx: 0, tz: -25, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'JBSI Headquarters', 
-              desc: 'Welcome to the core of JBSI.<br><br>I am Jaspreet Bhatia, a Full-Stack AI Engineer & Cloud Architect. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.<br><br>This town is a live WebGL representation of my portfolio. Step inside any building to view the datasets and schemas.', 
-              tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' },
-
-            // CONTACT (West)
-            { id: 'contact-email', type: 'Uplink', x: -35, z: -25, tx: -35, tz: -10, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', 
-              desc: 'Establish a direct communications channel for massive AI infrastructure projects or intelligent web applications.<br><br><b>bhatiajaspreet161@gmail.com</b>', 
-              tech: [], link: 'mailto:bhatiajaspreet161@gmail.com', linkText: 'Send Transmission' },
-            { id: 'contact-github', type: 'Uplink', x: -35, z: 25, tx: -35, tz: 10, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', 
-              desc: 'Access all open-source repositories, system architectures, and neural networking datasets.<br><br><b>@Jaspreet-Bhatia-SI</b>', 
-              tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
-            { id: 'contact-linkedin', type: 'Uplink', x: -65, z: -25, tx: -65, tz: -10, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', 
-              desc: 'Connect with me on the professional network to track career updates and technical posts.', 
-              tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect Now' },
-            { id: 'contact-insta', type: 'Uplink', x: -65, z: 25, tx: -65, tz: 10, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', 
-              desc: 'Behind the scenes of JBSI, hardware setups, and day-to-day operations.<br><br><b>@jass_bhatia.si</b>', 
-              tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' }
+            // POCHINKI CHURCH
+            { id: 'about-hq', type: 'Safehouse', x: -60, z: -20, tx: -45, tz: -20, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'The Church (HQ)', desc: 'Welcome to the core safehouse of JBSI. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' }
         ];
 
         // --- STATE MACHINE ---
         const state = {
-            mode: 'DRIVING', 
-            speed: 0,
-            angle: Math.PI, 
+            mode: 'DRIVING', speed: 0, angle: Math.PI, 
             keys: { w: false, a: false, s: false, d: false },
-            activeBuilding: null,
-            playerAngle: 0,
-            targetTimeMode: null
+            activeBuilding: null, playerAngle: 0, targetTimeMode: null
         };
 
-        // --- TIME CYCLES (Day / Evening / Night) ---
+        // --- SURVIVAL TIME CYCLES (Desaturated/Gritty) ---
         const timeModes = [
             { 
                 name: 'Day', icon: 'solar:sun-bold', iconColor: 'text-amber-400',
-                sky: '#87CEEB', ambient: 0.8, 
-                sunColor: 0xfff5b6, sunY: 200, sunIntensity: 1.2,
+                sky: '#7b8b70', ambient: 0.9, // Desaturated greenish/grey sky
+                sunColor: 0xfffae6, sunY: 150, sunIntensity: 1.2,
                 moonIntensity: 0, starsOpacity: 0,
-                groundColor: 0x4ade80, buildingLight: 0, carHeadlights: 0,
-                cloudTint: 0xffffff
+                groundColor: 0x5a634a, buildingLight: 0, carHeadlights: 0,
+                cloudTint: 0xdce2d5
             },
             { 
                 name: 'Evening', icon: 'solar:sunset-bold', iconColor: 'text-rose-400',
-                sky: '#f472b6', ambient: 0.5, // Pinkish sky
-                sunColor: 0xea580c, sunY: 40, sunIntensity: 0.9, // Orange setting sun
+                sky: '#b08166', ambient: 0.6, // Gritty orange/brown sunset
+                sunColor: 0xea580c, sunY: 30, sunIntensity: 1.0, 
                 moonIntensity: 0, starsOpacity: 0.2,
-                groundColor: 0x15803d, buildingLight: 0.5, carHeadlights: 2,
-                cloudTint: 0xffe4e6 // Rose tint
+                groundColor: 0x4a4a35, buildingLight: 0.5, carHeadlights: 3,
+                cloudTint: 0xe0a98b 
             },
             { 
                 name: 'Night', icon: 'solar:moon-bold', iconColor: 'text-blue-300',
-                sky: '#0f172a', ambient: 0.15,
+                sky: '#0a0f12', ambient: 0.2, // Pitch black/deep blue
                 sunColor: 0x000000, sunY: -50, sunIntensity: 0,
-                moonIntensity: 0.8, starsOpacity: 1,
-                groundColor: 0x064e3b, buildingLight: 2.0, carHeadlights: 5,
-                cloudTint: 0x334155 // Dark slate clouds
+                moonIntensity: 0.7, starsOpacity: 1,
+                groundColor: 0x111612, buildingLight: 2.0, carHeadlights: 8,
+                cloudTint: 0x222a30 
             }
         ];
         let currentModeIdx = 0;
@@ -230,7 +190,7 @@
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(timeModes[0].sky);
-        scene.fog = new THREE.FogExp2(timeModes[0].sky, 0.006);
+        scene.fog = new THREE.FogExp2(timeModes[0].sky, 0.007);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -256,42 +216,32 @@
         dirLight.shadow.camera.bottom = -200;
         scene.add(dirLight);
 
-        // --- CELESTIAL BODIES (Sun, Moon, Stars, Clouds) ---
-        // Sun
-        const sunMat = new THREE.MeshBasicMaterial({ color: timeModes[0].sunColor });
-        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), sunMat);
+        // --- CELESTIAL ---
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshBasicMaterial({ color: timeModes[0].sunColor }));
         sun.position.set(150, timeModes[0].sunY, 100);
         scene.add(sun);
 
-        // Moon
-        const moonMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
-        const moon = new THREE.Mesh(new THREE.SphereGeometry(12, 32, 32), moonMat);
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(12, 32, 32), new THREE.MeshBasicMaterial({ color: 0xe2e8f0 }));
         moon.position.set(-150, 150, -100);
         moon.visible = false;
         scene.add(moon);
-        
         const moonLight = new THREE.DirectionalLight(0x94a3b8, 0); 
         moonLight.position.copy(moon.position);
         moonLight.castShadow = true;
         scene.add(moonLight);
 
-        // Stars
         const starsGeo = new THREE.BufferGeometry();
         const starsCount = 1200;
         const posArray = new Float32Array(starsCount * 3);
-        for(let i = 0; i < starsCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 800; 
-        }
+        for(let i = 0; i < starsCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 800; 
         starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const starsMat = new THREE.PointsMaterial({ size: 1.5, color: 0xffffff, transparent: true, opacity: 0 });
-        const stars = new THREE.Points(starsGeo, starsMat);
+        const stars = new THREE.Points(starsGeo, new THREE.PointsMaterial({ size: 1.5, color: 0xffffff, transparent: true, opacity: 0 }));
         scene.add(stars);
 
-        // Clouds (Physical Fluffy Clouds for Pink Evening effect)
         const cloudsGroup = new THREE.Group();
         const cloudGeo = new THREE.SphereGeometry(1, 16, 16);
-        const cloudMaterials = []; // Keep track to tint them
-        for(let i=0; i<35; i++) {
+        const cloudMaterials = []; 
+        for(let i=0; i<30; i++) {
             const cloud = new THREE.Group();
             const chunks = 4 + Math.floor(Math.random()*4);
             const cMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -308,50 +258,44 @@
         }
         scene.add(cloudsGroup);
 
-        // --- ENVIRONMENT ---
+        // --- POCHINKI ENVIRONMENT ---
         const envGroup = new THREE.Group();
         scene.add(envGroup);
 
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({ color: timeModes[0].groundColor, roughness: 1.0 })); 
+        // Ground Terrain
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ color: timeModes[0].groundColor, roughness: 1.0 })); 
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
 
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 }); 
-        function createRoad(w, h, x, z) {
-            const road = new THREE.Mesh(new THREE.PlaneGeometry(w, h), roadMat);
-            road.rotation.x = -Math.PI / 2;
-            road.position.set(x, 0.05, z);
-            road.receiveShadow = true;
-            envGroup.add(road);
-        }
-        function createDashedLine(isHorizontal, length, xStart, zStart) {
-            const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); 
-            const count = Math.floor(length / 4);
-            for(let i=0; i<count; i++) {
-                const dash = new THREE.Mesh(new THREE.PlaneGeometry(isHorizontal ? 2 : 0.2, isHorizontal ? 0.2 : 2), dashMat);
-                dash.rotation.x = -Math.PI / 2;
-                dash.position.set(isHorizontal ? xStart + (i * 4) : xStart, 0.08, isHorizontal ? zStart : zStart + (i * 4));
-                envGroup.add(dash);
-            }
-        }
+        // Main Central Road (Asphalt)
+        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3d3d3d, roughness: 0.9 }); 
+        const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, 400), roadMat);
+        mainRoad.rotation.x = -Math.PI / 2;
+        mainRoad.position.set(0, 0.05, 0);
+        mainRoad.receiveShadow = true;
+        envGroup.add(mainRoad);
 
-        createRoad(24, 24, 0, 0);
-        createRoad(16, 140, 0, 70); createDashedLine(false, 140, 0, 12);
-        createRoad(16, 100, 0, -50); createDashedLine(false, 100, 0, -100);
-        createRoad(140, 16, 70, 0); createDashedLine(true, 140, 12, 0);
-        createRoad(140, 16, -70, 0); createDashedLine(true, 140, -140, 0);
+        // Dirt path to church
+        const dirtMat = new THREE.MeshStandardMaterial({ color: 0x594a36, roughness: 1.0 });
+        const dirtPath = new THREE.Mesh(new THREE.PlaneGeometry(45, 8), dirtMat);
+        dirtPath.rotation.x = -Math.PI / 2;
+        dirtPath.position.set(-22.5, 0.06, -20);
+        dirtPath.receiveShadow = true;
+        envGroup.add(dirtPath);
 
-        // --- HOUSES WITH INTERIORS ---
-        const wallColors = [0xf8fafc, 0xfef3c7, 0xe2e8f0, 0xffedd5, 0xfff1f2];
-        const roofColors = [0x1e293b, 0x451a03, 0x7c2d12, 0x334155];
+        // --- POCHINKI ARCHITECTURE ---
+        const wallColors = [0x9ea191, 0xbdad93, 0x8f7863, 0xa4a79b, 0x766c5a]; // Dirty greys, tans, browns
+        const roofColors = [0x78352b, 0x3b3a39, 0x4a3b32, 0x612d26]; // Terracotta red, dark grey, brown
 
         buildings.forEach(b => {
             const isHQ = b.id === 'about-hq';
-            const w = isHQ ? 20 : 14;
-            const d = isHQ ? 20 : 14;
-            const h = isHQ ? 12 : 7;
-            const t = 0.5; // wall thickness
+            const w = isHQ ? 18 : 12;
+            const d = isHQ ? 24 : 14;
+            // Some houses are 2 stories
+            const isTwoStory = Math.random() > 0.5 && !isHQ;
+            const h = isHQ ? 16 : (isTwoStory ? 12 : 7);
+            const t = 0.5; 
 
             const houseGroup = new THREE.Group();
             houseGroup.position.set(b.x, 0, b.z);
@@ -359,171 +303,210 @@
             b.angle = Math.atan2(b.tx - b.x, b.tz - b.z);
             houseGroup.rotation.y = b.angle;
 
-            const houseColor = isHQ ? 0x0f172a : wallColors[Math.floor(Math.random() * wallColors.length)];
-            const wallMat = new THREE.MeshStandardMaterial({ color: houseColor, roughness: 0.9, side: THREE.DoubleSide }); 
-            const interiorFloorMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.8 }); 
-
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d), interiorFloorMat);
-            floor.rotation.x = -Math.PI / 2;
-            floor.position.y = 0.1;
-            floor.receiveShadow = true;
+            const houseColor = isHQ ? 0x8a7a69 : wallColors[Math.floor(Math.random() * wallColors.length)];
+            const wallMat = new THREE.MeshStandardMaterial({ color: houseColor, roughness: 1.0, side: THREE.DoubleSide }); 
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: 0x555555 }));
+            floor.rotation.x = -Math.PI / 2; floor.position.y = 0.1; floor.receiveShadow = true;
             houseGroup.add(floor);
 
             const backWall = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), wallMat);
-            backWall.position.set(0, h/2, -d/2);
-            backWall.castShadow = true; backWall.receiveShadow = true;
+            backWall.position.set(0, h/2, -d/2); backWall.castShadow = true; backWall.receiveShadow = true;
             houseGroup.add(backWall);
 
             const leftWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat);
-            leftWall.position.set(-w/2, h/2, 0);
-            leftWall.castShadow = true; leftWall.receiveShadow = true;
+            leftWall.position.set(-w/2, h/2, 0); leftWall.castShadow = true; leftWall.receiveShadow = true;
             const rightWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat);
-            rightWall.position.set(w/2, h/2, 0);
-            rightWall.castShadow = true; rightWall.receiveShadow = true;
+            rightWall.position.set(w/2, h/2, 0); rightWall.castShadow = true; rightWall.receiveShadow = true;
             houseGroup.add(leftWall, rightWall);
 
             const doorW = 3, doorH = 5;
             const sideW = (w - doorW) / 2;
             const frontLeft = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat);
-            frontLeft.position.set(-w/2 + sideW/2, h/2, d/2);
-            frontLeft.castShadow = true; frontLeft.receiveShadow = true;
-            
+            frontLeft.position.set(-w/2 + sideW/2, h/2, d/2); frontLeft.castShadow = true; frontLeft.receiveShadow = true;
             const frontRight = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat);
-            frontRight.position.set(w/2 - sideW/2, h/2, d/2);
-            frontRight.castShadow = true; frontRight.receiveShadow = true;
-            
+            frontRight.position.set(w/2 - sideW/2, h/2, d/2); frontRight.castShadow = true; frontRight.receiveShadow = true;
             const frontTop = new THREE.Mesh(new THREE.BoxGeometry(doorW, h - doorH, t), wallMat);
-            frontTop.position.set(0, doorH + (h - doorH)/2, d/2);
-            frontTop.castShadow = true; frontTop.receiveShadow = true;
+            frontTop.position.set(0, doorH + (h - doorH)/2, d/2); frontTop.castShadow = true; frontTop.receiveShadow = true;
             houseGroup.add(frontLeft, frontRight, frontTop);
 
-            const winMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.1, metalness: 0.9 });
-            const winL = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 2, t+0.1), winMat);
+            // Broken looking windows
+            const winMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 });
+            const winL = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.5, 2, t+0.1), winMat);
             winL.position.set(-w/2 + sideW/2, h/2, d/2);
-            const winR = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 2, t+0.1), winMat);
+            const winR = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.5, 2, t+0.1), winMat);
             winR.position.set(w/2 - sideW/2, h/2, d/2);
             houseGroup.add(winL, winR);
 
+            // Door
             const hinge = new THREE.Group();
             hinge.position.set(-doorW/2, 0, d/2);
-            const doorMat = new THREE.MeshStandardMaterial({ color: 0x451a03 }); 
-            const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.2), doorMat);
-            door.position.set(doorW/2, doorH/2, 0); 
-            door.castShadow = true;
+            const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.2), new THREE.MeshStandardMaterial({ color: 0x3d2b1f }));
+            door.position.set(doorW/2, doorH/2, 0); door.castShadow = true;
             hinge.add(door);
             houseGroup.add(hinge);
             b.doorHinge = hinge;
 
-            const roofH = isHQ ? 6 : 4;
-            const rColor = isHQ ? 0x020617 : roofColors[Math.floor(Math.random() * roofColors.length)];
-            const roofMat = new THREE.MeshStandardMaterial({ color: rColor, roughness: 0.9 }); 
-            const roof = new THREE.Mesh(new THREE.ConeGeometry(w*0.8, roofH, 4), roofMat);
+            // Roof (Gabled/Pyramid style)
+            const roofH = isHQ ? 8 : 4;
+            const rColor = isHQ ? 0x3e3e3e : roofColors[Math.floor(Math.random() * roofColors.length)];
+            const roofMat = new THREE.MeshStandardMaterial({ color: rColor, roughness: 1.0 }); 
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*0.7, roofH, 4), roofMat);
             roof.position.set(0, h + roofH/2, 0);
             roof.rotation.y = Math.PI / 4;
             roof.castShadow = true;
             houseGroup.add(roof);
 
-            const boardGeo = new THREE.PlaneGeometry(8, 4.5);
-            const boardMat = new THREE.MeshBasicMaterial({ color: 0x000000 }); 
-            const board = new THREE.Mesh(boardGeo, boardMat);
+            // Church Tower
+            if (isHQ) {
+                const tower = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 6), wallMat);
+                tower.position.set(w/2 + 2, 12, d/2 - 2);
+                tower.castShadow = true; tower.receiveShadow = true;
+                houseGroup.add(tower);
+                const tRoof = new THREE.Mesh(new THREE.ConeGeometry(5, 8, 4), roofMat);
+                tRoof.position.set(w/2 + 2, 28, d/2 - 2);
+                tRoof.rotation.y = Math.PI/4; tRoof.castShadow = true;
+                houseGroup.add(tRoof);
+            }
+
+            // Interior Board
+            const board = new THREE.Mesh(new THREE.PlaneGeometry(8, 4.5), new THREE.MeshBasicMaterial({ color: 0x000000 }));
             board.position.set(0, 4, -d/2 + t + 0.05); 
             houseGroup.add(board);
             b.board = board; 
 
-            // Inner House Lights (Visible at night)
-            const hLight = new THREE.PointLight(b.color, 0, 20);
+            // Inner Light
+            const hLight = new THREE.PointLight(0xffa500, 0, 25);
             hLight.position.set(0, h/2, 0);
             houseGroup.add(hLight);
             b.interiorLight = hLight;
 
             envGroup.add(houseGroup);
 
-            // Driveway Trigger
-            const ringGeo = new THREE.RingGeometry(3, 4, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: b.color, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = -Math.PI / 2;
-            ring.position.set(b.tx, 0.1, b.tz);
+            // Loot Trigger Ring
+            const ring = new THREE.Mesh(new THREE.RingGeometry(2, 3, 32), new THREE.MeshBasicMaterial({ color: 0xea580c, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
+            ring.rotation.x = -Math.PI / 2; ring.position.set(b.tx, 0.1, b.tz);
             scene.add(ring);
-
             b.mesh = houseGroup; 
         });
 
-        // --- DECORATIONS (Trees) ---
-        const treeGeo = new THREE.ConeGeometry(1.5, 5, 8);
-        const treeMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.9 }); 
-        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.3, 1.5);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x78350f }); 
+        // --- PROPS (Fences, Hay Bales, Pine Trees) ---
+        // Wooden Fences generator
+        const fenceMat = new THREE.MeshStandardMaterial({ color: 0x4a3b2c, roughness: 1.0 });
+        function createFence(x, z, length, isHorizontal) {
+            const count = Math.floor(length / 2);
+            for(let i=0; i<count; i++) {
+                const post = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.5, 0.2), fenceMat);
+                const p1 = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.2, 0.1), fenceMat);
+                const p2 = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.2, 0.1), fenceMat);
+                const fx = isHorizontal ? x + (i*2) : x;
+                const fz = isHorizontal ? z : z + (i*2);
+                post.position.set(fx, 0.75, fz); post.castShadow = true;
+                p1.position.set(isHorizontal ? fx+1 : fx, 1.1, isHorizontal ? fz : fz+1); p1.castShadow = true;
+                p2.position.set(isHorizontal ? fx+1 : fx, 0.5, isHorizontal ? fz : fz+1); p2.castShadow = true;
+                if(!isHorizontal) { p1.rotation.y = Math.PI/2; p2.rotation.y = Math.PI/2; }
+                envGroup.add(post, p1, p2);
+            }
+        }
+        createFence(-15, -90, 40, false);
+        createFence(15, -90, 40, false);
+        createFence(-15, 10, 40, false);
+        createFence(15, 10, 40, false);
 
-        for(let i=0; i<400; i++) {
-            const x = (Math.random() - 0.5) * 400;
-            const z = (Math.random() - 0.5) * 400;
-            if(Math.abs(x) < 20 || Math.abs(z) < 20) continue; 
+        // Hay Bales
+        const hayMat = new THREE.MeshStandardMaterial({ color: 0xcfb53b, roughness: 1.0 });
+        const hayGeo = new THREE.CylinderGeometry(1.2, 1.2, 2.5, 8);
+        hayGeo.rotateZ(Math.PI/2);
+        for(let i=0; i<40; i++) {
+            const h = new THREE.Mesh(hayGeo, hayMat);
+            h.position.set((Math.random()-0.5)*200, 1.2, (Math.random()-0.5)*250);
+            if (Math.abs(h.position.x) > 12) {
+                h.rotation.y = Math.random() * Math.PI;
+                h.castShadow = true;
+                envGroup.add(h);
+            }
+        }
+
+        // Pine Trees
+        const treeGeo = new THREE.ConeGeometry(2, 9, 7);
+        const treeMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 1.0 }); 
+        const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 3);
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f }); 
+        for(let i=0; i<300; i++) {
+            const x = (Math.random() - 0.5) * 500;
+            const z = (Math.random() - 0.5) * 500;
+            if(Math.abs(x) < 15) continue; 
             let tooClose = false;
-            buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 15) tooClose = true; });
+            buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 12) tooClose = true; });
             if(tooClose) continue;
 
             const treeGrp = new THREE.Group();
             treeGrp.position.set(x, 0, z);
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-            trunk.position.y = 0.75; trunk.castShadow = true;
+            trunk.position.y = 1.5; trunk.castShadow = true;
             treeGrp.add(trunk);
             const leaves = new THREE.Mesh(treeGeo, treeMat);
-            leaves.position.y = 3.5; leaves.castShadow = true;
+            leaves.position.y = 6; leaves.castShadow = true;
             treeGrp.add(leaves);
             envGroup.add(treeGrp);
         }
 
-        // --- CAR SETUP ---
+        // --- UAZ VEHICLE (PUBG Jeep) ---
         const carGroup = new THREE.Group();
-        const chassisMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3, metalness: 0.6 }); 
-        const carChassis = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.6, 3.6), chassisMat);
-        carChassis.position.y = 0.6; carChassis.castShadow = true;
+        const chassisMat = new THREE.MeshStandardMaterial({ color: 0x3b4d28, roughness: 0.9, metalness: 0.2 }); // Olive Green
+        const carChassis = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 4.4), chassisMat);
+        carChassis.position.y = 1.0; carChassis.castShadow = true;
         carGroup.add(carChassis);
 
-        const canopyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 });
-        const canopy = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 1.8), canopyMat);
-        canopy.position.set(0, 1.1, -0.2);
-        carGroup.add(canopy);
+        // Open top roll cage / windshield
+        const frameMat = new THREE.MeshStandardMaterial({color: 0x111111});
+        const windshield = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.0, 0.1), frameMat);
+        windshield.position.set(0, 2.1, -0.6);
+        carGroup.add(windshield);
+        const rollbar1 = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.1, 0.1), frameMat);
+        rollbar1.position.set(0, 2.6, 1.8);
+        const rollbar2 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 2.5), frameMat);
+        rollbar2.position.set(-0.95, 2.6, 0.6);
+        const rollbar3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 2.5), frameMat);
+        rollbar3.position.set(0.95, 2.6, 0.6);
+        carGroup.add(rollbar1, rollbar2, rollbar3);
 
         // Headlights
-        let hlSpotL = new THREE.SpotLight(0xffffff, 0, 50, 0.4, 0.5, 1);
-        hlSpotL.position.set(-0.6, 0.6, -1.8);
-        hlSpotL.target.position.set(-0.6, 0, -20);
+        let hlSpotL = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1);
+        hlSpotL.position.set(-0.8, 1.0, -2.2); hlSpotL.target.position.set(-0.8, 0, -30);
         carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
-
-        let hlSpotR = new THREE.SpotLight(0xffffff, 0, 50, 0.4, 0.5, 1);
-        hlSpotR.position.set(0.6, 0.6, -1.8);
-        hlSpotR.target.position.set(0.6, 0, -20);
+        let hlSpotR = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1);
+        hlSpotR.position.set(0.8, 1.0, -2.2); hlSpotR.target.position.set(0.8, 0, -30);
         carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
 
-        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
-        const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16); wheelGeo.rotateZ(Math.PI / 2);
-        const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.0, 0.4, 1.2);
-        const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.0, 0.4, 1.2);
-        const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.0, 0.4, -1.2);
-        const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.0, 0.4, -1.2);
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 1.0 });
+        const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 16); wheelGeo.rotateZ(Math.PI / 2);
+        const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.2, 0.5, 1.4); w1.castShadow = true;
+        const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.2, 0.5, 1.4); w2.castShadow = true;
+        const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.2, 0.5, -1.4); w3.castShadow = true;
+        const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.2, 0.5, -1.4); w4.castShadow = true;
         carGroup.add(w1, w2, w3, w4);
         scene.add(carGroup);
 
-        // --- PLAYER CHARACTER (For Walking Inside) ---
+        // --- PLAYER CHARACTER (Survivor) ---
         const playerGroup = new THREE.Group();
-        const pBodyMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.8 }); // Blue suit
-        const pBody = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16), pBodyMat);
-        pBody.position.y = 0.75; pBody.castShadow = true;
-        const pHeadMat = new THREE.MeshStandardMaterial({ color: 0xfcbda1, roughness: 0.6 }); // Skin
-        const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), pHeadMat);
-        pHead.position.y = 1.9; pHead.castShadow = true;
-        playerGroup.add(pBody, pHead);
+        const pLegs = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.4), new THREE.MeshStandardMaterial({color: 0x3b3c36})); // Cargo pants
+        pLegs.position.y = 0.45; pLegs.castShadow = true;
+        const pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.1, 0.5), new THREE.MeshStandardMaterial({color: 0xcccccc})); // Dirty white shirt
+        pTorso.position.y = 1.45; pTorso.castShadow = true;
+        const pPack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.4), new THREE.MeshStandardMaterial({color: 0x222222})); // Level 2 Backpack
+        pPack.position.set(0, 1.45, 0.45); pPack.castShadow = true;
+        const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({color: 0xfcbda1})); // Skin
+        pHead.position.y = 2.2; pHead.castShadow = true;
+        playerGroup.add(pLegs, pTorso, pPack, pHead);
         scene.add(playerGroup);
         playerGroup.visible = false; 
 
-        // --- LABELS (HTML Overlays) ---
+        // --- LABELS ---
         const labelsContainer = document.getElementById('labels-container');
         buildings.forEach(b => {
             const div = document.createElement('div');
             div.className = 'house-label flex flex-col items-center gap-1';
-            div.innerHTML = `<div class="bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border-b-4" style="border-color: #${b.color.toString(16)}">${b.title}</div>`;
+            div.innerHTML = `<div class="bg-[#1c221a]/90 text-orange-400 text-[10px] font-mono font-bold px-2 py-1 rounded shadow-xl border border-[#3e4235]">${b.title}</div>`;
             labelsContainer.appendChild(div);
             b.labelEl = div;
         });
@@ -532,13 +515,10 @@
         document.getElementById('btn-time-cycle').addEventListener('click', () => {
             currentModeIdx = (currentModeIdx + 1) % 3;
             const target = timeModes[currentModeIdx];
-            
             const iconEl = document.getElementById('icon-time');
             iconEl.setAttribute('icon', target.icon);
-            // Reset color classes
             iconEl.className = `transition-transform duration-500 ${target.iconColor}`;
             document.getElementById('time-text').innerText = target.name;
-
             state.targetTimeMode = target;
         });
 
@@ -548,13 +528,12 @@
         const boardUI = document.getElementById('board-ui');
         const modeText = document.getElementById('mode-text');
         
-        let transSeq = [];
-        let transIdx = 0;
+        let transSeq = []; let transIdx = 0;
 
         function beginEnterHouse() {
             if(!state.activeBuilding || state.mode !== 'DRIVING') return;
             state.mode = 'TRANSITION';
-            modeText.innerText = 'JBSI [ENTERING]';
+            modeText.innerText = 'SURVIVOR [LOOTING]';
             btnEnterHouse.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
             btnEnterHouse.classList.add('opacity-0', 'scale-90', 'translate-y-4');
             
@@ -563,7 +542,7 @@
             playerGroup.position.x += 2; 
             playerGroup.visible = true;
 
-            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 9, 0, b.z + Math.cos(b.angle) * 9 );
+            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 8, 0, b.z + Math.cos(b.angle) * 8 );
             const insideWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 2, 0, b.z + Math.cos(b.angle) * 2 );
 
             transSeq = [
@@ -578,12 +557,12 @@
         function beginExitHouse() {
             if(state.mode !== 'WALKING') return;
             state.mode = 'TRANSITION';
-            modeText.innerText = 'JBSI [EXITING]';
+            modeText.innerText = 'SURVIVOR [EXITING]';
             btnExitHouse.classList.add('hidden');
             boardUI.classList.remove('active');
             
             const b = state.activeBuilding;
-            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 9, 0, b.z + Math.cos(b.angle) * 9 );
+            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 8, 0, b.z + Math.cos(b.angle) * 8 );
             const carWorldPos = new THREE.Vector3().copy(carGroup.position); carWorldPos.x += 2;
 
             transSeq = [
@@ -596,40 +575,33 @@
         }
 
         function populateBoardUI(b) {
-            document.getElementById('board-top-bar').style.backgroundColor = `#${b.color.toString(16)}`;
             document.getElementById('board-icon').setAttribute('icon', b.icon);
-            document.getElementById('board-icon').style.color = `#${b.color.toString(16)}`;
             document.getElementById('board-title').innerText = b.title;
             document.getElementById('board-subtitle').innerText = b.type;
-            document.getElementById('board-subtitle').style.color = `#${b.color.toString(16)}`;
             document.getElementById('board-desc').innerHTML = b.desc;
 
             const techCont = document.getElementById('board-tech-container');
             const techWrapper = document.getElementById('board-tech');
             if(b.tech && b.tech.length > 0) {
                 techCont.classList.remove('hidden');
-                techWrapper.innerHTML = b.tech.map(t => `<span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono font-bold text-slate-300">${t}</span>`).join('');
+                techWrapper.innerHTML = b.tech.map(t => `<span class="px-2 py-1 bg-[#2c352a] text-orange-300 text-xs font-mono font-bold border border-[#4a5d23]">${t}</span>`).join('');
             } else { techCont.classList.add('hidden'); }
 
             const linkEl = document.getElementById('board-link');
             if(b.link) {
                 linkEl.href = b.link;
                 document.getElementById('board-link-text').innerText = b.linkText;
-                linkEl.style.backgroundColor = `#${b.color.toString(16)}`;
+                linkEl.style.backgroundColor = `#ea580c`;
                 linkEl.classList.remove('hidden');
             } else { linkEl.classList.add('hidden'); }
         }
 
-        // --- INPUTS ---
         window.addEventListener('keydown', (e) => {
             const k = e.key.toLowerCase();
             if (state.keys.hasOwnProperty(k)) state.keys[k] = true;
             const keyEl = document.getElementById(`key-${k}`);
             if(keyEl) keyEl.classList.add('pressed');
-
-            if (e.key === 'Enter') {
-                if (state.mode === 'DRIVING' && state.activeBuilding) beginEnterHouse();
-            }
+            if (e.key === 'Enter' && state.mode === 'DRIVING' && state.activeBuilding) beginEnterHouse();
         });
 
         window.addEventListener('keyup', (e) => {
@@ -667,31 +639,28 @@
                 buildings.forEach(b => b.labelEl.style.opacity = '0');
                 return;
             }
-
             buildings.forEach(b => {
-                const pos = new THREE.Vector3(b.x, 8, b.z); 
+                const pos = new THREE.Vector3(b.x, 12, b.z); 
                 const dist = carGroup.position.distanceTo(new THREE.Vector3(b.x, 0, b.z));
-                if(dist > 50) { b.labelEl.style.opacity = '0'; b.labelEl.style.transform = `translate(-50%, -50%) scale(0.8)`; return; }
+                if(dist > 60) { b.labelEl.style.opacity = '0'; return; }
                 pos.project(camera);
                 if (pos.z < 1) {
                     b.labelEl.style.left = `${(pos.x * 0.5 + 0.5) * window.innerWidth}px`;
                     b.labelEl.style.top = `${(-(pos.y * 0.5) + 0.5) * window.innerHeight}px`;
                     b.labelEl.style.opacity = '1';
-                    b.labelEl.style.transform = `translate(-50%, -50%) scale(${Math.max(0.7, 1 - dist/50)})`;
+                    b.labelEl.style.transform = `translate(-50%, -50%) scale(${Math.max(0.6, 1 - dist/60)})`;
                 } else { b.labelEl.style.opacity = '0'; }
             });
         }
 
-        // --- ANIMATION LOOP ---
         const ACCELERATION = 0.025;
         const FRICTION = 0.95;
-        const MAX_SPEED = 0.9;
+        const MAX_SPEED = 0.8;
         const ROTATION_SPEED = 0.05;
 
         function animate() {
             requestAnimationFrame(animate);
 
-            // Handle Time of Day Transitions
             if (state.targetTimeMode) {
                 const t = state.targetTimeMode;
                 const lerpSpd = 0.02;
@@ -714,9 +683,7 @@
                 if (t.moonIntensity <= 0.05 && moon.visible) moon.visible = false;
                 
                 stars.material.opacity += (t.starsOpacity - stars.material.opacity) * lerpSpd;
-
                 ground.material.color.lerp(new THREE.Color(t.groundColor), lerpSpd);
-
                 cloudMaterials.forEach(m => m.color.lerp(new THREE.Color(t.cloudTint), lerpSpd));
 
                 buildings.forEach(b => {
@@ -726,7 +693,6 @@
                 hlSpotL.intensity += (t.carHeadlights - hlSpotL.intensity) * lerpSpd;
                 hlSpotR.intensity += (t.carHeadlights - hlSpotR.intensity) * lerpSpd;
             }
-
 
             if (state.mode === 'DRIVING') {
                 if (state.keys.w) state.speed += ACCELERATION;
@@ -745,13 +711,12 @@
                 let nextX = carGroup.position.x - Math.sin(state.angle) * state.speed;
                 let nextZ = carGroup.position.z - Math.cos(state.angle) * state.speed;
 
-                // Restrict Bounds
-                nextX = Math.max(-180, Math.min(180, nextX));
-                nextZ = Math.max(-180, Math.min(180, nextZ));
+                nextX = Math.max(-200, Math.min(200, nextX));
+                nextZ = Math.max(-200, Math.min(200, nextZ));
 
                 let collision = false;
                 buildings.forEach(b => {
-                    const radius = b.id === 'about-hq' ? 12 : 8;
+                    const radius = b.id === 'about-hq' ? 14 : 9;
                     if(Math.hypot(nextX - b.x, nextZ - b.z) < radius) collision = true;
                 });
 
@@ -760,20 +725,20 @@
                     carGroup.position.z = nextZ;
                 } else { state.speed = 0; }
 
-                const idealCamera = new THREE.Vector3(0, 8, 16).applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle).add(carGroup.position);
+                const idealCamera = new THREE.Vector3(0, 10, 18).applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle).add(carGroup.position);
                 camera.position.lerp(idealCamera, 0.1);
-                camera.lookAt(carGroup.position.clone().add(new THREE.Vector3(0,-2,-8)));
+                camera.lookAt(carGroup.position.clone().add(new THREE.Vector3(0,-1,-5)));
 
                 let nearby = null;
                 buildings.forEach(b => {
                     const dist = Math.hypot(carGroup.position.x - b.tx, carGroup.position.z - b.tz);
-                    if (dist < 5) nearby = b;
+                    if (dist < 6) nearby = b;
                 });
 
                 if (nearby !== state.activeBuilding) {
                     state.activeBuilding = nearby;
                     if (nearby) {
-                        document.getElementById('enter-text').innerText = `Enter ${nearby.title}`;
+                        document.getElementById('enter-text').innerText = `Loot ${nearby.title}`;
                         btnEnterHouse.classList.remove('opacity-0', 'scale-90', 'translate-y-4');
                         btnEnterHouse.classList.add('opacity-100', 'scale-100', 'translate-y-0');
                     } else {
@@ -783,11 +748,11 @@
                 }
 
                 if (Math.abs(state.speed) > 0.01) {
-                    const wheelRot = state.speed * 0.2;
+                    const wheelRot = state.speed * 0.25;
+                    carGroup.children[2].rotation.x += wheelRot;
                     carGroup.children[3].rotation.x += wheelRot;
                     carGroup.children[4].rotation.x += wheelRot;
                     carGroup.children[5].rotation.x += wheelRot;
-                    carGroup.children[6].rotation.x += wheelRot;
                 }
             } 
             else if (state.mode === 'TRANSITION') {
@@ -796,7 +761,6 @@
                     playerGroup.position.lerp(step.target, 0.06);
                     const targetAngle = Math.atan2(playerGroup.position.x - step.target.x, playerGroup.position.z - step.target.z);
                     playerGroup.rotation.y = targetAngle;
-
                     if (playerGroup.position.distanceTo(step.target) < 0.5) transIdx++;
                 } else if (step.type === 'door') {
                     const b = state.activeBuilding;
@@ -804,40 +768,38 @@
                     if (Math.abs(b.doorHinge.rotation.y - step.target) < 0.05) transIdx++;
                 } else if (step.type === 'done_in') {
                     state.mode = 'WALKING';
-                    modeText.innerText = 'JBSI [INTERIOR_MODE]';
+                    modeText.innerText = 'SURVIVOR [INDOORS]';
                     state.playerAngle = state.activeBuilding.angle + Math.PI; 
                     playerGroup.rotation.y = state.playerAngle;
-                    
                     populateBoardUI(state.activeBuilding);
                     boardUI.classList.add('active');
                     btnExitHouse.classList.remove('hidden');
                 } else if (step.type === 'done_out') {
                     state.mode = 'DRIVING';
-                    modeText.innerText = 'JBSI [DRIVING_MODE]';
+                    modeText.innerText = 'SURVIVOR [DRIVING]';
                     playerGroup.visible = false;
                     state.activeBuilding = null;
                 }
 
-                const idealCamera = new THREE.Vector3(0, 4, 8).applyAxisAngle(new THREE.Vector3(0,1,0), playerGroup.rotation.y).add(playerGroup.position);
+                const idealCamera = new THREE.Vector3(0, 5, 10).applyAxisAngle(new THREE.Vector3(0,1,0), playerGroup.rotation.y).add(playerGroup.position);
                 camera.position.lerp(idealCamera, 0.08);
-                camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1,0)));
+                camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1.5,0)));
             }
             else if (state.mode === 'WALKING') {
                 const b = state.activeBuilding;
-
                 let nextX = playerGroup.position.x;
                 let nextZ = playerGroup.position.z;
 
-                if (state.keys.w) { nextX -= Math.sin(state.playerAngle) * 0.15; nextZ -= Math.cos(state.playerAngle) * 0.15; }
-                if (state.keys.s) { nextX += Math.sin(state.playerAngle) * 0.15; nextZ += Math.cos(state.playerAngle) * 0.15; }
+                if (state.keys.w) { nextX -= Math.sin(state.playerAngle) * 0.12; nextZ -= Math.cos(state.playerAngle) * 0.12; }
+                if (state.keys.s) { nextX += Math.sin(state.playerAngle) * 0.12; nextZ += Math.cos(state.playerAngle) * 0.12; }
                 if (state.keys.a) state.playerAngle += 0.06;
                 if (state.keys.d) state.playerAngle -= 0.06;
                 
                 playerGroup.rotation.y = state.playerAngle;
 
                 const isHQ = b.id === 'about-hq';
-                const hw = isHQ ? 9 : 6;
-                const hd = isHQ ? 9 : 6;
+                const hw = isHQ ? 8 : 5;
+                const hd = isHQ ? 11 : 6;
                 
                 const dx = nextX - b.x;
                 const dz = nextZ - b.z;
@@ -851,7 +813,7 @@
                     playerGroup.position.z = nextZ;
                 }
 
-                const idealCamera = new THREE.Vector3(0, 3, 6).applyAxisAngle(new THREE.Vector3(0,1,0), state.playerAngle).add(playerGroup.position);
+                const idealCamera = new THREE.Vector3(0, 3.5, 7).applyAxisAngle(new THREE.Vector3(0,1,0), state.playerAngle).add(playerGroup.position);
                 camera.position.lerp(idealCamera, 0.1);
                 camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1.5,0)));
 
@@ -871,12 +833,10 @@
                 }
             }
 
-            document.getElementById('coords').innerText = `LOC: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
+            document.getElementById('coords').innerText = `GRID: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
             updateLabels();
 
-            // Rotate clouds slowly
-            cloudsGroup.rotation.y += 0.0005;
-
+            cloudsGroup.rotation.y += 0.0003;
             renderer.render(scene, camera);
         }
 
