@@ -54,6 +54,7 @@
                 <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right hidden md:block shadow-2xl">
                 <p class="text-[10px] uppercase text-orange-400/80 tracking-widest mb-3 font-mono font-bold">Controls</p>
                 <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Look</span><iconify-icon icon="solar:mouse-linear" width="22" class="text-slate-300"></iconify-icon></div>
+                <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Share</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-t">T</div></div>
                 <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Read</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-e">E</div></div>
                 <div class="flex items-center justify-end gap-2 mb-3"><span class="text-xs font-bold text-slate-400">Action</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-f">F</div></div>
                 <div class="flex items-center justify-end gap-1 mb-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-w">W</div></div>
@@ -880,6 +881,11 @@ function createNPC(x, z, color, patrolRadius) {
             state.mode = 'SHARING';
             state.shareTimer = 0;
             state.activeNPC.state = 'sharing';
+            // Snap camera to side view
+            const angleBetween = Math.atan2(state.activeNPC.grp.position.x - playerGroup.position.x, state.activeNPC.grp.position.z - playerGroup.position.z);
+            camTheta = angleBetween + Math.PI/2;
+            camPhi = Math.PI / 3;
+
             
             // Show phones
             playerGroup.userData.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = true; });
@@ -1035,6 +1041,67 @@ if (state.mode === 'DRIVING') {
                     }
                 }
             } 
+            else if (state.mode === 'SHARING') {
+                const npc = state.activeNPC;
+                state.shareTimer += 0.02;
+                const t = state.shareTimer;
+                
+                const pt = Math.atan2(playerGroup.position.x - npc.grp.position.x, playerGroup.position.z - npc.grp.position.z);
+                const nt = Math.atan2(npc.grp.position.x - playerGroup.position.x, npc.grp.position.z - playerGroup.position.z);
+                
+                // Keep players standing still
+                playerGroup.userData.lLeg.rotation.x = 0; playerGroup.userData.rLeg.rotation.x = 0;
+                playerGroup.userData.lArm.rotation.x = 0; 
+                npc.lLeg.rotation.x = 0; npc.rLeg.rotation.x = 0;
+                npc.lArm.rotation.x = 0;
+
+                // Turn to face each other (shortest angle lerp approx)
+                const dpy = nt - playerGroup.rotation.y;
+                playerGroup.rotation.y += Math.atan2(Math.sin(dpy), Math.cos(dpy)) * 0.1;
+                const dny = pt - npc.grp.rotation.y;
+                npc.grp.rotation.y += Math.atan2(Math.sin(dny), Math.cos(dny)) * 0.1;
+
+                if(t < 1.5) {
+                    playerGroup.userData.rArm.rotation.x += (-Math.PI/2 - playerGroup.userData.rArm.rotation.x) * 0.1;
+                    npc.rArm.rotation.x += (-Math.PI/2 - npc.rArm.rotation.x) * 0.1;
+                } else if(t < 5) {
+                    state.shareCard.material.opacity = Math.min(1, (t - 1.5) * 2);
+                    state.shareCard.position.y += 0.005;
+                    state.shareCard.rotation.y += 0.02;
+                } else {
+                    playerGroup.userData.rArm.rotation.x += (0 - playerGroup.userData.rArm.rotation.x) * 0.1;
+                    npc.rArm.rotation.x += (0 - npc.rArm.rotation.x) * 0.1;
+                    state.shareCard.material.opacity -= 0.05;
+                    if(state.shareCard.material.opacity <= 0) {
+                        scene.remove(state.shareCard);
+                        state.shareCard.geometry.dispose();
+                        state.shareCard.material.dispose();
+                        playerGroup.userData.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = false; });
+                        npc.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = false; });
+                        npc.state = 'idle';
+                        if (state.wasDrivingBeforeShare) {
+                            state.mode = 'DRIVING'; modeText.innerText = 'SURVIVOR [DRIVING]';
+                            playerGroup.visible = false;
+                        } else {
+                            state.mode = 'WALKING'; modeText.innerText = 'SURVIVOR [ON FOOT]';
+                        }
+                    }
+                }
+                
+                // Camera logic: allow user to rotate view during sharing!
+                const midX = (playerGroup.position.x + npc.grp.position.x) / 2;
+                const midZ = (playerGroup.position.z + npc.grp.position.z) / 2;
+                const target = new THREE.Vector3(midX, playerGroup.position.y + 1.5, midZ);
+                
+                const radius = 6;
+                const idealCamera = target.clone().add(new THREE.Vector3(
+                    Math.sin(camTheta) * Math.sin(camPhi) * radius,
+                    Math.cos(camPhi) * radius,
+                    Math.cos(camTheta) * Math.sin(camPhi) * radius
+                ));
+                camera.position.lerp(idealCamera, 0.1);
+                camera.lookAt(target);
+            }
             else if (state.mode === 'TRANSITION') {
                 const step = transSeq[transIdx];
                 if (step.type === 'walk') {
