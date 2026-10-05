@@ -657,7 +657,9 @@ function createNPC(x, z, color, patrolRadius) {
 
         // --- INPUT HANDLING ---
         document.body.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('button') && !e.target.closest('a')) {
+            const pUI = document.getElementById('phone-ui');
+            if (pUI && !pUI.classList.contains('hidden')) return;
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('button') && !e.target.closest('a') && !e.target.closest('input')) {
                 if (window.innerWidth > 768) document.body.requestPointerLock();
             }
         });
@@ -827,6 +829,7 @@ function createNPC(x, z, color, patrolRadius) {
         function togglePhone() {
             const isHidden = phoneUI.classList.contains('pointer-events-none');
             if(isHidden) {
+                if(document.pointerLockElement) document.exitPointerLock();
                 phoneUI.classList.remove('hidden');
                 requestAnimationFrame(() => {
                     phoneUI.classList.remove('opacity-0', 'pointer-events-none');
@@ -845,6 +848,12 @@ function createNPC(x, z, color, patrolRadius) {
         document.getElementById('btn-close-phone').addEventListener('click', togglePhone);
         phoneFrame.addEventListener('mousedown', e => e.stopPropagation());
         phoneFrame.addEventListener('touchstart', e => e.stopPropagation());
+        phoneUI.addEventListener('mousedown', (e) => {
+            if (e.target === phoneUI) togglePhone();
+        });
+        phoneUI.addEventListener('touchstart', (e) => {
+            if (e.target === phoneUI) togglePhone();
+        });
 
         // Spotlight Search Logic
         const spotlightBtn = document.getElementById('search-widget-btn');
