@@ -49,11 +49,7 @@
                 <!-- MINIMAP -->
                 <div id="minimap-wrapper" class="relative w-28 h-28 md:w-40 md:h-40 bg-[#1c221a]/80 backdrop-blur-md border-2 border-white/20 rounded-full overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300">
                     <canvas id="minimap-canvas" width="160" height="160" class="absolute inset-0 w-full h-full"></canvas>
-                    <div class="absolute top-1/2 left-1/2 w-4 h-4 -mt-2 -ml-2 pointer-events-none z-10 flex items-center justify-center">
-                        <svg id="minimap-blip" viewBox="0 0 24 24" class="w-full h-full text-orange-500 drop-shadow-[0_0_5px_rgba(234,88,12,1)]" style="transform-origin: center;">
-                            <path fill="currentColor" d="M12 2L22 20L12 16L2 20L12 2Z"/>
-                        </svg>
-                    </div>
+                    
                 </div>
                 <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right hidden md:block shadow-2xl">
                 <p class="text-[10px] uppercase text-orange-400/80 tracking-widest mb-3 font-mono font-bold">Controls</p>
@@ -678,7 +674,14 @@ try {
         btnExitHouse.addEventListener('click', beginExitHouse);
         btnReadMag.addEventListener('click', toggleSit);
         document.getElementById('btn-close-mag').addEventListener('click', toggleSit);
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (typeof minimapExpanded !== 'undefined' && minimapExpanded) {
+                minimapCanvas.width = window.innerWidth * 0.9;
+                minimapCanvas.height = window.innerHeight * 0.9;
+            }
+        });
 
         function updateLabels() {
             if(state.mode !== 'DRIVING') { buildings.forEach(b => b.labelEl.style.opacity = '0'); return; }
@@ -697,26 +700,86 @@ try {
         }
 
         
-        const minimapCanvas = document.getElementById('minimap-canvas');
+        
         const minimapWrapper = document.getElementById('minimap-wrapper');
-        let minimapExpanded = false;
-        minimapWrapper.addEventListener('click', () => {
-            minimapExpanded = !minimapExpanded;
-            if (minimapExpanded) {
-                minimapWrapper.classList.remove('w-28', 'h-28', 'md:w-40', 'md:h-40', 'rounded-full');
-                minimapWrapper.classList.add('w-[80vw]', 'h-[80vw]', 'md:w-[600px]', 'md:h-[600px]', 'rounded-lg', 'fixed', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2', 'z-[200]');
-                minimapCanvas.width = 600;
-                minimapCanvas.height = 600;
-            } else {
-                minimapWrapper.classList.add('w-28', 'h-28', 'md:w-40', 'md:h-40', 'rounded-full');
-                minimapWrapper.classList.remove('w-[80vw]', 'h-[80vw]', 'md:w-[600px]', 'md:h-[600px]', 'rounded-lg', 'fixed', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2', 'z-[200]');
-                minimapCanvas.width = 160;
-                minimapCanvas.height = 160;
-            }
-        });
-
+        const minimapCanvas = document.getElementById('minimap-canvas');
         const minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
-        const minimapBlip = document.getElementById('minimap-blip');
+        
+        let minimapExpanded = false;
+        let mapPanX = 0, mapPanY = 0, mapZoom = 1;
+        let mapDragStartX = 0, mapDragStartY = 0, isMapDragging = false, didMapDrag = false;
+        let initialPinchDist = null, initialPinchZoom = 1;
+
+        function startMapDrag(x, y) {
+            isMapDragging = true; didMapDrag = false;
+            mapDragStartX = x; mapDragStartY = y;
+        }
+        function doMapDrag(x, y) {
+            if(!isMapDragging) return;
+            const dx = x - mapDragStartX;
+            const dy = y - mapDragStartY;
+            if(Math.hypot(dx, dy) > 5) didMapDrag = true;
+            if(minimapExpanded && didMapDrag) {
+                // Adjust pan speed based on zoom
+                const panSpeed = 2.0 / mapZoom; 
+                mapPanX -= dx * panSpeed;
+                mapPanY -= dy * panSpeed;
+                mapDragStartX = x; mapDragStartY = y;
+            }
+        }
+        function endMapDrag(e) {
+            isMapDragging = false; initialPinchDist = null;
+            if(!didMapDrag && e && e.type && (e.type.includes('up') || e.type === 'touchend')) {
+                minimapExpanded = !minimapExpanded;
+                if (minimapExpanded) {
+                    minimapWrapper.classList.remove('w-28', 'h-28', 'md:w-40', 'md:h-40', 'rounded-full');
+                    minimapWrapper.classList.add('w-[90vw]', 'h-[90vh]', 'rounded-lg', 'fixed', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2', 'z-[200]');
+                    minimapCanvas.width = window.innerWidth * 0.9;
+                    minimapCanvas.height = window.innerHeight * 0.9;
+                    mapPanX = state.mode === 'DRIVING' ? carGroup.position.x : playerGroup.position.x;
+                    mapPanY = state.mode === 'DRIVING' ? carGroup.position.z : playerGroup.position.z;
+                    mapZoom = 1;
+                } else {
+                    minimapWrapper.classList.add('w-28', 'h-28', 'md:w-40', 'md:h-40', 'rounded-full');
+                    minimapWrapper.classList.remove('w-[90vw]', 'h-[90vh]', 'rounded-lg', 'fixed', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2', 'z-[200]');
+                    minimapCanvas.width = 160;
+                    minimapCanvas.height = 160;
+                }
+            }
+        }
+
+        minimapWrapper.addEventListener('mousedown', (e) => startMapDrag(e.clientX, e.clientY));
+        minimapWrapper.addEventListener('mousemove', (e) => doMapDrag(e.clientX, e.clientY));
+        minimapWrapper.addEventListener('mouseup', endMapDrag);
+        minimapWrapper.addEventListener('mouseleave', endMapDrag);
+
+        minimapWrapper.addEventListener('touchstart', (e) => {
+            if(e.touches.length === 1) startMapDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }, {passive: false});
+        
+        minimapWrapper.addEventListener('touchmove', (e) => {
+            if(minimapExpanded) e.preventDefault();
+            if(e.touches.length === 2 && minimapExpanded) {
+                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                if(initialPinchDist === null) { initialPinchDist = dist; initialPinchZoom = mapZoom; }
+                else {
+                    mapZoom = initialPinchZoom * (dist / initialPinchDist);
+                    mapZoom = Math.min(Math.max(0.3, mapZoom), 5);
+                }
+            } else if(e.touches.length === 1) {
+                doMapDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, {passive: false});
+        
+        minimapWrapper.addEventListener('touchend', endMapDrag);
+
+        minimapWrapper.addEventListener('wheel', (e) => {
+            if(!minimapExpanded) return;
+            e.preventDefault();
+            mapZoom += e.deltaY * -0.002;
+            mapZoom = Math.min(Math.max(0.3, mapZoom), 5);
+        }, {passive: false});
+
 
         function drawMinimap() {
             if(!minimapCtx) return;
@@ -728,13 +791,22 @@ try {
             const pz = state.mode === 'DRIVING' ? carGroup.position.z : playerGroup.position.z;
             const pAngle = state.mode === 'DRIVING' ? state.angle : state.playerAngle;
 
-            if(minimapBlip) minimapBlip.style.transform = `rotate(${-pAngle * (180/Math.PI)}deg)`;
+            // Follow player if not expanded
+            if(!minimapExpanded) {
+                mapPanX = px; mapPanY = pz; mapZoom = 1;
+            }
 
             minimapCtx.save();
             minimapCtx.translate(mw / 2, mh / 2);
-            const scale = (mw / 160) * (window.innerWidth < 768 ? 0.6 : 0.8);
-            minimapCtx.scale(scale, scale);
-            minimapCtx.translate(-px, -pz);
+            let baseScale = (mw / 160) * (window.innerWidth < 768 ? 0.6 : 0.8);
+            if(minimapExpanded) baseScale = (mw / 360); // Fits map roughly
+            
+            minimapCtx.scale(baseScale * mapZoom, baseScale * mapZoom);
+            minimapCtx.translate(-mapPanX, -mapPanY);
+
+            // Background for map
+            minimapCtx.fillStyle = state.mode === 'NIGHT' ? '#111' : (state.mode === 'EVENING' ? '#543' : '#45603a');
+            minimapCtx.fillRect(-400, -400, 800, 800);
 
             // Ring Road
             minimapCtx.fillStyle = '#594a36'; 
@@ -748,17 +820,31 @@ try {
 
             buildings.forEach(b => {
                 const isHQ = b.id === 'about-hq';
-                const w = isHQ ? 24 : 18; const d = isHQ ? 30 : 20;
-                
+                const bw = isHQ ? 24 : 18; const bd = isHQ ? 30 : 20;
                 minimapCtx.save();
                 minimapCtx.translate(b.x, b.z);
                 minimapCtx.rotate(-b.angle);
-                
-                minimapCtx.fillStyle = isHQ ? '#6366f1' : '#9ea191';
-                minimapCtx.fillRect(-w/2, -d/2, w, d);
-                minimapCtx.strokeStyle = '#ffffff'; minimapCtx.lineWidth = 1.5; minimapCtx.strokeRect(-w/2, -d/2, w, d);
+                minimapCtx.fillStyle = isHQ ? '#6366f1' : '#' + b.color.toString(16).padStart(6,'0');
+                minimapCtx.fillRect(-bw/2, -bd/2, bw, bd);
+                minimapCtx.strokeStyle = '#ffffff'; minimapCtx.lineWidth = 1.5; minimapCtx.strokeRect(-bw/2, -bd/2, bw, bd);
                 minimapCtx.restore();
             });
+
+            // Player Blip drawn dynamically
+            minimapCtx.save();
+            minimapCtx.translate(px, pz);
+            minimapCtx.rotate(-pAngle);
+            minimapCtx.fillStyle = '#f97316';
+            minimapCtx.shadowColor = '#ea580c';
+            minimapCtx.shadowBlur = 10;
+            minimapCtx.beginPath();
+            minimapCtx.moveTo(0, -8);
+            minimapCtx.lineTo(6, 8);
+            minimapCtx.lineTo(-6, 8);
+            minimapCtx.closePath();
+            minimapCtx.fill();
+            minimapCtx.restore();
+
             minimapCtx.restore();
         }
 
