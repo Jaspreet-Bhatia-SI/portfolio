@@ -128,7 +128,12 @@
     <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
 
     <script>
-window.onerror = function(msg, url, line, col, error) { alert("GLOBAL ERROR: " + msg + " at line " + line); };
+window.onerror = function(msg, url, line, col, error) { 
+    const errDiv = document.createElement('div');
+    errDiv.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;padding:20px;font-size:16px;word-break:break-all;";
+    errDiv.innerText = "GLOBAL ERROR: " + msg + " at line " + line;
+    document.body.appendChild(errDiv);
+};
 try {
         // --- POCHINKI ARCHITECTURE (Extended Layout) ---
         const buildings = [
@@ -928,11 +933,23 @@ if (state.mode === 'DRIVING') {
             }
 
             document.getElementById('coords').innerText = `GRID: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
-            updateLabels(); cloudsGroup.rotation.y += 0.0003; drawMinimap(); renderer.render(scene, camera); } catch(e) { console.error(e); alert("FATAL ERROR: " + e.message); throw e; }
+            updateLabels(); cloudsGroup.rotation.y += 0.0003; drawMinimap(); renderer.render(scene, camera); } catch(e) { 
+    console.error(e); 
+    const errDiv = document.createElement('div');
+    errDiv.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;padding:20px;font-size:16px;word-break:break-all;";
+    errDiv.innerText = "FATAL ERROR: " + e.message;
+    document.body.appendChild(errDiv);
+    throw e; 
+}
         }
 
         animate();
-    } catch(e) { alert("INIT ERROR: " + e.stack); }
+    } catch(e) { 
+    const errDiv = document.createElement('div');
+    errDiv.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;padding:20px;font-size:16px;word-break:break-all;";
+    errDiv.innerText = "INIT ERROR: " + e.stack;
+    document.body.appendChild(errDiv);
+}
 </script>
 </body>
 </html>
