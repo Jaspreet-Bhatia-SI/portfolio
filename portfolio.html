@@ -43,13 +43,26 @@
                 <span class="text-[10px] font-bold tracking-widest uppercase" id="time-text">Day</span>
             </button>
 
-            <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
+            
+            <!-- TOP RIGHT WRAPPER -->
+            <div class="flex flex-col items-end gap-4 pointer-events-auto">
+                <!-- MINIMAP -->
+                <div class="relative w-28 h-28 md:w-40 md:h-40 bg-[#1c221a]/80 backdrop-blur-md border-2 border-white/20 rounded-full overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                    <canvas id="minimap-canvas" width="160" height="160" class="absolute inset-0 w-full h-full"></canvas>
+                    <div class="absolute top-1/2 left-1/2 w-4 h-4 -mt-2 -ml-2 pointer-events-none z-10 flex items-center justify-center">
+                        <svg id="minimap-blip" viewBox="0 0 24 24" class="w-full h-full text-orange-500 drop-shadow-[0_0_5px_rgba(234,88,12,1)]" style="transform-origin: center;">
+                            <path fill="currentColor" d="M12 2L22 20L12 16L2 20L12 2Z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right hidden md:block shadow-2xl">
                 <p class="text-[10px] uppercase text-orange-400/80 tracking-widest mb-3 font-mono font-bold">Controls</p>
                 <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Look</span><iconify-icon icon="solar:mouse-linear" width="22" class="text-slate-300"></iconify-icon></div>
                 <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Read</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-e">E</div></div>
                 <div class="flex items-center justify-end gap-2 mb-3"><span class="text-xs font-bold text-slate-400">Action</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-f">F</div></div>
                 <div class="flex items-center justify-end gap-1 mb-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-w">W</div></div>
                 <div class="flex items-center justify-end gap-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-a">A</div><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-s">S</div><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-d">D</div></div>
+            </div>
             </div>
         </div>
 
@@ -563,6 +576,46 @@
             });
         }
 
+        
+        const minimapCanvas = document.getElementById('minimap-canvas');
+        const minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
+        const minimapBlip = document.getElementById('minimap-blip');
+
+        function drawMinimap() {
+            if(!minimapCtx) return;
+            minimapCtx.clearRect(0, 0, 160, 160);
+            
+            const px = state.mode === 'DRIVING' ? carGroup.position.x : playerGroup.position.x;
+            const pz = state.mode === 'DRIVING' ? carGroup.position.z : playerGroup.position.z;
+            const pAngle = state.mode === 'DRIVING' ? state.angle : state.playerAngle;
+
+            if(minimapBlip) minimapBlip.style.transform = `rotate(${-pAngle * (180/Math.PI)}deg)`;
+
+            minimapCtx.save();
+            minimapCtx.translate(80, 80);
+            const scale = window.innerWidth < 768 ? 0.6 : 0.8;
+            minimapCtx.scale(scale, scale);
+            minimapCtx.translate(-px, -pz);
+
+            minimapCtx.fillStyle = '#3d3d3d'; minimapCtx.fillRect(-8, -400, 16, 800);
+            minimapCtx.fillStyle = '#594a36'; minimapCtx.fillRect(-150, -56, 300, 12); minimapCtx.fillRect(-100, 44, 200, 12);
+
+            buildings.forEach(b => {
+                const isHQ = b.id === 'about-hq';
+                const w = isHQ ? 24 : 18; const d = isHQ ? 30 : 20;
+                
+                minimapCtx.save();
+                minimapCtx.translate(b.x, b.z);
+                minimapCtx.rotate(-b.angle);
+                
+                minimapCtx.fillStyle = isHQ ? '#6366f1' : '#9ea191';
+                minimapCtx.fillRect(-w/2, -d/2, w, d);
+                minimapCtx.strokeStyle = '#ffffff'; minimapCtx.lineWidth = 1.5; minimapCtx.strokeRect(-w/2, -d/2, w, d);
+                minimapCtx.restore();
+            });
+            minimapCtx.restore();
+        }
+
         const ACCELERATION = 0.04; const FRICTION = 0.96; const MAX_SPEED = 1.6; const ROTATION_SPEED = 0.055;
 
         function animate() {
@@ -738,7 +791,7 @@
             }
 
             document.getElementById('coords').innerText = `GRID: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
-            updateLabels(); cloudsGroup.rotation.y += 0.0003; renderer.render(scene, camera);
+            updateLabels(); cloudsGroup.rotation.y += 0.0003; drawMinimap(); renderer.render(scene, camera);
         }
 
         animate();
