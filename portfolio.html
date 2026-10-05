@@ -368,7 +368,11 @@ try {
         createVendorStall(12, -120, -Math.PI/2);
 
         const npcs = [];
-        function createNPC(x, z, color, patrolRadius) {
+        
+        const phoneGeo = new THREE.BoxGeometry(0.12, 0.25, 0.02);
+        const phoneMat = new THREE.MeshStandardMaterial({color: 0x111111, emissive: 0x444444});
+
+function createNPC(x, z, color, patrolRadius) {
             const npcGrp = new THREE.Group();
             const skinMat = new THREE.MeshStandardMaterial({color: 0xffccaa});
             const shirtMat = new THREE.MeshStandardMaterial({color: color});
@@ -377,6 +381,7 @@ try {
             const torso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.0, 0.4), shirtMat); torso.position.y = 1.25; torso.castShadow = true;
             const lArm = new THREE.Group(); lArm.position.set(-0.5, 1.6, 0); const lArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), skinMat); lArmMesh.position.y = -0.3; lArmMesh.castShadow = true; lArm.add(lArmMesh);
             const rArm = new THREE.Group(); rArm.position.set(0.5, 1.6, 0); const rArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), skinMat); rArmMesh.position.y = -0.3; rArmMesh.castShadow = true; rArm.add(rArmMesh);
+            const phone = new THREE.Mesh(phoneGeo, phoneMat); phone.position.set(0, -0.7, 0.1); phone.visible = false; rArm.add(phone);
             const lLeg = new THREE.Group(); lLeg.position.set(-0.2, 0.75, 0); const lLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat); lLegMesh.position.y = -0.375; lLegMesh.castShadow = true; lLeg.add(lLegMesh);
             const rLeg = new THREE.Group(); rLeg.position.set(0.2, 0.75, 0); const rLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat); rLegMesh.position.y = -0.375; rLegMesh.castShadow = true; rLeg.add(rLegMesh);
             npcGrp.add(head, torso, lArm, rArm, lLeg, rLeg); npcGrp.position.set(x, 0, z); scene.add(npcGrp);
@@ -509,6 +514,7 @@ try {
         }
         const lArm = createLimb(skinMat, 0, 1.1); lArm.position.set(-0.55, 2.5, 0); playerGroup.add(lArm);
         const rArm = createLimb(skinMat, 0, 1.1); rArm.position.set(0.55, 2.5, 0); playerGroup.add(rArm);
+        const pPhone = new THREE.Mesh(phoneGeo, phoneMat); pPhone.position.set(0, -1.0, 0.15); pPhone.visible = false; rArm.add(pPhone);
         const lLeg = createLimb(pantsMat, 0, 1.4); lLeg.position.set(-0.25, 1.4, 0); playerGroup.add(lLeg);
         const rLeg = createLimb(pantsMat, 0, 1.4); rLeg.position.set(0.25, 1.4, 0); playerGroup.add(rLeg);
         
@@ -618,6 +624,7 @@ try {
         const btnEnterHouse = document.getElementById('btn-enter-house');
         const btnExitHouse = document.getElementById('btn-exit-house');
         const btnReadMag = document.getElementById('btn-read-mag');
+        const btnShare = document.getElementById('btn-share');
         const magUI = document.getElementById('magazine-ui');
         const modeText = document.getElementById('mode-text');
         
@@ -855,7 +862,60 @@ try {
 
         const ACCELERATION = 0.04; const FRICTION = 0.96; const MAX_SPEED = 1.6; const ROTATION_SPEED = 0.055;
 
-        function animate() {
+        
+        // SHARING LOGIC
+        btnShare.addEventListener('click', () => {
+            if(!state.activeNPC || state.mode === 'SHARING') return;
+            state.wasDrivingBeforeShare = (state.mode === 'DRIVING');
+            if(state.wasDrivingBeforeShare) {
+                // Exit car
+                state.mode = 'WALKING'; modeText.innerText = 'SURVIVOR [SHARING]';
+                const npcSideX = state.activeNPC.grp.position.x > carGroup.position.x ? 3 : -3;
+                const npcSideZ = state.activeNPC.grp.position.z > carGroup.position.z ? 3 : -3;
+                playerGroup.position.set(carGroup.position.x + npcSideX, 0, carGroup.position.z + npcSideZ);
+                playerGroup.visible = true;
+            } else {
+                modeText.innerText = 'SURVIVOR [SHARING]';
+            }
+            state.mode = 'SHARING';
+            state.shareTimer = 0;
+            state.activeNPC.state = 'sharing';
+            
+            // Show phones
+            playerGroup.userData.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = true; });
+            state.activeNPC.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = true; });
+
+            // Create Contact Card
+            const cardCanvas = document.createElement('canvas'); cardCanvas.width = 512; cardCanvas.height = 256;
+            const ctx = cardCanvas.getContext('2d');
+            ctx.fillStyle = '#1e241c'; ctx.fillRect(0,0,512,256);
+            ctx.fillStyle = '#4f46e5'; ctx.fillRect(0,0,512,16);
+            ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 8; ctx.strokeRect(4,4,504,248);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 36px "Courier New"'; ctx.fillText('Jaspreet Bhatia (JBSI)', 20, 60);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '28px "Courier New"'; ctx.fillText('Software Engineer', 20, 100);
+            ctx.fillStyle = '#4ade80'; ctx.font = '22px "Courier New"'; 
+            ctx.fillText('bhatiajaspreet161@gmail.com', 20, 150);
+            ctx.fillText('linkedin.com/in/jaspreet-bhatia-si', 20, 190);
+            ctx.fillText('Instagram: @jass_bhatia.si', 20, 230);
+            
+            const cardTex = new THREE.CanvasTexture(cardCanvas);
+            const cardMat = new THREE.MeshBasicMaterial({map: cardTex, side: THREE.DoubleSide, transparent: true, opacity: 0});
+            state.shareCard = new THREE.Mesh(new THREE.PlaneGeometry(3, 1.5), cardMat);
+            
+            const midX = (playerGroup.position.x + state.activeNPC.grp.position.x) / 2;
+            const midZ = (playerGroup.position.z + state.activeNPC.grp.position.z) / 2;
+            state.shareCard.position.set(midX, 1.5, midZ);
+            scene.add(state.shareCard);
+            btnShare.classList.add('hidden', 'opacity-0');
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if(e.key.toLowerCase() === 't' && !btnShare.classList.contains('hidden')) {
+                btnShare.click();
+            }
+        });
+
+function animate() {
             requestAnimationFrame(animate); try {
 
             if (state.targetTimeMode) {
@@ -907,6 +967,23 @@ try {
                     npc.lLeg.rotation.x *= 0.9; npc.rLeg.rotation.x *= 0.9;
                 }
             });
+
+                // Nearest NPC logic
+                if (state.mode === 'WALKING' || state.mode === 'DRIVING') {
+                    let nearestNPC = null; let minDist = 12;
+                    const pPos = state.mode === 'DRIVING' ? carGroup.position : playerGroup.position;
+                    npcs.forEach(npc => {
+                        const d = Math.hypot(npc.grp.position.x - pPos.x, npc.grp.position.z - pPos.z);
+                        if(d < minDist) { minDist = d; nearestNPC = npc; }
+                    });
+                    if(nearestNPC) {
+                        state.activeNPC = nearestNPC;
+                        btnShare.classList.remove('hidden'); btnShare.classList.remove('opacity-0');
+                    } else {
+                        state.activeNPC = null;
+                        btnShare.classList.add('hidden', 'opacity-0');
+                    }
+                }
 if (state.mode === 'DRIVING') {
                 if (inputY < 0) state.speed += ACCELERATION; if (inputY > 0) state.speed -= ACCELERATION;
                 state.speed *= FRICTION; state.speed = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, state.speed));
