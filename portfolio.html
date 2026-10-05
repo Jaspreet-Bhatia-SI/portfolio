@@ -97,7 +97,7 @@
     <!-- Phone UI Overlay (iOS Style) -->
     <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
         <!-- Phone Frame -->
-        <div class="relative w-full max-w-[340px] h-[680px] bg-black rounded-[50px] border-[12px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
+        <div class="relative w-[90vw] max-w-[340px] h-[85vh] max-h-[680px] bg-black rounded-[36px] sm:rounded-[50px] border-[8px] sm:border-[12px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
             
             <!-- Dynamic Island / Notch -->
             <div class="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30 flex justify-between items-center px-2">
@@ -123,7 +123,7 @@
                 </button>
 
                 <!-- Search Widget -->
-                <div class="mt-6 mx-4 relative z-30">
+                <div class="mt-2 sm:mt-6 mx-4 relative z-30">
                     <div class="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-3 flex items-center gap-3 cursor-text shadow-lg hover:bg-white/30 transition-colors" id="search-widget-btn">
                         <iconify-icon icon="solar:magnifer-linear" width="20" class="text-white"></iconify-icon>
                         <span class="text-white/80 text-sm font-medium flex-1 text-left">Search or ask...</span>
@@ -132,7 +132,7 @@
                 </div>
 
                 <!-- Apps Grid -->
-                <div class="mt-10 px-6 grid grid-cols-4 gap-y-8 gap-x-4 z-20">
+                <div class="mt-4 sm:mt-8 px-4 sm:px-6 grid grid-cols-4 gap-y-4 sm:gap-y-8 gap-x-3 sm:gap-x-4 z-20">
                     <a href="mailto:bhatiajaspreet161@gmail.com" target="_blank" class="flex flex-col items-center gap-1.5 group">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-b from-[#5ac8fa] to-[#007aff] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="solar:letter-bold" width="34" class="text-white"></iconify-icon>
@@ -200,7 +200,7 @@
                     <div class="h-16 flex items-center px-4 pt-4 bg-gradient-to-b from-black/80 to-transparent absolute top-0 w-full z-10">
                         <button id="btn-close-camera" class="text-white hover:text-slate-300 transition-colors"><iconify-icon icon="solar:alt-arrow-left-linear" width="28"></iconify-icon></button>
                     </div>
-                    <video id="camera-feed" class="w-full h-full object-cover" autoplay playsinline></video>
+                    <video id="camera-feed" class="w-full h-full object-cover" autoplay playsinline muted></video>
                     <div id="camera-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-100 z-20"></div>
                     <div class="h-32 bg-black/80 absolute bottom-0 w-full flex items-center justify-center z-10">
                         <button id="btn-capture" class="w-16 h-16 rounded-full border-[4px] border-white flex items-center justify-center cursor-pointer active:scale-95 transition-transform">
