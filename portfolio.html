@@ -90,14 +90,12 @@
 
     
     <!-- Contacts Toggle Button -->
-    <button id="btn-contacts" class="hidden pointer-events-auto absolute bottom-32 right-6 md:right-8 bg-white/20 backdrop-blur-md border border-white/40 p-4 rounded-full shadow-[0_4px_30px_rgba(0,0,0,0.1)] text-white hover:bg-white/30 transition-all hover:scale-110 active:scale-95 z-[90]">
-        <iconify-icon icon="solar:smartphone-bold" width="28"></iconify-icon>
-    </button>
+    
 
     <!-- Phone UI Overlay (iOS Style) -->
     <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
         <!-- Phone Frame Wrapper for perfect scaling -->
-        <div class="flex items-center justify-center w-full h-full pointer-events-none" style="transform: scale(min(1, calc(95vw / 340), calc(90vh / 680)));">
+        <div id="phone-scale-wrapper" class="flex items-center justify-center w-full h-full pointer-events-none">
             <!-- Phone Frame -->
             <div class="relative w-[320px] h-[640px] shrink-0 bg-black rounded-[44px] border-[10px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
             
@@ -871,7 +869,7 @@ function createNPC(x, z, color, patrolRadius) {
         document.getElementById('btn-close-mag').addEventListener('click', toggleSit);
         
         let hasContact = false;
-        const btnContacts = document.getElementById('btn-contacts');
+        
         const phoneUI = document.getElementById('phone-ui');
         const phoneFrame = document.getElementById('phone-frame');
         const timeEl = document.getElementById('phone-time');
@@ -881,7 +879,19 @@ function createNPC(x, z, color, patrolRadius) {
             timeEl.innerText = d.getHours() + ':' + d.getMinutes().toString().padStart(2, '0');
         }, 1000);
         
+
+        function resizePhone() {
+            const wrapper = document.getElementById('phone-scale-wrapper');
+            if (wrapper) {
+                const scale = Math.min(1, (window.innerWidth * 0.95) / 350, (window.innerHeight * 0.9) / 680);
+                wrapper.style.transform = `scale(${scale})`;
+            }
+        }
+        window.addEventListener('resize', resizePhone);
+        
         function togglePhone() {
+            resizePhone();
+
             const isHidden = phoneUI.classList.contains('pointer-events-none');
             if(isHidden) {
                 if(document.pointerLockElement) document.exitPointerLock();
@@ -907,7 +917,7 @@ function createNPC(x, z, color, patrolRadius) {
                 }
             }
         }
-        btnContacts.addEventListener('click', togglePhone);
+        
         document.getElementById('btn-close-phone').addEventListener('click', togglePhone);
         phoneFrame.addEventListener('mousedown', e => e.stopPropagation());
         phoneFrame.addEventListener('touchstart', e => e.stopPropagation());
@@ -1372,7 +1382,7 @@ if (state.mode === 'DRIVING') {
                 } else if (t >= 1.5 && t < 1.55) {
                     if (!hasContact) {
                         hasContact = true;
-                        document.getElementById('btn-contacts').classList.remove('hidden');
+                        
                         togglePhone(); 
                     }
                 } else if (t > 2.5) {
