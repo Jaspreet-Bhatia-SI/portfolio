@@ -7,15 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #7b8b70; overflow: hidden; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         #canvas-container { width: 100%; height: 100%; display: block; }
         .key-cap { box-shadow: 0 4px 0 #0f172a; transition: all 0.1s; }
         .key-cap:active, .key-cap.pressed { transform: translateY(4px); box-shadow: 0 0 0 #0f172a; }
-        .house-label { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; transition: all 0.2s; opacity: 0; margin-top: -60px;}
-        .board-ui { position: absolute; transform-origin: center center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .board-ui.active { pointer-events: auto; opacity: 1; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -23,17 +20,15 @@
 </head>
 <body class="bg-[#7b8b70] text-slate-300 antialiased h-screen w-screen overflow-hidden">
 
-    <!-- LANDSCAPE PROMPT -->
     <div class="landscape-prompt portrait:flex hidden fixed inset-0 z-[999] bg-[#1a1c18] flex-col items-center justify-center text-white p-8 text-center">
         <iconify-icon icon="solar:smartphone-rotate-2-linear" width="64" class="text-orange-500 mb-4 animate-bounce"></iconify-icon>
         <h2 class="text-xl font-bold tracking-widest uppercase mb-2">Rotate Device</h2>
         <p class="text-sm text-slate-400">Survival mode requires landscape orientation for dual-stick controls.</p>
     </div>
 
-    <!-- UI LAYER (Dashboard) -->
+    <!-- UI LAYER -->
     <div class="fixed inset-0 z-40 pointer-events-none flex flex-col justify-between p-4 sm:p-8">
         
-        <!-- Header -->
         <div class="flex justify-between items-start w-full">
             <div class="flex flex-col gap-1 pointer-events-auto">
                 <div class="flex items-center gap-2 bg-[#1c221a]/90 p-2.5 rounded-lg backdrop-blur border border-white/10 shadow-lg">
@@ -43,39 +38,30 @@
                 <div class="text-[10px] text-slate-400 tracking-wider font-mono bg-[#1c221a]/90 px-2 py-1 rounded w-max border border-white/5 mt-1 shadow" id="coords">GRID: 0, 0</div>
             </div>
 
-            <!-- Time Cycle Button -->
             <button id="btn-time-cycle" class="pointer-events-auto absolute top-6 left-1/2 -translate-x-1/2 bg-[#1c221a]/90 backdrop-blur border border-white/10 px-5 py-2.5 rounded-full shadow-2xl text-white hover:bg-[#2c352a] transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95">
                 <iconify-icon id="icon-time" icon="solar:sun-bold" width="20" class="text-amber-400 group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
                 <span class="text-[10px] font-bold tracking-widest uppercase" id="time-text">Day</span>
             </button>
 
-            <!-- Controls Hint (PC Only) -->
             <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
                 <p class="text-[10px] uppercase text-orange-400/80 tracking-widest mb-3 font-mono font-bold">Controls</p>
-                <div class="flex items-center justify-end gap-2 mb-2">
-                    <span class="text-xs font-bold text-slate-400">Look</span>
-                    <iconify-icon icon="solar:mouse-linear" width="22" class="text-slate-300"></iconify-icon>
-                </div>
-                <div class="flex items-center justify-end gap-2 mb-3">
-                    <span class="text-xs font-bold text-slate-400">Action</span>
-                    <div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-f">F</div>
-                </div>
-                <div class="flex items-center justify-end gap-1 mb-1">
-                    <div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-w">W</div>
-                </div>
-                <div class="flex items-center justify-end gap-1">
-                    <div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-a">A</div>
-                    <div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-s">S</div>
-                    <div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-d">D</div>
-                </div>
+                <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Look</span><iconify-icon icon="solar:mouse-linear" width="22" class="text-slate-300"></iconify-icon></div>
+                <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Read</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-e">E</div></div>
+                <div class="flex items-center justify-end gap-2 mb-3"><span class="text-xs font-bold text-slate-400">Action</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-f">F</div></div>
+                <div class="flex items-center justify-end gap-1 mb-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-w">W</div></div>
+                <div class="flex items-center justify-end gap-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-a">A</div><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-s">S</div><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-d">D</div></div>
             </div>
         </div>
 
-        <!-- Center Action Buttons -->
+        <!-- Center Prompts -->
         <div class="absolute top-[70%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 pointer-events-none w-full z-50">
             <button id="btn-enter-house" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-orange-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(234,88,12,0.4)] hover:bg-orange-500 active:scale-95 cursor-pointer border border-orange-400/50">
                 <iconify-icon icon="solar:door-open-linear" width="22" class="animate-pulse"></iconify-icon>
                 <span id="enter-text"><span class="hidden md:inline">Press [F] to </span>Loot</span>
+            </button>
+            <button id="btn-read-mag" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-emerald-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(16,185,129,0.4)] hover:bg-emerald-500 active:scale-95 cursor-pointer border border-emerald-400/50">
+                <iconify-icon icon="solar:book-linear" width="22" class="animate-pulse"></iconify-icon>
+                <span><span class="hidden md:inline">Press [E] to </span>Read Magazine</span>
             </button>
         </div>
 
@@ -87,65 +73,68 @@
         </div>
     </div>
 
-    <!-- Virtual Joystick (Mobile) -->
+    <!-- Virtual Joystick -->
     <div id="joystick-base" class="md:hidden hidden absolute w-24 h-24 rounded-full border border-white/30 bg-black/20 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none shadow-[0_0_20px_rgba(255,255,255,0.1)]">
         <div id="joystick-stick" class="absolute top-1/2 left-1/2 w-10 h-10 rounded-full bg-white/40 transform -translate-x-1/2 -translate-y-1/2 shadow-sm"></div>
     </div>
+    <div id="crosshair" class="hidden md:block fixed top-1/2 left-1/2 w-1.5 h-1.5 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none shadow-[0_0_4px_rgba(0,0,0,1)] mix-blend-difference"></div>
 
-    <!-- PC Crosshair -->
-    <div id="crosshair" class="hidden md:block fixed top-1/2 left-1/2 w-1 h-1 bg-white/80 rounded-full transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none shadow-[0_0_4px_rgba(0,0,0,1)] mix-blend-difference"></div>
+    <!-- MAGAZINE UI (FULLSCREEN OVERLAY) -->
+    <div id="magazine-ui" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 pointer-events-auto transition-opacity duration-300 opacity-0">
+        <div class="relative w-full max-w-5xl h-[80vh] bg-[#f4ebd8] rounded-md shadow-2xl flex flex-col md:flex-row overflow-hidden text-slate-900 shadow-[0_0_100px_rgba(0,0,0,0.8)] book-texture">
+            <!-- Spine shadow -->
+            <div class="absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 bg-gradient-to-r from-transparent via-black/10 to-transparent z-10 hidden md:block"></div>
+            
+            <div class="w-full md:w-1/2 p-8 md:p-12 border-b md:border-b-0 md:border-r border-[#d4c8a9]/50 flex flex-col justify-center bg-gradient-to-br from-[#f4ebd8] to-[#e6dcc6]">
+                <div class="mb-4 text-orange-700">
+                    <iconify-icon id="mag-icon" icon="solar:box-linear" width="64"></iconify-icon>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold font-serif mb-4 leading-tight text-[#2c1e16]" id="mag-title">Project Title</h2>
+                <div class="h-1 w-20 bg-orange-600 mb-6"></div>
+                <p class="text-sm uppercase tracking-widest text-orange-600 font-bold mb-6 font-mono" id="mag-type">Type</p>
+                <div id="mag-tech" class="flex flex-wrap gap-2 mt-auto"></div>
+            </div>
+            
+            <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col bg-gradient-to-bl from-[#f4ebd8] to-[#e6dcc6]">
+                <p class="text-lg md:text-xl font-serif leading-relaxed text-[#3d2b1f] first-letter:text-5xl first-letter:font-bold first-letter:text-orange-700 first-letter:mr-1 first-letter:float-left" id="mag-desc">Description goes here.</p>
+                
+                <div class="mt-auto pt-12 flex justify-between items-center">
+                    <div class="font-mono text-xs text-slate-500 uppercase tracking-widest">JBSI Archive</div>
+                    <a id="mag-link" href="#" target="_blank" class="bg-[#2c1e16] text-[#f4ebd8] px-8 py-4 rounded uppercase font-bold text-sm tracking-widest hover:bg-orange-700 transition-colors shadow-lg">Execute</a>
+                </div>
+            </div>
+            
+            <button id="btn-close-mag" class="absolute top-4 right-4 md:top-6 md:right-6 text-[#2c1e16]/50 hover:text-[#2c1e16] transition-colors p-2 bg-black/5 rounded-full">
+                <iconify-icon icon="solar:close-circle-bold" width="36"></iconify-icon>
+            </button>
+        </div>
+    </div>
 
     <!-- 3D CANVAS -->
     <div id="canvas-container" class="relative z-0"></div>
     <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
 
-    <!-- DYNAMIC INFO BOARD -->
-    <div id="board-ui" class="board-ui w-[600px] bg-[#1a1c18] border border-[#3e4235] rounded-xl shadow-2xl overflow-hidden flex flex-col">
-        <div id="board-top-bar" class="h-2 w-full bg-orange-500 shrink-0"></div>
-        <div class="p-8 pb-4 shrink-0 flex items-start gap-4">
-            <div id="board-icon-bg" class="w-14 h-14 bg-[#2b2e25] rounded-xl flex items-center justify-center text-white text-3xl border border-[#3e4235]">
-                <iconify-icon id="board-icon" icon="solar:box-linear"></iconify-icon>
-            </div>
-            <div>
-                <h2 id="board-title" class="text-3xl font-bold text-white tracking-tight">Title</h2>
-                <p id="board-subtitle" class="text-xs text-orange-400 mt-1 uppercase tracking-widest font-mono font-bold">Subtitle</p>
-            </div>
-        </div>
-        <div class="p-8 pt-0">
-            <p id="board-desc" class="text-slate-300 leading-relaxed text-sm bg-[#22251e] p-5 rounded border border-[#3e4235] font-mono"></p>
-            <div id="board-tech-container" class="mt-6 hidden">
-                <div id="board-tech" class="flex flex-wrap gap-2"></div>
-            </div>
-            <div class="mt-8">
-                <a id="board-link" href="#" target="_blank" class="hidden w-max px-8 py-4 rounded font-bold text-white shadow-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-3">
-                    <span id="board-link-text">Execute Link</span>
-                    <iconify-icon icon="solar:alt-arrow-right-linear" width="22"></iconify-icon>
-                </a>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // --- POCHINKI ARCHITECTURE (Erangel Layout) ---
+        // --- POCHINKI ARCHITECTURE (Extended Layout) ---
         const buildings = [
-            { id: 'proj-curator', type: 'Project', x: -25, z: -80, tx: -10, tz: -80, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
-            { id: 'proj-foodzie', type: 'Project', x: 25, z: -70, tx: 10, tz: -70, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', desc: 'E-Commerce ecosystem. Flutter mobile, Python backend, PostgreSQL.', tech: ['Flutter', 'Python', 'Postgres'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
-            { id: 'proj-stark', type: 'Project', x: -25, z: -50, tx: -10, tz: -50, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', desc: 'Desktop voice assistant automating OS tasks.', tech: ['Python', 'NLP'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
-            { id: 'proj-mltree', type: 'Project', x: 25, z: -40, tx: 10, tz: -40, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', desc: 'Interactive node-based architecture mapping ML algorithms.', tech: ['D3.js', 'Data Science'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
-            { id: 'proj-crypto', type: 'Project', x: -25, z: -20, tx: -10, tz: -20, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', desc: 'Cryptographic tool for secure password generation.', tech: ['Cryptography', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
-            { id: 'proj-resq', type: 'Project', x: 25, z: -10, tx: 10, tz: -10, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', desc: 'ML emergency response optimization routing.', tech: ['Python', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
+            { id: 'proj-curator', type: 'Project', x: -35, z: -50, tx: -15, tz: -50, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline built in Python to autonomously map educational content.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
+            { id: 'proj-foodzie', type: 'Project', x: 35, z: -50, tx: 15, tz: -50, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', desc: 'Massive E-Commerce ecosystem running a Flutter mobile client, Python server, and PostgreSQL database with complex order routing.', tech: ['Flutter', 'Python', 'Postgres'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
+            { id: 'proj-stark', type: 'Project', x: -35, z: -20, tx: -15, tz: -20, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', desc: 'Desktop voice assistant automating OS tasks and pulling live intelligence from the web using NLP.', tech: ['Python', 'NLP'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
+            { id: 'proj-mltree', type: 'Project', x: 35, z: -20, tx: 15, tz: -20, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', desc: 'Interactive node-based architecture mapping 150+ ML algorithms. Bridges theoretical math to application.', tech: ['D3.js', 'Data Science'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
+            { id: 'proj-crypto', type: 'Project', x: -35, z: 10, tx: -15, tz: 10, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', desc: 'Cryptographic tool for secure password generation utilizing system entropy to build unbreakable hashes.', tech: ['Cryptography', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
+            { id: 'proj-resq', type: 'Project', x: 35, z: 10, tx: 15, tz: 10, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', desc: 'ML emergency response optimization. Calculates fastest dynamic routing for critical emergency vehicles.', tech: ['Python', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
             
-            { id: 'skill-ai', type: 'Skill Domain', x: -25, z: 20, tx: -10, tz: 20, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', desc: 'Neural networks, LLM pipelines, autonomous agents.', tech: [], link: null },
-            { id: 'skill-backend', type: 'Skill Domain', x: 25, z: 30, tx: 10, tz: 30, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', desc: 'Scalable server-side infrastructure. Python, FastAPI, Node.js.', tech: [], link: null },
-            { id: 'skill-frontend', type: 'Skill Domain', x: -25, z: 50, tx: -10, tz: 50, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', desc: 'React, Next.js, Tailwind, Flutter, WebGL.', tech: [], link: null },
-            { id: 'skill-cloud', type: 'Skill Domain', x: 25, z: 60, tx: 10, tz: 60, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', desc: 'AWS, Docker, CI/CD, Linux.', tech: [], link: null },
+            { id: 'skill-ai', type: 'Skill Domain', x: -35, z: 50, tx: -15, tz: 50, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', desc: 'Deep expertise in training neural networks, designing LLM pipelines, and building autonomous agents that act on web data.', tech: ['TensorFlow', 'PyTorch', 'Agents'], link: null },
+            { id: 'skill-backend', type: 'Skill Domain', x: 35, z: 50, tx: 15, tz: 50, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', desc: 'Scalable server-side infrastructure. Extensive experience architecting REST and GraphQL APIs handling thousands of RPM.', tech: ['Python', 'Node.js', 'Go'], link: null },
+            { id: 'skill-frontend', type: 'Skill Domain', x: -70, z: 50, tx: -70, tz: 30, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', desc: 'Crafting highly interactive, performant, and beautiful interfaces. Expert in DOM manipulation and WebGL 3D rendering.', tech: ['React', 'Three.js', 'Tailwind'], link: null },
+            { id: 'skill-cloud', type: 'Skill Domain', x: 70, z: 50, tx: 70, tz: 30, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', desc: 'Deploying robust cloud architectures. Mastery over AWS ec2/s3, Docker orchestration, and automated CI/CD pipelines.', tech: ['AWS', 'Docker', 'Linux'], link: null },
 
-            { id: 'contact-email', type: 'Uplink', x: -25, z: 80, tx: -10, tz: 80, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', desc: 'bhatiajaspreet161@gmail.com', tech: [], link: 'mailto:bhatiajaspreet161@gmail.com', linkText: 'Send Email' },
-            { id: 'contact-github', type: 'Uplink', x: 25, z: 90, tx: 10, tz: 90, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', desc: '@Jaspreet-Bhatia-SI', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
-            { id: 'contact-linkedin', type: 'Uplink', x: -25, z: 110, tx: -10, tz: 110, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', desc: 'Connect professionally.', tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect' },
-            { id: 'contact-insta', type: 'Uplink', x: 25, z: 120, tx: 10, tz: 120, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', desc: '@jass_bhatia.si', tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' },
+            { id: 'contact-email', type: 'Uplink', x: -70, z: -50, tx: -70, tz: -30, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', desc: 'Establish a direct communications channel for massive AI infrastructure projects.<br>bhatiajaspreet161@gmail.com', tech: [], link: 'mailto:bhatiajaspreet161@gmail.com', linkText: 'Send Email' },
+            { id: 'contact-github', type: 'Uplink', x: 70, z: -50, tx: 70, tz: -30, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', desc: 'Access all open-source repositories, system architectures, and raw intelligence data. @Jaspreet-Bhatia-SI', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
+            { id: 'contact-linkedin', type: 'Uplink', x: -110, z: -50, tx: -90, tz: -50, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', desc: 'Connect with me professionally to track updates and technical writings.', tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect' },
+            { id: 'contact-insta', type: 'Uplink', x: 110, z: -50, tx: 90, tz: -50, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', desc: 'Behind the scenes hardware operations and daily tech logs. @jass_bhatia.si', tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' },
 
-            { id: 'about-hq', type: 'Safehouse', x: -60, z: -20, tx: -45, tz: -20, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'The Church (HQ)', desc: 'Welcome to the core safehouse of JBSI. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' }
+            { id: 'about-hq', type: 'Safehouse', x: 0, z: -120, tx: 0, tz: -100, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'The Church (HQ)', desc: 'Welcome to the core safehouse of JBSI. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' }
         ];
 
         // --- STATE MACHINE ---
@@ -155,15 +144,8 @@
             activeBuilding: null, playerAngle: 0, targetTimeMode: null
         };
 
-        // Camera Spherical Coordinates
-        let camTheta = Math.PI; 
-        let camPhi = Math.PI / 3;
-        let camRadius = 18;
-
-        // Inputs (Normalized -1 to 1)
-        let inputX = 0; 
-        let inputY = 0;
-        let isPointerLocked = false;
+        let camTheta = Math.PI, camPhi = 1.2, camRadius = 18;
+        let inputX = 0, inputY = 0, isPointerLocked = false, isSitting = false;
 
         // --- SURVIVAL TIME CYCLES ---
         const timeModes = [
@@ -175,58 +157,58 @@
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(timeModes[0].sky);
-        scene.fog = new THREE.FogExp2(timeModes[0].sky, 0.007);
-
+        const scene = new THREE.Scene(); scene.background = new THREE.Color(timeModes[0].sky); scene.fog = new THREE.FogExp2(timeModes[0].sky, 0.006);
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
-        // --- LIGHTING ---
         const ambientLight = new THREE.HemisphereLight(0xffffff, 0x444444, timeModes[0].ambient); scene.add(ambientLight);
         const dirLight = new THREE.DirectionalLight(timeModes[0].sunColor, timeModes[0].sunIntensity); 
         dirLight.position.set(150, timeModes[0].sunY, 100); dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 0.5; dirLight.shadow.camera.far = 500;
-        dirLight.shadow.camera.left = -200; dirLight.shadow.camera.right = 200;
-        dirLight.shadow.camera.top = 200; dirLight.shadow.camera.bottom = -200;
+        dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048; dirLight.shadow.camera.near = 0.5; dirLight.shadow.camera.far = 500;
+        dirLight.shadow.camera.left = -200; dirLight.shadow.camera.right = 200; dirLight.shadow.camera.top = 200; dirLight.shadow.camera.bottom = -200;
         scene.add(dirLight);
 
         // --- CELESTIAL ---
-        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshBasicMaterial({ color: timeModes[0].sunColor }));
-        sun.position.set(150, timeModes[0].sunY, 100); scene.add(sun);
-        const moon = new THREE.Mesh(new THREE.SphereGeometry(12, 32, 32), new THREE.MeshBasicMaterial({ color: 0xe2e8f0 }));
-        moon.position.set(-150, 150, -100); moon.visible = false; scene.add(moon);
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshBasicMaterial({ color: timeModes[0].sunColor })); sun.position.set(150, timeModes[0].sunY, 100); scene.add(sun);
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(12, 32, 32), new THREE.MeshBasicMaterial({ color: 0xe2e8f0 })); moon.position.set(-150, 150, -100); moon.visible = false; scene.add(moon);
         const moonLight = new THREE.DirectionalLight(0x94a3b8, 0); moonLight.position.copy(moon.position); moonLight.castShadow = true; scene.add(moonLight);
-        const starsGeo = new THREE.BufferGeometry(); const posArray = new Float32Array(1200 * 3);
-        for(let i = 0; i < 3600; i++) posArray[i] = (Math.random() - 0.5) * 800; 
-        starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starsGeo = new THREE.BufferGeometry(); const posArray = new Float32Array(1200 * 3); for(let i = 0; i < 3600; i++) posArray[i] = (Math.random() - 0.5) * 800; starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         const stars = new THREE.Points(starsGeo, new THREE.PointsMaterial({ size: 1.5, color: 0xffffff, transparent: true, opacity: 0 })); scene.add(stars);
 
         const cloudsGroup = new THREE.Group(); const cloudGeo = new THREE.SphereGeometry(1, 16, 16); const cloudMaterials = []; 
         for(let i=0; i<30; i++) {
-            const cloud = new THREE.Group(); const chunks = 4 + Math.floor(Math.random()*4);
-            const cMat = new THREE.MeshLambertMaterial({ color: 0xffffff }); cloudMaterials.push(cMat);
+            const cloud = new THREE.Group(); const chunks = 4 + Math.floor(Math.random()*4); const cMat = new THREE.MeshLambertMaterial({ color: 0xffffff }); cloudMaterials.push(cMat);
             for(let j=0; j<chunks; j++) {
-                const chunk = new THREE.Mesh(cloudGeo, cMat); chunk.position.set( (Math.random()-0.5)*5, (Math.random()-0.5)*2, (Math.random()-0.5)*5 );
-                const s = 5 + Math.random()*5; chunk.scale.set(s, s*0.6, s); cloud.add(chunk);
+                const chunk = new THREE.Mesh(cloudGeo, cMat); chunk.position.set( (Math.random()-0.5)*5, (Math.random()-0.5)*2, (Math.random()-0.5)*5 ); const s = 5 + Math.random()*5; chunk.scale.set(s, s*0.6, s); cloud.add(chunk);
             }
             cloud.position.set((Math.random()-0.5)*500, 90 + Math.random()*40, (Math.random()-0.5)*500); cloudsGroup.add(cloud);
         }
         scene.add(cloudsGroup);
 
-        // --- ENVIRONMENT ---
+        // --- ENVIRONMENT & ROADS ---
         const envGroup = new THREE.Group(); scene.add(envGroup);
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ color: timeModes[0].groundColor, roughness: 1.0 })); 
-        ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-        const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, 400), new THREE.MeshStandardMaterial({ color: 0x3d3d3d, roughness: 0.9 }));
-        mainRoad.rotation.x = -Math.PI / 2; mainRoad.position.set(0, 0.05, 0); mainRoad.receiveShadow = true; envGroup.add(mainRoad);
-        const dirtPath = new THREE.Mesh(new THREE.PlaneGeometry(45, 8), new THREE.MeshStandardMaterial({ color: 0x594a36, roughness: 1.0 }));
-        dirtPath.rotation.x = -Math.PI / 2; dirtPath.position.set(-22.5, 0.06, -20); dirtPath.receiveShadow = true; envGroup.add(dirtPath);
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ color: timeModes[0].groundColor, roughness: 1.0 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+        
+        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3d3d3d, roughness: 0.9 }); 
+        const dirtMat = new THREE.MeshStandardMaterial({ color: 0x594a36, roughness: 1.0 });
+
+        const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, 400), roadMat); mainRoad.rotation.x = -Math.PI/2; mainRoad.position.set(0, 0.05, 0); mainRoad.receiveShadow = true; envGroup.add(mainRoad);
+        const crossRoad1 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad1.rotation.x = -Math.PI/2; crossRoad1.position.set(0, 0.06, -50); crossRoad1.receiveShadow = true; envGroup.add(crossRoad1);
+        const crossRoad2 = new THREE.Mesh(new THREE.PlaneGeometry(200, 12), dirtMat); crossRoad2.rotation.x = -Math.PI/2; crossRoad2.position.set(0, 0.06, 50); crossRoad2.receiveShadow = true; envGroup.add(crossRoad2);
+
+        // Dynamic Poster Generator
+        function createPosterTexture(title, type) {
+            const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1e241c'; ctx.fillRect(0,0,1024,512); // dark olive
+            ctx.fillStyle = '#ea580c'; ctx.font = 'bold 90px "Courier New", monospace';
+            ctx.fillText(title, 80, 200);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '50px "Courier New", monospace';
+            ctx.fillText(type.toUpperCase(), 80, 320);
+            ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 16; ctx.strokeRect(20,20,984,472);
+            return new THREE.CanvasTexture(canvas);
+        }
 
         // Architecture
         const wallColors = [0x9ea191, 0xbdad93, 0x8f7863, 0xa4a79b, 0x766c5a]; 
@@ -234,51 +216,76 @@
 
         buildings.forEach(b => {
             const isHQ = b.id === 'about-hq';
-            const w = isHQ ? 18 : 12, d = isHQ ? 24 : 14;
-            const h = isHQ ? 16 : (Math.random() > 0.5 ? 12 : 7);
+            const w = isHQ ? 24 : 18, d = isHQ ? 30 : 20; // Bigger houses!
+            const h = isHQ ? 16 : (Math.random() > 0.5 ? 12 : 9);
             const t = 0.5; 
 
             const houseGroup = new THREE.Group(); houseGroup.position.set(b.x, 0, b.z);
             b.angle = Math.atan2(b.tx - b.x, b.tz - b.z); houseGroup.rotation.y = b.angle;
 
             const wallMat = new THREE.MeshStandardMaterial({ color: isHQ ? 0x8a7a69 : wallColors[Math.floor(Math.random() * wallColors.length)], roughness: 1.0, side: THREE.DoubleSide }); 
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: 0x555555 }));
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: 0x444444 }));
             floor.rotation.x = -Math.PI / 2; floor.position.y = 0.1; floor.receiveShadow = true; houseGroup.add(floor);
 
             const backWall = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), wallMat); backWall.position.set(0, h/2, -d/2); backWall.castShadow = backWall.receiveShadow = true; houseGroup.add(backWall);
             const leftWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat); leftWall.position.set(-w/2, h/2, 0); leftWall.castShadow = leftWall.receiveShadow = true; houseGroup.add(leftWall);
             const rightWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat); rightWall.position.set(w/2, h/2, 0); rightWall.castShadow = rightWall.receiveShadow = true; houseGroup.add(rightWall);
 
-            const doorW = 3, doorH = 5, sideW = (w - doorW) / 2;
+            const doorW = 3, doorH = 6, sideW = (w - doorW) / 2;
             const frontLeft = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat); frontLeft.position.set(-w/2 + sideW/2, h/2, d/2); frontLeft.castShadow = frontLeft.receiveShadow = true; houseGroup.add(frontLeft);
             const frontRight = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat); frontRight.position.set(w/2 - sideW/2, h/2, d/2); frontRight.castShadow = frontRight.receiveShadow = true; houseGroup.add(frontRight);
             const frontTop = new THREE.Mesh(new THREE.BoxGeometry(doorW, h - doorH, t), wallMat); frontTop.position.set(0, doorH + (h - doorH)/2, d/2); frontTop.castShadow = frontTop.receiveShadow = true; houseGroup.add(frontTop);
 
             const winMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 });
-            const winL = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.5, 2, t+0.1), winMat); winL.position.set(-w/2 + sideW/2, h/2, d/2); houseGroup.add(winL);
-            const winR = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.5, 2, t+0.1), winMat); winR.position.set(w/2 - sideW/2, h/2, d/2); houseGroup.add(winR);
+            const winL = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 3, t+0.1), winMat); winL.position.set(-w/2 + sideW/2, h/2, d/2); houseGroup.add(winL);
+            const winR = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 3, t+0.1), winMat); winR.position.set(w/2 - sideW/2, h/2, d/2); houseGroup.add(winR);
 
             const hinge = new THREE.Group(); hinge.position.set(-doorW/2, 0, d/2);
             const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.2), new THREE.MeshStandardMaterial({ color: 0x3d2b1f })); door.position.set(doorW/2, doorH/2, 0); door.castShadow = true; hinge.add(door); houseGroup.add(hinge); b.doorHinge = hinge;
 
-            const roofH = isHQ ? 8 : 4;
+            const roofH = isHQ ? 10 : 6;
             const roofMat = new THREE.MeshStandardMaterial({ color: isHQ ? 0x3e3e3e : roofColors[Math.floor(Math.random() * roofColors.length)], roughness: 1.0 }); 
             const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*0.7, roofH, 4), roofMat); roof.position.set(0, h + roofH/2, 0); roof.rotation.y = Math.PI / 4; roof.castShadow = true; houseGroup.add(roof);
 
             if (isHQ) {
-                const tower = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 6), wallMat); tower.position.set(w/2 + 2, 12, d/2 - 2); tower.castShadow = tower.receiveShadow = true; houseGroup.add(tower);
-                const tRoof = new THREE.Mesh(new THREE.ConeGeometry(5, 8, 4), roofMat); tRoof.position.set(w/2 + 2, 28, d/2 - 2); tRoof.rotation.y = Math.PI/4; tRoof.castShadow = true; houseGroup.add(tRoof);
+                const tower = new THREE.Mesh(new THREE.BoxGeometry(8, 28, 8), wallMat); tower.position.set(w/2 + 2, 14, d/2 - 2); tower.castShadow = tower.receiveShadow = true; houseGroup.add(tower);
+                const tRoof = new THREE.Mesh(new THREE.ConeGeometry(7, 10, 4), roofMat); tRoof.position.set(w/2 + 2, 33, d/2 - 2); tRoof.rotation.y = Math.PI/4; tRoof.castShadow = true; houseGroup.add(tRoof);
             }
 
-            const board = new THREE.Mesh(new THREE.PlaneGeometry(8, 4.5), new THREE.MeshBasicMaterial({ color: 0x000000 })); board.position.set(0, 4, -d/2 + t + 0.05); houseGroup.add(board); b.board = board; 
-            const hLight = new THREE.PointLight(0xffa500, 0, 25); hLight.position.set(0, h/2, 0); houseGroup.add(hLight); b.interiorLight = hLight;
+            // Interior Props: Wall Poster
+            const posterTex = createPosterTexture(b.title, b.type);
+            const poster = new THREE.Mesh(new THREE.PlaneGeometry(8, 4), new THREE.MeshBasicMaterial({map: posterTex}));
+            poster.position.set(0, 5, -d/2 + t + 0.05); houseGroup.add(poster);
+
+            // Interior Props: Couch & Table
+            const couchGrp = new THREE.Group();
+            const seatMat = new THREE.MeshStandardMaterial({color: 0x3e2b1e});
+            const seat = new THREE.Mesh(new THREE.BoxGeometry(6, 1, 2.5), seatMat); seat.position.y = 0.5; seat.castShadow = true;
+            const back = new THREE.Mesh(new THREE.BoxGeometry(6, 2.5, 0.6), seatMat); back.position.set(0, 1.8, -1); back.castShadow = true;
+            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.8, 2.5), seatMat); armL.position.set(-3.2, 0.9, 0); armL.castShadow = true;
+            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.8, 2.5), seatMat); armR.position.set(3.2, 0.9, 0); armR.castShadow = true;
+            couchGrp.add(seat, back, armL, armR);
+            couchGrp.position.set(0, 0, 0); houseGroup.add(couchGrp);
+            
+            const tblGrp = new THREE.Group();
+            const tblTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 2.5), new THREE.MeshStandardMaterial({color: 0x221100})); tblTop.position.y = 1.2; tblTop.castShadow = true;
+            const tblLeg = new THREE.Mesh(new THREE.BoxGeometry(3, 1.2, 1.5), new THREE.MeshStandardMaterial({color: 0x111111})); tblLeg.position.y = 0.6; tblLeg.castShadow = true;
+            const mag = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.9), new THREE.MeshStandardMaterial({color: 0xffffff})); mag.position.set(-0.6, 1.35, 0); mag.rotation.y = 0.2; mag.castShadow = true;
+            const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.4, 12), new THREE.MeshStandardMaterial({color: 0xe0e0e0})); cup.position.set(0.8, 1.5, -0.3); cup.castShadow = true;
+            tblGrp.add(tblTop, tblLeg, mag, cup);
+            tblGrp.position.set(0, 0, 3.5); houseGroup.add(tblGrp);
+
+            b.couchWorldPos = new THREE.Vector3(0, 0.5, 0.5); // Local offset for sitting player
+
+            const hLight = new THREE.PointLight(0xffaa55, 0, 30); hLight.position.set(0, h/2, 0); houseGroup.add(hLight); b.interiorLight = hLight;
             envGroup.add(houseGroup);
 
             const ring = new THREE.Mesh(new THREE.RingGeometry(2, 3, 32), new THREE.MeshBasicMaterial({ color: 0xea580c, side: THREE.DoubleSide, transparent: true, opacity: 0.6 })); ring.rotation.x = -Math.PI / 2; ring.position.set(b.tx, 0.1, b.tz); scene.add(ring);
             b.mesh = houseGroup; 
+            b.dims = { hw: w/2 - 1.5, hd: d/2 - 1.5 }; // Stored for collisions
         });
 
-        // Props
+        // External Props
         const fenceMat = new THREE.MeshStandardMaterial({ color: 0x4a3b2c, roughness: 1.0 });
         function createFence(x, z, length, isHorizontal) {
             const count = Math.floor(length / 2);
@@ -289,55 +296,73 @@
                 if(!isHorizontal) { p1.rotation.y = Math.PI/2; p2.rotation.y = Math.PI/2; } envGroup.add(post, p1, p2);
             }
         }
-        createFence(-15, -90, 40, false); createFence(15, -90, 40, false); createFence(-15, 10, 40, false); createFence(15, 10, 40, false);
+        createFence(-12, -180, 100, false); createFence(12, -180, 100, false);
+        createFence(-12, 80, 100, false); createFence(12, 80, 100, false);
 
-        const hayMat = new THREE.MeshStandardMaterial({ color: 0xcfb53b, roughness: 1.0 });
-        const hayGeo = new THREE.CylinderGeometry(1.2, 1.2, 2.5, 8); hayGeo.rotateZ(Math.PI/2);
+        const hayMat = new THREE.MeshStandardMaterial({ color: 0xcfb53b, roughness: 1.0 }); const hayGeo = new THREE.CylinderGeometry(1.2, 1.2, 2.5, 8); hayGeo.rotateZ(Math.PI/2);
         for(let i=0; i<40; i++) {
-            const h = new THREE.Mesh(hayGeo, hayMat); h.position.set((Math.random()-0.5)*200, 1.2, (Math.random()-0.5)*250);
+            const h = new THREE.Mesh(hayGeo, hayMat); h.position.set((Math.random()-0.5)*300, 1.2, (Math.random()-0.5)*300);
             if (Math.abs(h.position.x) > 12) { h.rotation.y = Math.random() * Math.PI; h.castShadow = true; envGroup.add(h); }
         }
-
-        const treeGeo = new THREE.ConeGeometry(2, 9, 7); const treeMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 1.0 }); 
-        const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 3); const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f }); 
-        for(let i=0; i<300; i++) {
-            const x = (Math.random() - 0.5) * 500, z = (Math.random() - 0.5) * 500;
-            if(Math.abs(x) < 15) continue; 
-            let tooClose = false; buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 12) tooClose = true; }); if(tooClose) continue;
+        const treeGeo = new THREE.ConeGeometry(2.5, 12, 7); const treeMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 1.0 }); 
+        const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 4); const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f }); 
+        for(let i=0; i<400; i++) {
+            const x = (Math.random() - 0.5) * 600, z = (Math.random() - 0.5) * 600;
+            if(Math.abs(x) < 20 && Math.abs(z) < 200) continue; 
+            let tooClose = false; buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 16) tooClose = true; }); if(tooClose) continue;
             const treeGrp = new THREE.Group(); treeGrp.position.set(x, 0, z);
-            const trunk = new THREE.Mesh(trunkGeo, trunkMat); trunk.position.y = 1.5; trunk.castShadow = true; treeGrp.add(trunk);
-            const leaves = new THREE.Mesh(treeGeo, treeMat); leaves.position.y = 6; leaves.castShadow = true; treeGrp.add(leaves);
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat); trunk.position.y = 2; trunk.castShadow = true; treeGrp.add(trunk);
+            const leaves = new THREE.Mesh(treeGeo, treeMat); leaves.position.y = 8; leaves.castShadow = true; treeGrp.add(leaves);
             envGroup.add(treeGrp);
         }
 
-        // --- UAZ VEHICLE ---
+        // --- UAZ VEHICLE (Mahindra Thar Style) ---
         const carGroup = new THREE.Group();
-        const carChassis = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 4.4), new THREE.MeshStandardMaterial({ color: 0x3b4d28, roughness: 0.9, metalness: 0.2 }));
-        carChassis.position.y = 1.0; carChassis.castShadow = true; carGroup.add(carChassis);
-        const frameMat = new THREE.MeshStandardMaterial({color: 0x111111});
-        const windshield = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.0, 0.1), frameMat); windshield.position.set(0, 2.1, -0.6); carGroup.add(windshield);
-        const rollbar1 = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.1, 0.1), frameMat); rollbar1.position.set(0, 2.6, 1.8);
-        const rollbar2 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 2.5), frameMat); rollbar2.position.set(-0.95, 2.6, 0.6);
-        const rollbar3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 2.5), frameMat); rollbar3.position.set(0.95, 2.6, 0.6);
-        carGroup.add(rollbar1, rollbar2, rollbar3);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.3 }); // Black Thar
+        const trimMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+        
+        const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 5.0), bodyMat); chassis.position.y = 1.2; chassis.castShadow = true;
+        const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.5, 2.6), bodyMat); cabin.position.set(0, 2.5, 0.4); cabin.castShadow = true;
+        const fFender = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.2, 1.4), trimMat); fFender.position.set(0, 1.0, -1.6);
+        const rFender = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.2, 1.4), trimMat); rFender.position.set(0, 1.0, 1.6);
+        
+        const spareTire = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.4, 16), new THREE.MeshStandardMaterial({color:0x111}));
+        spareTire.rotation.z = Math.PI/2; spareTire.rotation.y = Math.PI/2; spareTire.position.set(0, 2.0, 2.7);
 
-        let hlSpotL = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1); hlSpotL.position.set(-0.8, 1.0, -2.2); hlSpotL.target.position.set(-0.8, 0, -30); carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
-        let hlSpotR = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1); hlSpotR.position.set(0.8, 1.0, -2.2); hlSpotR.target.position.set(0.8, 0, -30); carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
+        const windshield = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.2, 0.1), new THREE.MeshStandardMaterial({color: 0x111111, roughness:0})); windshield.position.set(0, 2.5, -0.9);
+        carGroup.add(chassis, cabin, fFender, rFender, spareTire, windshield);
 
-        const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 16); wheelGeo.rotateZ(Math.PI / 2); const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 1.0 });
-        const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.2, 0.5, 1.4); w1.castShadow = true;
-        const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.2, 0.5, 1.4); w2.castShadow = true;
-        const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.2, 0.5, -1.4); w3.castShadow = true;
-        const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.2, 0.5, -1.4); w4.castShadow = true;
+        let hlSpotL = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1); hlSpotL.position.set(-0.8, 1.2, -2.5); hlSpotL.target.position.set(-0.8, 0, -30); carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
+        let hlSpotR = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1); hlSpotR.position.set(0.8, 1.2, -2.5); hlSpotR.target.position.set(0.8, 0, -30); carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
+
+        const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.6, 16); wheelGeo.rotateZ(Math.PI / 2); const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 1.0 });
+        const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.2, 0.6, 1.6); w1.castShadow = true;
+        const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.2, 0.6, 1.6); w2.castShadow = true;
+        const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.2, 0.6, -1.6); w3.castShadow = true;
+        const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.2, 0.6, -1.6); w4.castShadow = true;
         carGroup.add(w1, w2, w3, w4); scene.add(carGroup);
 
-        // --- PLAYER CHARACTER ---
+        // --- PLAYER CHARACTER (Articulated Natural Survivor) ---
         const playerGroup = new THREE.Group();
-        const pLegs = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.4), new THREE.MeshStandardMaterial({color: 0x3b3c36})); pLegs.position.y = 0.45; pLegs.castShadow = true;
-        const pTorso = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.1, 0.5), new THREE.MeshStandardMaterial({color: 0xcccccc})); pTorso.position.y = 1.45; pTorso.castShadow = true;
-        const pPack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.4), new THREE.MeshStandardMaterial({color: 0x222222})); pPack.position.set(0, 1.45, 0.45); pPack.castShadow = true;
-        const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({color: 0xfcbda1})); pHead.position.y = 2.2; pHead.castShadow = true;
-        playerGroup.add(pLegs, pTorso, pPack, pHead); scene.add(playerGroup); playerGroup.visible = false; 
+        const skinMat = new THREE.MeshStandardMaterial({color: 0xfcbda1});
+        const shirtMat = new THREE.MeshStandardMaterial({color: 0xc4c4b8});
+        const pantsMat = new THREE.MeshStandardMaterial({color: 0x4a4f44});
+        
+        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), shirtMat); torso.position.y = 2.0; torso.castShadow = true; playerGroup.add(torso);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skinMat); head.position.y = 2.9; head.castShadow = true; playerGroup.add(head);
+        const pack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.0, 0.4), new THREE.MeshStandardMaterial({color:0x222})); pack.position.set(0, 2.0, 0.45); pack.castShadow = true; playerGroup.add(pack);
+
+        function createLimb(mat, yOff, len) {
+            const pivot = new THREE.Group(); const m = new THREE.Mesh(new THREE.BoxGeometry(0.3, len, 0.3), mat);
+            m.position.y = -len/2 + yOff; m.castShadow = true; pivot.add(m); return pivot;
+        }
+        const lArm = createLimb(skinMat, 0, 1.1); lArm.position.set(-0.55, 2.5, 0); playerGroup.add(lArm);
+        const rArm = createLimb(skinMat, 0, 1.1); rArm.position.set(0.55, 2.5, 0); playerGroup.add(rArm);
+        const lLeg = createLimb(pantsMat, 0, 1.4); lLeg.position.set(-0.25, 1.4, 0); playerGroup.add(lLeg);
+        const rLeg = createLimb(pantsMat, 0, 1.4); rLeg.position.set(0.25, 1.4, 0); playerGroup.add(rLeg);
+        
+        playerGroup.userData = { lArm, rArm, lLeg, rLeg };
+        scene.add(playerGroup); playerGroup.visible = false; 
 
         // --- LABELS ---
         const labelsContainer = document.getElementById('labels-container');
@@ -348,7 +373,6 @@
         });
 
         // --- INPUT HANDLING ---
-        // Pointer Lock & Mouse Look (Desktop)
         document.body.addEventListener('click', (e) => {
             if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('button') && !e.target.closest('a')) {
                 if (window.innerWidth > 768) document.body.requestPointerLock();
@@ -356,57 +380,49 @@
         });
         document.addEventListener('pointerlockchange', () => { isPointerLocked = (document.pointerLockElement === document.body); });
         document.addEventListener('mousemove', (e) => {
-            if (!isPointerLocked || state.mode === 'TRANSITION') return;
-            camTheta -= e.movementX * 0.003;
-            camPhi -= e.movementY * 0.003;
+            if (!isPointerLocked || state.mode === 'TRANSITION' || isSitting) return;
+            camTheta -= e.movementX * 0.003; camPhi -= e.movementY * 0.003;
             camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi));
         });
 
-        // Keyboard
         window.addEventListener('keydown', (e) => {
             const k = e.key.toLowerCase();
             if (state.keys.hasOwnProperty(k)) state.keys[k] = true;
             const keyEl = document.getElementById(`key-${k}`); if(keyEl) keyEl.classList.add('pressed');
             if (k === 'f') {
                 if (state.mode === 'DRIVING' && state.activeBuilding) beginEnterHouse();
-                else if (state.mode === 'WALKING') beginExitHouse();
-                const btnF = document.getElementById(`key-f`); if(btnF) btnF.classList.add('pressed', 'bg-orange-600');
+                else if (state.mode === 'WALKING' && !isSitting) beginExitHouse();
+                const btn = document.getElementById(`key-f`); if(btn) btn.classList.add('pressed', 'bg-orange-600');
+            }
+            if (k === 'e') {
+                if (state.mode === 'WALKING') toggleSit();
+                else if (state.mode === 'READING') toggleSit();
+                const btn = document.getElementById(`key-e`); if(btn) btn.classList.add('pressed', 'bg-orange-600');
             }
         });
         window.addEventListener('keyup', (e) => {
             const k = e.key.toLowerCase();
             if (state.keys.hasOwnProperty(k)) state.keys[k] = false;
             const keyEl = document.getElementById(`key-${k}`); if(keyEl) keyEl.classList.remove('pressed');
-            if (k === 'f') {
-                const btnF = document.getElementById(`key-f`); if(btnF) btnF.classList.remove('pressed', 'bg-orange-600');
-            }
+            if (k === 'f') { const btn = document.getElementById(`key-f`); if(btn) btn.classList.remove('pressed', 'bg-orange-600'); }
+            if (k === 'e') { const btn = document.getElementById(`key-e`); if(btn) btn.classList.remove('pressed', 'bg-orange-600'); }
         });
 
-        // Virtual Joysticks & Touch Look (Mobile)
         let moveTouchId = null; let lookTouchId = null;
         let joyStartX = 0, joyStartY = 0; let lastLookX = 0, lastLookY = 0;
-        const joyBase = document.getElementById('joystick-base');
-        const joyStick = document.getElementById('joystick-stick');
+        const joyBase = document.getElementById('joystick-base'); const joyStick = document.getElementById('joystick-stick');
 
         container.addEventListener('touchstart', e => {
-            // Ignore if touching a UI element
             if(e.target !== renderer.domElement) return;
             for(let i=0; i<e.changedTouches.length; i++) {
                 const t = e.changedTouches[i];
                 if (t.clientX < window.innerWidth / 2) {
                     if (moveTouchId === null) {
-                        moveTouchId = t.identifier;
-                        joyStartX = t.clientX; joyStartY = t.clientY;
-                        joyBase.style.display = 'block';
-                        joyBase.style.left = joyStartX + 'px';
-                        joyBase.style.top = joyStartY + 'px';
-                        joyStick.style.transform = `translate(-50%, -50%)`;
+                        moveTouchId = t.identifier; joyStartX = t.clientX; joyStartY = t.clientY;
+                        joyBase.style.display = 'block'; joyBase.style.left = joyStartX + 'px'; joyBase.style.top = joyStartY + 'px'; joyStick.style.transform = `translate(-50%, -50%)`;
                     }
                 } else {
-                    if (lookTouchId === null) {
-                        lookTouchId = t.identifier;
-                        lastLookX = t.clientX; lastLookY = t.clientY;
-                    }
+                    if (lookTouchId === null) { lookTouchId = t.identifier; lastLookX = t.clientX; lastLookY = t.clientY; }
                 }
             }
         }, {passive: false});
@@ -423,10 +439,9 @@
                     joyStick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
                     inputX = dx / maxDist; inputY = dy / maxDist;
                 } else if (t.identifier === lookTouchId) {
-                    if(state.mode !== 'TRANSITION') {
+                    if(state.mode !== 'TRANSITION' && !isSitting) {
                         const dx = t.clientX - lastLookX; const dy = t.clientY - lastLookY;
-                        camTheta -= dx * 0.005; camPhi -= dy * 0.005;
-                        camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi));
+                        camTheta -= dx * 0.005; camPhi -= dy * 0.005; camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi));
                     }
                     lastLookX = t.clientX; lastLookY = t.clientY;
                 }
@@ -436,101 +451,106 @@
         const handleTouchEnd = e => {
             for(let i=0; i<e.changedTouches.length; i++) {
                 const t = e.changedTouches[i];
-                if (t.identifier === moveTouchId) {
-                    moveTouchId = null; inputX = 0; inputY = 0;
-                    joyBase.style.display = 'none';
-                } else if (t.identifier === lookTouchId) {
-                    lookTouchId = null;
-                }
+                if (t.identifier === moveTouchId) { moveTouchId = null; inputX = 0; inputY = 0; joyBase.style.display = 'none'; } 
+                else if (t.identifier === lookTouchId) { lookTouchId = null; }
             }
         };
         container.addEventListener('touchend', handleTouchEnd); container.addEventListener('touchcancel', handleTouchEnd);
 
-
         // --- UI CLICKS ---
         document.getElementById('btn-time-cycle').addEventListener('click', () => {
-            currentModeIdx = (currentModeIdx + 1) % 3;
-            const target = timeModes[currentModeIdx];
-            const iconEl = document.getElementById('icon-time');
-            iconEl.setAttribute('icon', target.icon);
-            iconEl.className = `transition-transform duration-500 ${target.iconColor}`;
-            document.getElementById('time-text').innerText = target.name;
-            state.targetTimeMode = target;
+            currentModeIdx = (currentModeIdx + 1) % 3; const target = timeModes[currentModeIdx];
+            const iconEl = document.getElementById('icon-time'); iconEl.setAttribute('icon', target.icon); iconEl.className = `transition-transform duration-500 ${target.iconColor}`;
+            document.getElementById('time-text').innerText = target.name; state.targetTimeMode = target;
         });
 
         const btnEnterHouse = document.getElementById('btn-enter-house');
         const btnExitHouse = document.getElementById('btn-exit-house');
-        const boardUI = document.getElementById('board-ui');
+        const btnReadMag = document.getElementById('btn-read-mag');
+        const magUI = document.getElementById('magazine-ui');
         const modeText = document.getElementById('mode-text');
         
         let transSeq = []; let transIdx = 0;
 
         function beginEnterHouse() {
             if(!state.activeBuilding || state.mode !== 'DRIVING') return;
-            state.mode = 'TRANSITION';
-            modeText.innerText = 'SURVIVOR [LOOTING]';
-            btnEnterHouse.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
-            btnEnterHouse.classList.add('opacity-0', 'scale-90', 'translate-y-4');
-            
-            const b = state.activeBuilding;
-            playerGroup.position.copy(carGroup.position);
-            playerGroup.position.x += 2; 
-            playerGroup.visible = true;
-
-            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 8, 0, b.z + Math.cos(b.angle) * 8 );
-            const insideWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 2, 0, b.z + Math.cos(b.angle) * 2 );
-            transSeq = [ { type: 'walk', target: doorWorldPos }, { type: 'door', target: Math.PI / 2 }, { type: 'walk', target: insideWorldPos }, { type: 'done_in' } ];
-            transIdx = 0;
+            state.mode = 'TRANSITION'; modeText.innerText = 'SURVIVOR [LOOTING]';
+            btnEnterHouse.classList.remove('opacity-100', 'scale-100', 'translate-y-0'); btnEnterHouse.classList.add('opacity-0', 'scale-90', 'translate-y-4');
+            const b = state.activeBuilding; playerGroup.position.copy(carGroup.position); playerGroup.position.x += 2.5; playerGroup.visible = true;
+            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 12, 0, b.z + Math.cos(b.angle) * 12 );
+            const insideWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 4, 0, b.z + Math.cos(b.angle) * 4 );
+            transSeq = [ { type: 'walk', target: doorWorldPos }, { type: 'door', target: Math.PI / 2 }, { type: 'walk', target: insideWorldPos }, { type: 'done_in' } ]; transIdx = 0;
         }
 
         function beginExitHouse() {
             if(state.mode !== 'WALKING') return;
-            state.mode = 'TRANSITION';
-            modeText.innerText = 'SURVIVOR [EXITING]';
-            btnExitHouse.classList.add('hidden');
-            boardUI.classList.remove('active');
-            
-            const b = state.activeBuilding;
-            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 8, 0, b.z + Math.cos(b.angle) * 8 );
-            const carWorldPos = new THREE.Vector3().copy(carGroup.position); carWorldPos.x += 2;
-            transSeq = [ { type: 'walk', target: doorWorldPos }, { type: 'door', target: 0 }, { type: 'walk', target: carWorldPos }, { type: 'done_out' } ];
-            transIdx = 0;
+            state.mode = 'TRANSITION'; modeText.innerText = 'SURVIVOR [EXITING]';
+            btnExitHouse.classList.add('hidden'); btnReadMag.classList.add('opacity-0', 'scale-90');
+            const b = state.activeBuilding; const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 12, 0, b.z + Math.cos(b.angle) * 12 );
+            const carWorldPos = new THREE.Vector3().copy(carGroup.position); carWorldPos.x += 2.5;
+            transSeq = [ { type: 'walk', target: doorWorldPos }, { type: 'door', target: 0 }, { type: 'walk', target: carWorldPos }, { type: 'done_out' } ]; transIdx = 0;
         }
 
-        function populateBoardUI(b) {
-            document.getElementById('board-icon').setAttribute('icon', b.icon); document.getElementById('board-title').innerText = b.title; document.getElementById('board-subtitle').innerText = b.type; document.getElementById('board-desc').innerHTML = b.desc;
-            const techCont = document.getElementById('board-tech-container'); const techWrapper = document.getElementById('board-tech');
-            if(b.tech && b.tech.length > 0) { techCont.classList.remove('hidden'); techWrapper.innerHTML = b.tech.map(t => `<span class="px-2 py-1 bg-[#2c352a] text-orange-300 text-xs font-mono font-bold border border-[#4a5d23]">${t}</span>`).join(''); } else { techCont.classList.add('hidden'); }
-            const linkEl = document.getElementById('board-link');
-            if(b.link) { linkEl.href = b.link; document.getElementById('board-link-text').innerText = b.linkText; linkEl.classList.remove('hidden'); } else { linkEl.classList.add('hidden'); }
+        function toggleSit() {
+            if(!state.activeBuilding || state.mode === 'TRANSITION') return;
+            isSitting = !isSitting;
+            const b = state.activeBuilding;
+            if(isSitting) {
+                state.mode = 'READING'; modeText.innerText = 'SURVIVOR [READING]';
+                btnReadMag.classList.add('opacity-0', 'scale-90'); btnExitHouse.classList.add('hidden');
+                
+                // Sit animation & snapping
+                const cw = b.couchWorldPos.clone().applyAxisAngle(new THREE.Vector3(0,1,0), b.angle).add(new THREE.Vector3(b.x, 0, b.z));
+                playerGroup.position.copy(cw);
+                playerGroup.rotation.y = b.angle + Math.PI; // Face table
+                playerGroup.userData.lLeg.rotation.x = -Math.PI/2; playerGroup.userData.rLeg.rotation.x = -Math.PI/2;
+                playerGroup.userData.lArm.rotation.x = -Math.PI/3; playerGroup.userData.rArm.rotation.x = -Math.PI/3;
+                
+                // Show Magazine overlay
+                document.getElementById('mag-icon').setAttribute('icon', b.icon); document.getElementById('mag-title').innerText = b.title; document.getElementById('mag-type').innerText = b.type; document.getElementById('mag-desc').innerHTML = b.desc;
+                const tWrap = document.getElementById('mag-tech'); if(b.tech && b.tech.length){ tWrap.innerHTML = b.tech.map(t=>`<span class="px-3 py-1 bg-orange-200/50 text-orange-900 border border-orange-300 rounded font-bold text-xs font-mono">${t}</span>`).join(''); } else { tWrap.innerHTML=''; }
+                const lEl = document.getElementById('mag-link'); if(b.link) { lEl.href = b.link; lEl.innerText = b.linkText; lEl.style.display='block';} else {lEl.style.display='none';}
+                magUI.classList.remove('hidden'); setTimeout(()=> magUI.classList.remove('opacity-0'), 10);
+            } else {
+                state.mode = 'WALKING'; modeText.innerText = 'SURVIVOR [INDOORS]';
+                magUI.classList.add('opacity-0'); setTimeout(()=> magUI.classList.add('hidden'), 300);
+                
+                // Stand up
+                playerGroup.position.x += Math.sin(playerGroup.rotation.y + Math.PI) * 2;
+                playerGroup.position.z += Math.cos(playerGroup.rotation.y + Math.PI) * 2;
+                playerGroup.userData.lLeg.rotation.x = 0; playerGroup.userData.rLeg.rotation.x = 0;
+                playerGroup.userData.lArm.rotation.x = 0; playerGroup.userData.rArm.rotation.x = 0;
+                btnExitHouse.classList.remove('hidden');
+            }
         }
 
         btnEnterHouse.addEventListener('click', beginEnterHouse);
         btnExitHouse.addEventListener('click', beginExitHouse);
+        btnReadMag.addEventListener('click', toggleSit);
+        document.getElementById('btn-close-mag').addEventListener('click', toggleSit);
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
         function updateLabels() {
             if(state.mode !== 'DRIVING') { buildings.forEach(b => b.labelEl.style.opacity = '0'); return; }
             buildings.forEach(b => {
-                const pos = new THREE.Vector3(b.x, 12, b.z); 
+                const pos = new THREE.Vector3(b.x, 18, b.z); 
                 const dist = carGroup.position.distanceTo(new THREE.Vector3(b.x, 0, b.z));
-                if(dist > 60) { b.labelEl.style.opacity = '0'; return; }
+                if(dist > 70) { b.labelEl.style.opacity = '0'; return; }
                 pos.project(camera);
                 if (pos.z < 1) {
                     b.labelEl.style.left = `${(pos.x * 0.5 + 0.5) * window.innerWidth}px`;
                     b.labelEl.style.top = `${(-(pos.y * 0.5) + 0.5) * window.innerHeight}px`;
                     b.labelEl.style.opacity = '1';
-                    b.labelEl.style.transform = `translate(-50%, -50%) scale(${Math.max(0.6, 1 - dist/60)})`;
+                    b.labelEl.style.transform = `translate(-50%, -50%) scale(${Math.max(0.6, 1 - dist/70)})`;
                 } else { b.labelEl.style.opacity = '0'; }
             });
         }
 
-        const ACCELERATION = 0.025; const FRICTION = 0.95; const MAX_SPEED = 0.8; const ROTATION_SPEED = 0.05;
+        const ACCELERATION = 0.025; const FRICTION = 0.95; const MAX_SPEED = 0.9; const ROTATION_SPEED = 0.05;
 
         function animate() {
             requestAnimationFrame(animate);
 
-            // Time lerping
             if (state.targetTimeMode) {
                 const t = state.targetTimeMode; const lerpSpd = 0.02;
                 const targetSky = new THREE.Color(t.sky); scene.background.lerp(targetSky, lerpSpd); scene.fog.color.lerp(targetSky, lerpSpd);
@@ -544,20 +564,15 @@
                 hlSpotL.intensity += (t.carHeadlights - hlSpotL.intensity) * lerpSpd; hlSpotR.intensity += (t.carHeadlights - hlSpotR.intensity) * lerpSpd;
             }
 
-            // Keyboard Override (Normalized inputX/inputY)
             if (window.innerWidth > 768 && moveTouchId === null) {
                 inputX = 0; inputY = 0;
-                if (state.keys.w) inputY = -1;
-                if (state.keys.s) inputY = 1;
-                if (state.keys.a) inputX = -1;
-                if (state.keys.d) inputX = 1;
-                if (inputX !== 0 && inputY !== 0) { inputX *= 0.707; inputY *= 0.707; } // Normalize diagonal
+                if (state.keys.w) inputY = -1; if (state.keys.s) inputY = 1;
+                if (state.keys.a) inputX = -1; if (state.keys.d) inputX = 1;
+                if (inputX !== 0 && inputY !== 0) { inputX *= 0.707; inputY *= 0.707; }
             }
 
             if (state.mode === 'DRIVING') {
-                // Car Physics (Forward/back is Y, steering is X relative to car, NOT camera)
-                if (inputY < 0) state.speed += ACCELERATION;
-                if (inputY > 0) state.speed -= ACCELERATION;
+                if (inputY < 0) state.speed += ACCELERATION; if (inputY > 0) state.speed -= ACCELERATION;
                 state.speed *= FRICTION; state.speed = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, state.speed));
 
                 if (Math.abs(state.speed) > 0.01) {
@@ -568,18 +583,17 @@
                 carGroup.rotation.y = state.angle;
                 let nextX = carGroup.position.x - Math.sin(state.angle) * state.speed;
                 let nextZ = carGroup.position.z - Math.cos(state.angle) * state.speed;
-                nextX = Math.max(-200, Math.min(200, nextX)); nextZ = Math.max(-200, Math.min(200, nextZ));
+                nextX = Math.max(-300, Math.min(300, nextX)); nextZ = Math.max(-300, Math.min(300, nextZ));
 
-                let collision = false; buildings.forEach(b => { const radius = b.id === 'about-hq' ? 14 : 9; if(Math.hypot(nextX - b.x, nextZ - b.z) < radius) collision = true; });
+                let collision = false; buildings.forEach(b => { const radius = b.id === 'about-hq' ? 18 : 14; if(Math.hypot(nextX - b.x, nextZ - b.z) < radius) collision = true; });
                 if(!collision) { carGroup.position.x = nextX; carGroup.position.z = nextZ; } else { state.speed = 0; }
 
                 if (Math.abs(state.speed) > 0.01) {
                     const wheelRot = state.speed * 0.25;
-                    carGroup.children[4].rotation.x += wheelRot; carGroup.children[5].rotation.x += wheelRot;
                     carGroup.children[6].rotation.x += wheelRot; carGroup.children[7].rotation.x += wheelRot;
+                    carGroup.children[8].rotation.x += wheelRot; carGroup.children[9].rotation.x += wheelRot;
                 }
 
-                // 3rd Person Camera Look
                 const target = carGroup.position.clone(); target.y += 1.5;
                 camRadius = 14;
                 camera.position.x = target.x + camRadius * Math.sin(camPhi) * Math.sin(camTheta);
@@ -587,9 +601,8 @@
                 camera.position.z = target.z + camRadius * Math.sin(camPhi) * Math.cos(camTheta);
                 camera.lookAt(target);
 
-                // Interactions
                 let nearby = null;
-                buildings.forEach(b => { const dist = Math.hypot(carGroup.position.x - b.tx, carGroup.position.z - b.tz); if (dist < 6) nearby = b; });
+                buildings.forEach(b => { const dist = Math.hypot(carGroup.position.x - b.tx, carGroup.position.z - b.tz); if (dist < 8) nearby = b; });
                 if (nearby !== state.activeBuilding) {
                     state.activeBuilding = nearby;
                     if (nearby) {
@@ -605,79 +618,97 @@
                 if (step.type === 'walk') {
                     playerGroup.position.lerp(step.target, 0.06);
                     playerGroup.rotation.y = Math.atan2(playerGroup.position.x - step.target.x, playerGroup.position.z - step.target.z);
-                    if (playerGroup.position.distanceTo(step.target) < 0.5) transIdx++;
+                    
+                    // Simple walk animation
+                    const t = Date.now() * 0.01;
+                    playerGroup.userData.lArm.rotation.x = Math.sin(t) * 0.5; playerGroup.userData.rArm.rotation.x = -Math.sin(t) * 0.5;
+                    playerGroup.userData.lLeg.rotation.x = -Math.sin(t) * 0.5; playerGroup.userData.rLeg.rotation.x = Math.sin(t) * 0.5;
+
+                    if (playerGroup.position.distanceTo(step.target) < 0.5) {
+                        transIdx++; playerGroup.userData.lArm.rotation.x = 0; playerGroup.userData.rArm.rotation.x = 0; playerGroup.userData.lLeg.rotation.x = 0; playerGroup.userData.rLeg.rotation.x = 0;
+                    }
                 } else if (step.type === 'door') {
                     const b = state.activeBuilding; b.doorHinge.rotation.y += (step.target - b.doorHinge.rotation.y) * 0.1;
                     if (Math.abs(b.doorHinge.rotation.y - step.target) < 0.05) transIdx++;
                 } else if (step.type === 'done_in') {
                     state.mode = 'WALKING'; modeText.innerText = 'SURVIVOR [INDOORS]';
                     state.playerAngle = state.activeBuilding.angle + Math.PI; playerGroup.rotation.y = state.playerAngle;
-                    populateBoardUI(state.activeBuilding); boardUI.classList.add('active'); btnExitHouse.classList.remove('hidden');
-                    
-                    // Reset Cam to look behind player
-                    camTheta = state.playerAngle;
-                    camPhi = Math.PI / 3;
+                    btnExitHouse.classList.remove('hidden'); camTheta = state.playerAngle; camPhi = Math.PI / 3;
                 } else if (step.type === 'done_out') {
                     state.mode = 'DRIVING'; modeText.innerText = 'SURVIVOR [DRIVING]';
-                    playerGroup.visible = false; state.activeBuilding = null;
-                    
-                    // Reset Cam to look behind car
-                    camTheta = state.angle;
-                    camPhi = Math.PI / 3;
+                    playerGroup.visible = false; state.activeBuilding = null; camTheta = state.angle; camPhi = Math.PI / 3;
                 }
-
                 const target = playerGroup.position.clone(); target.y += 1.5;
                 const idealCamera = target.clone().add(new THREE.Vector3(0, 3, 6).applyAxisAngle(new THREE.Vector3(0,1,0), playerGroup.rotation.y));
                 camera.position.lerp(idealCamera, 0.08); camera.lookAt(target);
             }
             else if (state.mode === 'WALKING') {
-                // PUBG Player movement relative to Camera Angle
                 const camForward = new THREE.Vector3(Math.sin(camTheta), 0, Math.cos(camTheta)).normalize();
                 const camRight = new THREE.Vector3(Math.sin(camTheta - Math.PI/2), 0, Math.cos(camTheta - Math.PI/2)).normalize();
-                
                 const moveVec = new THREE.Vector3().addScaledVector(camForward, -inputY).addScaledVector(camRight, -inputX);
                 
-                let nextX = playerGroup.position.x;
-                let nextZ = playerGroup.position.z;
-
+                let nextX = playerGroup.position.x; let nextZ = playerGroup.position.z;
                 if (moveVec.lengthSq() > 0.01) {
-                    moveVec.normalize();
-                    state.playerAngle = Math.atan2(moveVec.x, moveVec.z);
-                    playerGroup.rotation.y = state.playerAngle; // instantly face moving direction
+                    moveVec.normalize(); state.playerAngle = Math.atan2(moveVec.x, moveVec.z);
+                    playerGroup.rotation.y = state.playerAngle;
+                    const speed = 0.15; nextX += moveVec.x * speed; nextZ += moveVec.z * speed;
                     
-                    const speed = 0.12;
-                    nextX += moveVec.x * speed;
-                    nextZ += moveVec.z * speed;
+                    // Walk animation
+                    const t = Date.now() * 0.015;
+                    playerGroup.userData.lArm.rotation.x = Math.sin(t) * 0.6; playerGroup.userData.rArm.rotation.x = -Math.sin(t) * 0.6;
+                    playerGroup.userData.lLeg.rotation.x = -Math.sin(t) * 0.6; playerGroup.userData.rLeg.rotation.x = Math.sin(t) * 0.6;
+                } else {
+                    playerGroup.userData.lArm.rotation.x = 0; playerGroup.userData.rArm.rotation.x = 0;
+                    playerGroup.userData.lLeg.rotation.x = 0; playerGroup.userData.rLeg.rotation.x = 0;
                 }
 
-                // Collisions
+                // Robust Box Collision with Sliding
                 const b = state.activeBuilding;
-                const isHQ = b.id === 'about-hq';
-                const hw = isHQ ? 8 : 5, hd = isHQ ? 11 : 6;
-                const dx = nextX - b.x, dz = nextZ - b.z;
-                const cosA = Math.cos(-b.angle), sinA = Math.sin(-b.angle);
-                const localX = dx * cosA - dz * sinA; const localZ = dx * sinA + dz * cosA;
+                let allowX = true, allowZ = true;
+                
+                const dxX = nextX - b.x; const dzX = playerGroup.position.z - b.z;
+                const locXX = dxX * Math.cos(-b.angle) - dzX * Math.sin(-b.angle);
+                const locZX = dxX * Math.sin(-b.angle) + dzX * Math.cos(-b.angle);
+                if (Math.abs(locXX) > b.dims.hw || Math.abs(locZX) > b.dims.hd) allowX = false;
+                
+                const dxZ = playerGroup.position.x - b.x; const dzZ = nextZ - b.z;
+                const locXZ = dxZ * Math.cos(-b.angle) - dzZ * Math.sin(-b.angle);
+                const locZZ = dxZ * Math.sin(-b.angle) + dzZ * Math.cos(-b.angle);
+                if (Math.abs(locXZ) > b.dims.hw || Math.abs(locZZ) > b.dims.hd) allowZ = false;
 
-                if (Math.abs(localX) < hw && Math.abs(localZ) < hd) {
-                    playerGroup.position.x = nextX; playerGroup.position.z = nextZ;
+                if (allowX) playerGroup.position.x = nextX;
+                if (allowZ) playerGroup.position.z = nextZ;
+
+                // Check distance to couch for reading prompt
+                const cw = b.couchWorldPos.clone().applyAxisAngle(new THREE.Vector3(0,1,0), b.angle).add(new THREE.Vector3(b.x, 0, b.z));
+                if (playerGroup.position.distanceTo(cw) < 4.0) {
+                    btnReadMag.classList.remove('opacity-0', 'scale-90');
+                } else {
+                    btnReadMag.classList.add('opacity-0', 'scale-90');
                 }
 
-                // 3rd Person Camera Look
                 const target = playerGroup.position.clone(); target.y += 1.5;
-                camRadius = 6;
+                camRadius = 7;
                 camera.position.x = target.x + camRadius * Math.sin(camPhi) * Math.sin(camTheta);
                 camera.position.y = target.y + camRadius * Math.cos(camPhi);
                 camera.position.z = target.z + camRadius * Math.sin(camPhi) * Math.cos(camTheta);
                 camera.lookAt(target);
-
-                const boardWorldPos = new THREE.Vector3(); b.board.getWorldPosition(boardWorldPos);
-                const dist = camera.position.distanceTo(boardWorldPos); boardWorldPos.project(camera);
-                if (boardWorldPos.z < 1) {
-                    boardUI.style.left = `${(boardWorldPos.x * 0.5 + 0.5) * window.innerWidth}px`;
-                    boardUI.style.top = `${(-(boardWorldPos.y * 0.5) + 0.5) * window.innerHeight}px`;
-                    boardUI.style.transform = `translate(-50%, -50%) scale(${Math.max(0.3, Math.min(1.0, 15 / dist))})`;
-                    boardUI.style.opacity = '1';
-                } else { boardUI.style.opacity = '0'; }
+            }
+            else if (state.mode === 'READING') {
+                const b = state.activeBuilding;
+                const target = playerGroup.position.clone(); target.y += 1.5;
+                camRadius = 2.5; // Zoomed in slightly over shoulder
+                
+                const magWorldPos = new THREE.Vector3(0, 0, 3.5).applyAxisAngle(new THREE.Vector3(0,1,0), b.angle).add(new THREE.Vector3(b.x, 0, b.z));
+                const dir = magWorldPos.sub(camera.position).normalize();
+                
+                const idealCamX = target.x - Math.sin(b.angle) * camRadius;
+                const idealCamZ = target.z - Math.cos(b.angle) * camRadius;
+                camera.position.lerp(new THREE.Vector3(idealCamX, target.y + 1, idealCamZ), 0.1);
+                
+                // Keep looking at magazine table area
+                const lookTarget = new THREE.Vector3(0, 1, 3.5).applyAxisAngle(new THREE.Vector3(0,1,0), b.angle).add(new THREE.Vector3(b.x, 0, b.z));
+                camera.lookAt(lookTarget);
             }
 
             document.getElementById('coords').innerText = `GRID: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
