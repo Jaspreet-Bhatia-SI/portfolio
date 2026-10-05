@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+import os
+
+html_content = """<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -380,3 +382,8 @@
   </script>
 </body>
 </html>
+"""
+
+with open('portfolio.html', 'w') as f:
+    f.write(html_content)
+
