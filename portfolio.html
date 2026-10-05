@@ -36,6 +36,12 @@
                 <div class="text-[10px] text-slate-400 tracking-wider font-mono bg-slate-900/80 px-2 py-1 rounded w-max border border-white/5 mt-1 shadow" id="coords">LOC: 0, 0</div>
             </div>
 
+            <!-- Time Cycle Button (Center Top) -->
+            <button id="btn-time-cycle" class="pointer-events-auto absolute top-6 left-1/2 -translate-x-1/2 bg-slate-900/80 backdrop-blur border border-white/10 px-5 py-2.5 rounded-full shadow-2xl text-white hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95">
+                <iconify-icon id="icon-time" icon="solar:sun-bold" width="20" class="text-amber-400 group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
+                <span class="text-[10px] font-bold tracking-widest uppercase" id="time-text">Day</span>
+            </button>
+
             <!-- Controls Hint -->
             <div class="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
                 <p class="text-[10px] uppercase text-slate-400 tracking-widest mb-2 font-mono font-bold">Movement</p>
@@ -182,20 +188,49 @@
 
         // --- STATE MACHINE ---
         const state = {
-            mode: 'DRIVING', // DRIVING, TRANSITION, WALKING
+            mode: 'DRIVING', 
             speed: 0,
             angle: Math.PI, 
             keys: { w: false, a: false, s: false, d: false },
             activeBuilding: null,
-            playerAngle: 0
+            playerAngle: 0,
+            targetTimeMode: null
         };
+
+        // --- TIME CYCLES (Day / Evening / Night) ---
+        const timeModes = [
+            { 
+                name: 'Day', icon: 'solar:sun-bold', iconColor: 'text-amber-400',
+                sky: '#87CEEB', ambient: 0.8, 
+                sunColor: 0xfff5b6, sunY: 200, sunIntensity: 1.2,
+                moonIntensity: 0, starsOpacity: 0,
+                groundColor: 0x4ade80, buildingLight: 0, carHeadlights: 0,
+                cloudTint: 0xffffff
+            },
+            { 
+                name: 'Evening', icon: 'solar:sunset-bold', iconColor: 'text-rose-400',
+                sky: '#f472b6', ambient: 0.5, // Pinkish sky
+                sunColor: 0xea580c, sunY: 40, sunIntensity: 0.9, // Orange setting sun
+                moonIntensity: 0, starsOpacity: 0.2,
+                groundColor: 0x15803d, buildingLight: 0.5, carHeadlights: 2,
+                cloudTint: 0xffe4e6 // Rose tint
+            },
+            { 
+                name: 'Night', icon: 'solar:moon-bold', iconColor: 'text-blue-300',
+                sky: '#0f172a', ambient: 0.15,
+                sunColor: 0x000000, sunY: -50, sunIntensity: 0,
+                moonIntensity: 0.8, starsOpacity: 1,
+                groundColor: 0x064e3b, buildingLight: 2.0, carHeadlights: 5,
+                cloudTint: 0x334155 // Dark slate clouds
+            }
+        ];
+        let currentModeIdx = 0;
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        const skyColor = new THREE.Color('#87CEEB'); 
-        scene.background = skyColor;
-        scene.fog = new THREE.FogExp2(skyColor, 0.006);
+        scene.background = new THREE.Color(timeModes[0].sky);
+        scene.fog = new THREE.FogExp2(timeModes[0].sky, 0.006);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -205,11 +240,11 @@
         container.appendChild(renderer.domElement);
 
         // --- LIGHTING ---
-        const ambientLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7); 
+        const ambientLight = new THREE.HemisphereLight(0xffffff, 0x444444, timeModes[0].ambient); 
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xfff5b6, 1.2); 
-        dirLight.position.set(150, 200, 100);
+        const dirLight = new THREE.DirectionalLight(timeModes[0].sunColor, timeModes[0].sunIntensity); 
+        dirLight.position.set(150, timeModes[0].sunY, 100);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
@@ -221,15 +256,63 @@
         dirLight.shadow.camera.bottom = -200;
         scene.add(dirLight);
 
-        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshBasicMaterial({ color: 0xfff5b6 }));
-        sun.position.set(150, 200, 100);
+        // --- CELESTIAL BODIES (Sun, Moon, Stars, Clouds) ---
+        // Sun
+        const sunMat = new THREE.MeshBasicMaterial({ color: timeModes[0].sunColor });
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), sunMat);
+        sun.position.set(150, timeModes[0].sunY, 100);
         scene.add(sun);
+
+        // Moon
+        const moonMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
+        const moon = new THREE.Mesh(new THREE.SphereGeometry(12, 32, 32), moonMat);
+        moon.position.set(-150, 150, -100);
+        moon.visible = false;
+        scene.add(moon);
+        
+        const moonLight = new THREE.DirectionalLight(0x94a3b8, 0); 
+        moonLight.position.copy(moon.position);
+        moonLight.castShadow = true;
+        scene.add(moonLight);
+
+        // Stars
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 1200;
+        const posArray = new Float32Array(starsCount * 3);
+        for(let i = 0; i < starsCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 800; 
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starsMat = new THREE.PointsMaterial({ size: 1.5, color: 0xffffff, transparent: true, opacity: 0 });
+        const stars = new THREE.Points(starsGeo, starsMat);
+        scene.add(stars);
+
+        // Clouds (Physical Fluffy Clouds for Pink Evening effect)
+        const cloudsGroup = new THREE.Group();
+        const cloudGeo = new THREE.SphereGeometry(1, 16, 16);
+        const cloudMaterials = []; // Keep track to tint them
+        for(let i=0; i<35; i++) {
+            const cloud = new THREE.Group();
+            const chunks = 4 + Math.floor(Math.random()*4);
+            const cMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            cloudMaterials.push(cMat);
+            for(let j=0; j<chunks; j++) {
+                const chunk = new THREE.Mesh(cloudGeo, cMat);
+                chunk.position.set( (Math.random()-0.5)*5, (Math.random()-0.5)*2, (Math.random()-0.5)*5 );
+                const s = 5 + Math.random()*5;
+                chunk.scale.set(s, s*0.6, s);
+                cloud.add(chunk);
+            }
+            cloud.position.set((Math.random()-0.5)*500, 90 + Math.random()*40, (Math.random()-0.5)*500);
+            cloudsGroup.add(cloud);
+        }
+        scene.add(cloudsGroup);
 
         // --- ENVIRONMENT ---
         const envGroup = new THREE.Group();
         scene.add(envGroup);
 
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 1.0 })); 
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({ color: timeModes[0].groundColor, roughness: 1.0 })); 
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
@@ -273,28 +356,24 @@
             const houseGroup = new THREE.Group();
             houseGroup.position.set(b.x, 0, b.z);
 
-            // Angle to face the road (trigger point)
             b.angle = Math.atan2(b.tx - b.x, b.tz - b.z);
             houseGroup.rotation.y = b.angle;
 
             const houseColor = isHQ ? 0x0f172a : wallColors[Math.floor(Math.random() * wallColors.length)];
             const wallMat = new THREE.MeshStandardMaterial({ color: houseColor, roughness: 0.9, side: THREE.DoubleSide }); 
-            const interiorFloorMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.8 }); // Grey carpet inside
+            const interiorFloorMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.8 }); 
 
-            // Floor inside
             const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d), interiorFloorMat);
             floor.rotation.x = -Math.PI / 2;
             floor.position.y = 0.1;
             floor.receiveShadow = true;
             houseGroup.add(floor);
 
-            // Back Wall
             const backWall = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), wallMat);
             backWall.position.set(0, h/2, -d/2);
             backWall.castShadow = true; backWall.receiveShadow = true;
             houseGroup.add(backWall);
 
-            // Side Walls
             const leftWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat);
             leftWall.position.set(-w/2, h/2, 0);
             leftWall.castShadow = true; leftWall.receiveShadow = true;
@@ -303,7 +382,6 @@
             rightWall.castShadow = true; rightWall.receiveShadow = true;
             houseGroup.add(leftWall, rightWall);
 
-            // Front Wall (Split for door)
             const doorW = 3, doorH = 5;
             const sideW = (w - doorW) / 2;
             const frontLeft = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat);
@@ -319,7 +397,6 @@
             frontTop.castShadow = true; frontTop.receiveShadow = true;
             houseGroup.add(frontLeft, frontRight, frontTop);
 
-            // Windows on front walls
             const winMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.1, metalness: 0.9 });
             const winL = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 2, t+0.1), winMat);
             winL.position.set(-w/2 + sideW/2, h/2, d/2);
@@ -327,10 +404,9 @@
             winR.position.set(w/2 - sideW/2, h/2, d/2);
             houseGroup.add(winL, winR);
 
-            // Door & Hinge
             const hinge = new THREE.Group();
             hinge.position.set(-doorW/2, 0, d/2);
-            const doorMat = new THREE.MeshStandardMaterial({ color: 0x451a03 }); // Wood
+            const doorMat = new THREE.MeshStandardMaterial({ color: 0x451a03 }); 
             const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.2), doorMat);
             door.position.set(doorW/2, doorH/2, 0); 
             door.castShadow = true;
@@ -338,7 +414,6 @@
             houseGroup.add(hinge);
             b.doorHinge = hinge;
 
-            // Roof
             const roofH = isHQ ? 6 : 4;
             const rColor = isHQ ? 0x020617 : roofColors[Math.floor(Math.random() * roofColors.length)];
             const roofMat = new THREE.MeshStandardMaterial({ color: rColor, roughness: 0.9 }); 
@@ -348,17 +423,22 @@
             roof.castShadow = true;
             houseGroup.add(roof);
 
-            // Information Screen / Board Inside
             const boardGeo = new THREE.PlaneGeometry(8, 4.5);
-            const boardMat = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black screen
+            const boardMat = new THREE.MeshBasicMaterial({ color: 0x000000 }); 
             const board = new THREE.Mesh(boardGeo, boardMat);
-            board.position.set(0, 4, -d/2 + t + 0.05); // Placed on back wall
+            board.position.set(0, 4, -d/2 + t + 0.05); 
             houseGroup.add(board);
-            b.board = board; // Ref for projecting HTML
+            b.board = board; 
+
+            // Inner House Lights (Visible at night)
+            const hLight = new THREE.PointLight(b.color, 0, 20);
+            hLight.position.set(0, h/2, 0);
+            houseGroup.add(hLight);
+            b.interiorLight = hLight;
 
             envGroup.add(houseGroup);
 
-            // --- DRIVEWAY TRIGGER ---
+            // Driveway Trigger
             const ringGeo = new THREE.RingGeometry(3, 4, 32);
             const ringMat = new THREE.MeshBasicMaterial({ color: b.color, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
             const ring = new THREE.Mesh(ringGeo, ringMat);
@@ -406,6 +486,17 @@
         canopy.position.set(0, 1.1, -0.2);
         carGroup.add(canopy);
 
+        // Headlights
+        let hlSpotL = new THREE.SpotLight(0xffffff, 0, 50, 0.4, 0.5, 1);
+        hlSpotL.position.set(-0.6, 0.6, -1.8);
+        hlSpotL.target.position.set(-0.6, 0, -20);
+        carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
+
+        let hlSpotR = new THREE.SpotLight(0xffffff, 0, 50, 0.4, 0.5, 1);
+        hlSpotR.position.set(0.6, 0.6, -1.8);
+        hlSpotR.target.position.set(0.6, 0, -20);
+        carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
+
         const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
         const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16); wheelGeo.rotateZ(Math.PI / 2);
         const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.0, 0.4, 1.2);
@@ -417,15 +508,15 @@
 
         // --- PLAYER CHARACTER (For Walking Inside) ---
         const playerGroup = new THREE.Group();
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.8 }); // Blue suit
-        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16), bodyMat);
-        body.position.y = 0.75; body.castShadow = true;
-        const headMat = new THREE.MeshStandardMaterial({ color: 0xfcbda1, roughness: 0.6 }); // Skin
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), headMat);
-        head.position.y = 1.9; head.castShadow = true;
-        playerGroup.add(body, head);
+        const pBodyMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.8 }); // Blue suit
+        const pBody = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16), pBodyMat);
+        pBody.position.y = 0.75; pBody.castShadow = true;
+        const pHeadMat = new THREE.MeshStandardMaterial({ color: 0xfcbda1, roughness: 0.6 }); // Skin
+        const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), pHeadMat);
+        pHead.position.y = 1.9; pHead.castShadow = true;
+        playerGroup.add(pBody, pHead);
         scene.add(playerGroup);
-        playerGroup.visible = false; // Hidden initially
+        playerGroup.visible = false; 
 
         // --- LABELS (HTML Overlays) ---
         const labelsContainer = document.getElementById('labels-container');
@@ -435,6 +526,20 @@
             div.innerHTML = `<div class="bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border-b-4" style="border-color: #${b.color.toString(16)}">${b.title}</div>`;
             labelsContainer.appendChild(div);
             b.labelEl = div;
+        });
+
+        // --- TIME TOGGLE LOGIC ---
+        document.getElementById('btn-time-cycle').addEventListener('click', () => {
+            currentModeIdx = (currentModeIdx + 1) % 3;
+            const target = timeModes[currentModeIdx];
+            
+            const iconEl = document.getElementById('icon-time');
+            iconEl.setAttribute('icon', target.icon);
+            // Reset color classes
+            iconEl.className = `transition-transform duration-500 ${target.iconColor}`;
+            document.getElementById('time-text').innerText = target.name;
+
+            state.targetTimeMode = target;
         });
 
         // --- TRANSITION & UI LOGIC ---
@@ -454,23 +559,12 @@
             btnEnterHouse.classList.add('opacity-0', 'scale-90', 'translate-y-4');
             
             const b = state.activeBuilding;
-            
-            // Spawn player next to car
             playerGroup.position.copy(carGroup.position);
             playerGroup.position.x += 2; 
             playerGroup.visible = true;
 
-            // Target positions
-            const doorWorldPos = new THREE.Vector3(
-                b.x + Math.sin(b.angle) * 9, // Slightly outside the door
-                0, 
-                b.z + Math.cos(b.angle) * 9
-            );
-            const insideWorldPos = new THREE.Vector3(
-                b.x + Math.sin(b.angle) * 2, // Inside the house center
-                0, 
-                b.z + Math.cos(b.angle) * 2
-            );
+            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 9, 0, b.z + Math.cos(b.angle) * 9 );
+            const insideWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 2, 0, b.z + Math.cos(b.angle) * 2 );
 
             transSeq = [
                 { type: 'walk', target: doorWorldPos },
@@ -489,13 +583,8 @@
             boardUI.classList.remove('active');
             
             const b = state.activeBuilding;
-            const doorWorldPos = new THREE.Vector3(
-                b.x + Math.sin(b.angle) * 9, 
-                0, 
-                b.z + Math.cos(b.angle) * 9
-            );
-            const carWorldPos = new THREE.Vector3().copy(carGroup.position);
-            carWorldPos.x += 2;
+            const doorWorldPos = new THREE.Vector3( b.x + Math.sin(b.angle) * 9, 0, b.z + Math.cos(b.angle) * 9 );
+            const carWorldPos = new THREE.Vector3().copy(carGroup.position); carWorldPos.x += 2;
 
             transSeq = [
                 { type: 'walk', target: doorWorldPos },
@@ -594,8 +683,50 @@
         }
 
         // --- ANIMATION LOOP ---
+        const ACCELERATION = 0.025;
+        const FRICTION = 0.95;
+        const MAX_SPEED = 0.9;
+        const ROTATION_SPEED = 0.05;
+
         function animate() {
             requestAnimationFrame(animate);
+
+            // Handle Time of Day Transitions
+            if (state.targetTimeMode) {
+                const t = state.targetTimeMode;
+                const lerpSpd = 0.02;
+
+                const targetSky = new THREE.Color(t.sky);
+                scene.background.lerp(targetSky, lerpSpd);
+                scene.fog.color.lerp(targetSky, lerpSpd);
+
+                ambientLight.intensity += (t.ambient - ambientLight.intensity) * lerpSpd;
+                
+                const targetSunCol = new THREE.Color(t.sunColor);
+                dirLight.color.lerp(targetSunCol, lerpSpd);
+                dirLight.intensity += (t.sunIntensity - dirLight.intensity) * lerpSpd;
+                sun.position.y += (t.sunY - sun.position.y) * lerpSpd;
+                dirLight.position.y = sun.position.y;
+                sun.material.color.lerp(targetSunCol, lerpSpd);
+
+                moonLight.intensity += (t.moonIntensity - moonLight.intensity) * lerpSpd;
+                if (t.moonIntensity > 0 && !moon.visible) moon.visible = true;
+                if (t.moonIntensity <= 0.05 && moon.visible) moon.visible = false;
+                
+                stars.material.opacity += (t.starsOpacity - stars.material.opacity) * lerpSpd;
+
+                ground.material.color.lerp(new THREE.Color(t.groundColor), lerpSpd);
+
+                cloudMaterials.forEach(m => m.color.lerp(new THREE.Color(t.cloudTint), lerpSpd));
+
+                buildings.forEach(b => {
+                    if(b.interiorLight) b.interiorLight.intensity += (t.buildingLight - b.interiorLight.intensity) * lerpSpd;
+                });
+
+                hlSpotL.intensity += (t.carHeadlights - hlSpotL.intensity) * lerpSpd;
+                hlSpotR.intensity += (t.carHeadlights - hlSpotR.intensity) * lerpSpd;
+            }
+
 
             if (state.mode === 'DRIVING') {
                 if (state.keys.w) state.speed += ACCELERATION;
@@ -618,7 +749,6 @@
                 nextX = Math.max(-180, Math.min(180, nextX));
                 nextZ = Math.max(-180, Math.min(180, nextZ));
 
-                // Collision
                 let collision = false;
                 buildings.forEach(b => {
                     const radius = b.id === 'about-hq' ? 12 : 8;
@@ -630,12 +760,10 @@
                     carGroup.position.z = nextZ;
                 } else { state.speed = 0; }
 
-                // Chase Camera
                 const idealCamera = new THREE.Vector3(0, 8, 16).applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle).add(carGroup.position);
                 camera.position.lerp(idealCamera, 0.1);
                 camera.lookAt(carGroup.position.clone().add(new THREE.Vector3(0,-2,-8)));
 
-                // Proximity Trigger
                 let nearby = null;
                 buildings.forEach(b => {
                     const dist = Math.hypot(carGroup.position.x - b.tx, carGroup.position.z - b.tz);
@@ -654,7 +782,6 @@
                     }
                 }
 
-                // Wheels rotate
                 if (Math.abs(state.speed) > 0.01) {
                     const wheelRot = state.speed * 0.2;
                     carGroup.children[3].rotation.x += wheelRot;
@@ -667,7 +794,6 @@
                 const step = transSeq[transIdx];
                 if (step.type === 'walk') {
                     playerGroup.position.lerp(step.target, 0.06);
-                    // Smooth lookAt
                     const targetAngle = Math.atan2(playerGroup.position.x - step.target.x, playerGroup.position.z - step.target.z);
                     playerGroup.rotation.y = targetAngle;
 
@@ -679,7 +805,7 @@
                 } else if (step.type === 'done_in') {
                     state.mode = 'WALKING';
                     modeText.innerText = 'JBSI [INTERIOR_MODE]';
-                    state.playerAngle = state.activeBuilding.angle + Math.PI; // Face the back wall board
+                    state.playerAngle = state.activeBuilding.angle + Math.PI; 
                     playerGroup.rotation.y = state.playerAngle;
                     
                     populateBoardUI(state.activeBuilding);
@@ -692,7 +818,6 @@
                     state.activeBuilding = null;
                 }
 
-                // Camera follows player closely
                 const idealCamera = new THREE.Vector3(0, 4, 8).applyAxisAngle(new THREE.Vector3(0,1,0), playerGroup.rotation.y).add(playerGroup.position);
                 camera.position.lerp(idealCamera, 0.08);
                 camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1,0)));
@@ -700,7 +825,6 @@
             else if (state.mode === 'WALKING') {
                 const b = state.activeBuilding;
 
-                // Player Movement
                 let nextX = playerGroup.position.x;
                 let nextZ = playerGroup.position.z;
 
@@ -711,15 +835,12 @@
                 
                 playerGroup.rotation.y = state.playerAngle;
 
-                // Boundary check inside house (rough box)
                 const isHQ = b.id === 'about-hq';
                 const hw = isHQ ? 9 : 6;
                 const hd = isHQ ? 9 : 6;
                 
-                // Calculate local coordinates of next position relative to house center
                 const dx = nextX - b.x;
                 const dz = nextZ - b.z;
-                // Rotate local coords by -b.angle to align with AABB
                 const cosA = Math.cos(-b.angle);
                 const sinA = Math.sin(-b.angle);
                 const localX = dx * cosA - dz * sinA;
@@ -730,12 +851,10 @@
                     playerGroup.position.z = nextZ;
                 }
 
-                // Camera
                 const idealCamera = new THREE.Vector3(0, 3, 6).applyAxisAngle(new THREE.Vector3(0,1,0), state.playerAngle).add(playerGroup.position);
                 camera.position.lerp(idealCamera, 0.1);
                 camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1.5,0)));
 
-                // Project Board UI
                 const boardWorldPos = new THREE.Vector3();
                 b.board.getWorldPosition(boardWorldPos);
                 const dist = camera.position.distanceTo(boardWorldPos);
@@ -744,7 +863,6 @@
                 if (boardWorldPos.z < 1) {
                     boardUI.style.left = `${(boardWorldPos.x * 0.5 + 0.5) * window.innerWidth}px`;
                     boardUI.style.top = `${(-(boardWorldPos.y * 0.5) + 0.5) * window.innerHeight}px`;
-                    // Scale down based on distance
                     const scale = Math.max(0.3, Math.min(1.0, 15 / dist));
                     boardUI.style.transform = `translate(-50%, -50%) scale(${scale})`;
                     boardUI.style.opacity = '1';
@@ -755,6 +873,9 @@
 
             document.getElementById('coords').innerText = `LOC: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
             updateLabels();
+
+            // Rotate clouds slowly
+            cloudsGroup.rotation.y += 0.0005;
 
             renderer.render(scene, camera);
         }
