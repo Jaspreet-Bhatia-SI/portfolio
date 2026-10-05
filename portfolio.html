@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jaspreet Bhatia — Full-Stack AI Engineer</title>
   
-  <!-- CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -15,10 +14,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            mono: ['JetBrains Mono', 'monospace'],
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'], sans: ['Inter', 'sans-serif'] },
           colors: {
             bg: { base: '#fafaf9', surface: '#ffffff', card: '#ffffff', elevated: '#f5f5f4' },
             slate: { border: 'rgba(0,0,0,0.06)' }
@@ -48,9 +44,7 @@
       -webkit-text-fill-color: transparent;
       background-image: linear-gradient(90deg, #14b8a6, #10b981);
     }
-    .vfx-border {
-      position: relative;
-    }
+    .vfx-border { position: relative; }
     .vfx-border::before {
       content: "";
       position: absolute;
@@ -67,7 +61,6 @@
 </head>
 <body class="antialiased selection:bg-teal-500/20 selection:text-teal-900">
 
-  <!-- Navbar -->
   <nav class="fixed w-full z-50 top-0 border-b border-black/5 bg-white/70 backdrop-blur-md transition-all duration-300" id="navbar">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <a href="#" class="font-bold text-xl tracking-tighter flex items-center gap-2 text-stone-900">
@@ -86,7 +79,6 @@
     </div>
   </nav>
 
-  <!-- Hero Section with Vanta.js 3D Background -->
   <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
     <div id="vanta-canvas"></div>
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-bg-base/80 to-bg-base z-10 pointer-events-none"></div>
@@ -106,14 +98,13 @@
         <a href="#projects" class="w-full sm:w-auto px-8 py-4 rounded-full bg-stone-900 text-white font-semibold hover:bg-stone-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-stone-900/10">
           View My Work <i class="fa-solid fa-arrow-down"></i>
         </a>
-        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white border border-stone-200 text-stone-700 font-medium hover:bg-stone-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
+        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="relative z-20 w-full sm:w-auto px-8 py-4 rounded-full bg-white border border-stone-200 text-stone-700 font-medium hover:bg-stone-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
           <i class="fa-brands fa-github text-lg"></i> GitHub
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Skills Matrix -->
   <section id="skills" class="py-24 relative z-20 bg-bg-base">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16" data-aos="fade-up">
@@ -146,7 +137,6 @@
     </div>
   </section>
 
-  <!-- Featured Projects -->
   <section id="projects" class="py-24 relative z-20">
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6" data-aos="fade-up">
@@ -154,26 +144,27 @@
           <h2 class="text-3xl md:text-5xl font-bold mb-4 text-stone-900">Featured <span class="text-emerald-500">Projects</span></h2>
           <p class="text-stone-500 max-w-xl">A curated selection of my production-grade applications, AI agents, and visualizers.</p>
         </div>
-        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="text-teal-600 hover:text-teal-700 font-medium flex items-center gap-2 group">
+        <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="relative z-20 text-teal-600 hover:text-teal-700 font-medium flex items-center gap-2 group">
           View all on GitHub <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
         </a>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
-        <!-- Curator AI -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group cursor-pointer" onclick="window.open('https://curator.foodzie.store', '_blank')" data-aos="fade-up" data-aos-delay="100">
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden">
+        <!-- Curator AI (LIVE) -->
+        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="100">
+          <a href="https://curator.foodzie.store" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit Curator AI"></a>
+          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-32 h-32 bg-teal-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 pointer-events-auto">
               <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white shadow-sm">
                 <i class="fa-solid fa-robot text-xl"></i>
               </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/CuratorAI" target="_blank" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600">
+              <a href="https://github.com/Jaspreet-Bhatia-SI/CuratorAI" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
                 <i class="fa-brands fa-github"></i>
               </a>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">Curator AI</h3>
+            <h3 class="text-2xl font-bold text-stone-800 mb-3">Curator AI <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
             <p class="text-stone-500 text-sm mb-6 flex-1">An autonomous AI media curator using Groq LLMs & DuckDuckGo RAG to generate educational roadmaps and bypass anti-bot systems for media extraction.</p>
             <div class="flex flex-wrap gap-2 mt-auto">
               <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">FastAPI</span>
@@ -183,19 +174,20 @@
           </div>
         </div>
 
-        <!-- Foodzie -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group cursor-pointer" onclick="window.open('https://foodzie.store', '_blank')" data-aos="fade-up" data-aos-delay="200">
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden">
+        <!-- Foodzie (LIVE) -->
+        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="200">
+          <a href="https://foodzie.store" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit Foodzie"></a>
+          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 pointer-events-auto">
               <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-500 border border-orange-200 flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-burger text-xl"></i>
               </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/foodzie" target="_blank" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600">
+              <a href="https://github.com/Jaspreet-Bhatia-SI/foodzie" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
                 <i class="fa-brands fa-github"></i>
               </a>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">Foodzie Platform</h3>
+            <h3 class="text-2xl font-bold text-stone-800 mb-3">Foodzie Platform <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
             <p class="text-stone-500 text-sm mb-6 flex-1">A massive full-stack E-Commerce ecosystem. Includes a Flutter mobile app, Python backend, PostgreSQL database, and integrated Razorpay payments.</p>
             <div class="flex flex-wrap gap-2 mt-auto">
               <span class="px-3 py-1 rounded-full bg-sky-50 text-xs font-mono text-sky-700 border border-sky-100">Flutter</span>
@@ -205,41 +197,42 @@
           </div>
         </div>
 
-        <!-- Stark AI -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group cursor-pointer" onclick="window.open('https://github.com/Jaspreet-Bhatia-SI/stark-ai', '_blank')" data-aos="fade-up" data-aos-delay="300">
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden">
+        <!-- Stark AI (GITHUB) -->
+        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="300">
+          <a href="https://github.com/Jaspreet-Bhatia-SI/stark-ai" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="View on Github"></a>
+          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 pointer-events-auto">
               <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-microchip text-xl"></i>
               </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/stark-ai" target="_blank" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600">
+              <a href="https://github.com/Jaspreet-Bhatia-SI/stark-ai" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
                 <i class="fa-brands fa-github"></i>
               </a>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">Stark AI Assistant</h3>
+            <h3 class="text-2xl font-bold text-stone-800 mb-3">Stark AI Assistant <span class="text-xs ml-2 px-2 py-1 bg-stone-100 text-stone-600 rounded-full font-mono align-middle"><i class="fa-brands fa-github"></i> GITHUB</span></h3>
             <p class="text-stone-500 text-sm mb-6 flex-1">An intelligent desktop voice assistant capable of automating system tasks, fetching live intelligence, and executing natural language commands.</p>
             <div class="flex flex-wrap gap-2 mt-auto">
               <span class="px-3 py-1 rounded-full bg-emerald-50 text-xs font-mono text-emerald-700 border border-emerald-100">NLP</span>
               <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">Python</span>
-              <span class="px-3 py-1 rounded-full bg-stone-100 text-xs font-mono text-stone-700 border border-stone-200">Speech-to-Text</span>
             </div>
           </div>
         </div>
 
-        <!-- ML Tree -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group cursor-pointer" onclick="window.open('https://github.com/Jaspreet-Bhatia-SI/ml-tree', '_blank')" data-aos="fade-up" data-aos-delay="400">
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden">
+        <!-- ML Tree (GITHUB) -->
+        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="400">
+          <a href="https://jaspreet-bhatia-si.github.io/ml-tree" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit ML Tree"></a>
+          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 pointer-events-auto">
               <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 border border-emerald-200 flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-network-wired text-xl"></i>
               </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/ml-tree" target="_blank" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600">
+              <a href="https://github.com/Jaspreet-Bhatia-SI/ml-tree" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
                 <i class="fa-brands fa-github"></i>
               </a>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">ML Tree Visualizer</h3>
+            <h3 class="text-2xl font-bold text-stone-800 mb-3">ML Tree Visualizer <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
             <p class="text-stone-500 text-sm mb-6 flex-1">An interactive node-based architecture mapping 150+ machine learning algorithms, bridging the gap between theoretical data science and practical application.</p>
             <div class="flex flex-wrap gap-2 mt-auto">
               <span class="px-3 py-1 rounded-full bg-orange-50 text-xs font-mono text-orange-700 border border-orange-100">D3.js</span>
@@ -248,19 +241,20 @@
           </div>
         </div>
 
-        <!-- Secure Password Generator -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group cursor-pointer" onclick="window.open('https://github.com/Jaspreet-Bhatia-SI/secure-password-generator', '_blank')" data-aos="fade-up" data-aos-delay="500">
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden">
+        <!-- Secure Password Generator (GITHUB) -->
+        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="500">
+          <a href="https://jaspreet-bhatia-si.github.io/secure-password-generator" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit Generator"></a>
+          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-32 h-32 bg-rose-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 pointer-events-auto">
               <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-500 border border-rose-200 flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-shield-halved text-xl"></i>
               </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/secure-password-generator" target="_blank" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600">
+              <a href="https://github.com/Jaspreet-Bhatia-SI/secure-password-generator" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
                 <i class="fa-brands fa-github"></i>
               </a>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">CryptoAuth Generator</h3>
+            <h3 class="text-2xl font-bold text-stone-800 mb-3">CryptoAuth Generator <span class="text-xs ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full font-mono align-middle">LIVE</span></h3>
             <p class="text-stone-500 text-sm mb-6 flex-1">A highly secure cryptographic tool for generating unbreakable passwords using entropy algorithms and strict policy enforcements.</p>
             <div class="flex flex-wrap gap-2 mt-auto">
               <span class="px-3 py-1 rounded-full bg-stone-100 text-xs font-mono text-stone-700 border border-stone-200">Cryptography</span>
@@ -269,19 +263,20 @@
           </div>
         </div>
 
-        <!-- ResQ AI -->
-        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group cursor-pointer" onclick="window.open('https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', '_blank')" data-aos="fade-up" data-aos-delay="600">
-          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden">
+        <!-- ResQ AI (GITHUB) -->
+        <div class="glass-card vfx-border rounded-3xl p-1 flex flex-col group relative" data-aos="fade-up" data-aos-delay="600">
+          <a href="https://github.com/Jaspreet-Bhatia-SI/ResQ-AI" target="_blank" class="absolute inset-0 z-10 rounded-3xl" aria-label="Visit ResQ AI"></a>
+          <div class="bg-white rounded-[22px] p-6 h-full flex flex-col relative overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50 blur-3xl rounded-full"></div>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 pointer-events-auto">
               <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 border border-amber-200 flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-truck-medical text-xl"></i>
               </div>
-              <a href="https://github.com/Jaspreet-Bhatia-SI/ResQ-AI" target="_blank" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600">
+              <a href="https://github.com/Jaspreet-Bhatia-SI/ResQ-AI" target="_blank" class="relative z-20 w-10 h-10 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center hover:bg-stone-100 transition-colors text-stone-600 cursor-pointer" title="View Source">
                 <i class="fa-brands fa-github"></i>
               </a>
             </div>
-            <h3 class="text-2xl font-bold text-stone-800 mb-3">ResQ AI</h3>
+            <h3 class="text-2xl font-bold text-stone-800 mb-3">ResQ AI <span class="text-xs ml-2 px-2 py-1 bg-stone-100 text-stone-600 rounded-full font-mono align-middle"><i class="fa-brands fa-github"></i> GITHUB</span></h3>
             <p class="text-stone-500 text-sm mb-6 flex-1">A machine learning driven emergency response orchestration platform. Optimizes routing and resource allocation for critical situations in real-time.</p>
             <div class="flex flex-wrap gap-2 mt-auto">
               <span class="px-3 py-1 rounded-full bg-teal-50 text-xs font-mono text-teal-700 border border-teal-100">AI Routing</span>
@@ -294,7 +289,6 @@
     </div>
   </section>
 
-  <!-- Contact Section -->
   <section id="contact" class="py-24 relative z-20">
     <div class="max-w-4xl mx-auto px-6 text-center" data-aos="fade-up">
       <div class="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 mx-auto mb-8 p-1 shadow-sm">
@@ -306,12 +300,12 @@
       <p class="text-xl text-stone-500 mb-10 max-w-2xl mx-auto">Whether you have a massive AI infrastructure project or need an intelligent web application, my inbox is always open.</p>
       
       <div class="flex flex-wrap justify-center gap-4">
-        <a href="mailto:bhatiajaspreet161@gmail.com" class="px-8 py-4 rounded-full bg-stone-900 text-white font-bold hover:bg-stone-800 transition-colors flex items-center gap-2 shadow-lg shadow-stone-900/10">
+        <a href="mailto:bhatiajaspreet161@gmail.com" class="relative z-20 px-8 py-4 rounded-full bg-stone-900 text-white font-bold hover:bg-stone-800 transition-colors flex items-center gap-2 shadow-lg shadow-stone-900/10">
           Say Hello <i class="fa-solid fa-paper-plane"></i>
         </a>
       </div>
       
-      <div class="flex justify-center gap-6 mt-16 border-t border-black/5 pt-10">
+      <div class="flex justify-center gap-6 mt-16 border-t border-black/5 pt-10 relative z-20">
         <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="w-12 h-12 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all hover:-translate-y-1">
           <i class="fa-brands fa-github text-xl"></i>
         </a>
@@ -325,20 +319,16 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer class="py-8 text-center text-stone-400 text-sm border-t border-black/5 relative z-20 bg-white">
     <p>&copy; 2026 Jaspreet Bhatia (JBSI). Engineered with precision.</p>
   </footer>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
   
   <script>
     AOS.init({ once: true, offset: 50, duration: 800, easing: 'ease-out-cubic' });
-
-    // Vanta 3D Background - WARM TEAL/EMERALD THEME
     VANTA.NET({
       el: "#vanta-canvas",
       mouseControls: true,
@@ -355,7 +345,6 @@
       spacing: 18.00,
       showDots: true
     });
-
     window.addEventListener('scroll', () => {
       const nav = document.getElementById('navbar');
       if (window.scrollY > 50) {
