@@ -94,22 +94,22 @@
 
     <!-- MAGAZINE UI (FULLSCREEN OVERLAY) -->
     <div id="magazine-ui" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 pointer-events-auto transition-opacity duration-300 opacity-0">
-        <div class="relative w-full max-w-5xl h-[80vh] bg-[#f4ebd8] rounded-md shadow-2xl flex flex-col md:flex-row overflow-hidden text-slate-900 shadow-[0_0_100px_rgba(0,0,0,0.8)] book-texture">
+        <div class="relative w-full max-w-5xl max-h-[85vh] md:h-[80vh] bg-[#f4ebd8] rounded-md shadow-2xl flex flex-col md:flex-row overflow-y-auto md:overflow-hidden text-slate-900 shadow-[0_0_100px_rgba(0,0,0,0.8)] book-texture">
             <!-- Spine shadow -->
             <div class="absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 bg-gradient-to-r from-transparent via-black/10 to-transparent z-10 hidden md:block"></div>
             
-            <div class="w-full md:w-1/2 p-8 md:p-12 border-b md:border-b-0 md:border-r border-[#d4c8a9]/50 flex flex-col justify-center bg-gradient-to-br from-[#f4ebd8] to-[#e6dcc6]">
+            <div class="w-full md:w-1/2 p-6 md:p-12 border-b md:border-b-0 md:border-r border-[#d4c8a9]/50 flex flex-col justify-center bg-gradient-to-br from-[#f4ebd8] to-[#e6dcc6]">
                 <div class="mb-4 text-orange-700">
-                    <iconify-icon id="mag-icon" icon="solar:box-linear" width="64"></iconify-icon>
+                    <iconify-icon id="mag-icon" icon="solar:box-linear" width="48" class="md:w-[64px]"></iconify-icon>
                 </div>
-                <h2 class="text-4xl md:text-5xl font-bold font-serif mb-4 leading-tight text-[#2c1e16]" id="mag-title">Project Title</h2>
+                <h2 class="text-3xl md:text-5xl font-bold font-serif mb-4 leading-tight text-[#2c1e16]" id="mag-title">Project Title</h2>
                 <div class="h-1 w-20 bg-orange-600 mb-6"></div>
                 <p class="text-sm uppercase tracking-widest text-orange-600 font-bold mb-6 font-mono" id="mag-type">Type</p>
                 <div id="mag-tech" class="flex flex-wrap gap-2 mt-auto"></div>
             </div>
             
-            <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col bg-gradient-to-bl from-[#f4ebd8] to-[#e6dcc6]">
-                <p class="text-lg md:text-xl font-serif leading-relaxed text-[#3d2b1f] first-letter:text-5xl first-letter:font-bold first-letter:text-orange-700 first-letter:mr-1 first-letter:float-left" id="mag-desc">Description goes here.</p>
+            <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col bg-gradient-to-bl from-[#f4ebd8] to-[#e6dcc6]">
+                <p class="text-base md:text-xl font-serif leading-relaxed text-[#3d2b1f] first-letter:text-4xl md:first-letter:text-5xl first-letter:font-bold first-letter:text-orange-700 first-letter:mr-1 first-letter:float-left" id="mag-desc">Description goes here.</p>
                 
                 <div class="mt-auto pt-12 flex justify-between items-center">
                     <div class="font-mono text-xs text-slate-500 uppercase tracking-widest">JBSI Archive</div>
@@ -117,7 +117,7 @@
                 </div>
             </div>
             
-            <button id="btn-close-mag" class="absolute top-4 right-4 md:top-6 md:right-6 text-[#2c1e16]/50 hover:text-[#2c1e16] transition-colors p-2 bg-black/5 rounded-full">
+            <button id="btn-close-mag" class="fixed sm:absolute top-4 right-4 md:top-6 md:right-6 text-[#2c1e16]/50 hover:text-[#2c1e16] transition-colors p-2 bg-black/10 md:bg-black/5 rounded-full z-10 backdrop-blur-sm">
                 <iconify-icon icon="solar:close-circle-bold" width="36"></iconify-icon>
             </button>
         </div>
