@@ -96,8 +96,10 @@
 
     <!-- Phone UI Overlay (iOS Style) -->
     <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
-        <!-- Phone Frame -->
-        <div class="relative w-[90vw] max-w-[340px] h-[85vh] max-h-[680px] bg-black rounded-[36px] sm:rounded-[50px] border-[8px] sm:border-[12px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
+        <!-- Phone Frame Wrapper for perfect scaling -->
+        <div class="flex items-center justify-center w-full h-full pointer-events-none" style="transform: scale(min(1, calc(95vw / 340), calc(90vh / 680)));">
+            <!-- Phone Frame -->
+            <div class="relative w-[320px] h-[640px] shrink-0 bg-black rounded-[44px] border-[10px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
             
             <!-- Dynamic Island / Notch -->
             <div class="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30 flex justify-between items-center px-2">
@@ -123,7 +125,7 @@
                 </button>
 
                 <!-- Search Widget -->
-                <div class="mt-2 sm:mt-6 mx-4 relative z-30">
+                <div class="mt-5 mx-4 relative z-30">
                     <div class="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-3 flex items-center gap-3 cursor-text shadow-lg hover:bg-white/30 transition-colors" id="search-widget-btn">
                         <iconify-icon icon="solar:magnifer-linear" width="20" class="text-white"></iconify-icon>
                         <span class="text-white/80 text-sm font-medium flex-1 text-left">Search or ask...</span>
@@ -132,7 +134,7 @@
                 </div>
 
                 <!-- Apps Grid -->
-                <div class="mt-4 sm:mt-8 px-4 sm:px-6 grid grid-cols-4 gap-y-4 sm:gap-y-8 gap-x-3 sm:gap-x-4 z-20">
+                <div class="mt-8 px-5 grid grid-cols-4 gap-y-8 gap-x-3 z-20">
                     <div onclick="window.open('mailto:bhatiajaspreet161@gmail.com', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-b from-[#5ac8fa] to-[#007aff] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="solar:letter-bold" width="34" class="text-white"></iconify-icon>
@@ -1518,6 +1520,96 @@ if (state.mode === 'DRIVING') {
     errDiv.innerText = "INIT ERROR: " + e.stack;
     document.body.appendChild(errDiv);
 }
-</script>
+
+        // --- Camera & Gallery Logic ---
+        window.galleryImages = [];
+        window.cameraStream = null;
+
+        const btnOpenCamera = document.getElementById('btn-open-camera');
+        const btnOpenGallery = document.getElementById('btn-open-gallery');
+        const cameraApp = document.getElementById('camera-app');
+        const galleryApp = document.getElementById('gallery-app');
+        const btnCloseCamera = document.getElementById('btn-close-camera');
+        const btnCloseGallery = document.getElementById('btn-close-gallery');
+        const cameraFeed = document.getElementById('camera-feed');
+        const btnCapture = document.getElementById('btn-capture');
+        const cameraFlash = document.getElementById('camera-flash');
+        const galleryGrid = document.getElementById('gallery-grid');
+
+        if(btnOpenCamera) {
+            btnOpenCamera.addEventListener('click', async () => {
+                cameraApp.classList.remove('translate-y-full');
+                try {
+                    window.cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: { ideal: 'environment' } },
+                        audio: false
+                    });
+                    cameraFeed.srcObject = window.cameraStream;
+                    await cameraFeed.play();
+                } catch (err) {
+                    console.error("Camera access denied or unavailable", err);
+                    alert("Camera permissions are required to take pictures. Please allow camera access in your browser settings and try again.");
+                    cameraApp.classList.add('translate-y-full');
+                }
+            });
+        }
+
+        if(btnCloseCamera) {
+            btnCloseCamera.addEventListener('click', () => {
+                cameraApp.classList.add('translate-y-full');
+                if(window.cameraStream) {
+                    window.cameraStream.getTracks().forEach(t => t.stop());
+                    window.cameraStream = null;
+                }
+            });
+        }
+
+        if(btnCapture) {
+            btnCapture.addEventListener('click', () => {
+                if(!window.cameraStream) return;
+                
+                // Flash effect
+                cameraFlash.classList.remove('opacity-0');
+                cameraFlash.classList.add('opacity-100');
+                setTimeout(() => {
+                    cameraFlash.classList.remove('opacity-100');
+                    cameraFlash.classList.add('opacity-0');
+                }, 100);
+
+                // Capture logic
+                const canvas = document.createElement('canvas');
+                canvas.width = cameraFeed.videoWidth || 480;
+                canvas.height = cameraFeed.videoHeight || 640;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+                
+                const dataUrl = canvas.toDataURL('image/png');
+                window.galleryImages.unshift(dataUrl); 
+            });
+        }
+
+        if(btnOpenGallery) {
+            btnOpenGallery.addEventListener('click', () => {
+                galleryApp.classList.remove('translate-y-full');
+                galleryGrid.innerHTML = '';
+                if (window.galleryImages.length === 0) {
+                    galleryGrid.innerHTML = '<div class="col-span-3 text-center text-slate-400 mt-12 font-medium text-sm">No Photos or Videos</div>';
+                } else {
+                    window.galleryImages.forEach(src => {
+                        const img = document.createElement('img');
+                        img.src = src;
+                        img.className = 'w-full aspect-square object-cover bg-slate-200';
+                        galleryGrid.appendChild(img);
+                    });
+                }
+            });
+        }
+
+        if(btnCloseGallery) {
+            btnCloseGallery.addEventListener('click', () => {
+                galleryApp.classList.add('translate-y-full');
+            });
+        }
+    </script>
 </body>
 </html>
