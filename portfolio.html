@@ -11,35 +11,34 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #87CEEB; overflow: hidden; touch-action: none; }
         #canvas-container { width: 100%; height: 100%; display: block; }
-        .modal-panel { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(16px); }
         .key-cap { box-shadow: 0 4px 0 #0f172a; transition: all 0.1s; }
         .key-cap:active, .key-cap.pressed { transform: translateY(4px); box-shadow: 0 0 0 #0f172a; }
-        .world-label { position: absolute; transform: translate(-50%, -50%); pointer-events: none; transition: opacity 0.3s; z-index: 10; }
-        .house-label { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; transition: all 0.2s; opacity: 0; margin-top: -40px;}
+        .house-label { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; transition: all 0.2s; opacity: 0; margin-top: -60px;}
+        .board-ui { position: absolute; transform-origin: center center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .board-ui.active { pointer-events: auto; opacity: 1; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
 <body class="bg-sky-300 text-slate-300 antialiased h-screen w-screen overflow-hidden">
 
     <!-- UI LAYER (Dashboard) -->
-    <div class="fixed inset-0 z-50 pointer-events-none flex flex-col justify-between p-6 sm:p-8">
+    <div class="fixed inset-0 z-50 pointer-events-none flex flex-col justify-between p-4 sm:p-8">
         
         <!-- Header -->
         <div class="flex justify-between items-start w-full">
             <div class="flex flex-col gap-1 pointer-events-auto">
                 <div class="flex items-center gap-2 bg-slate-900/80 p-2.5 rounded-lg backdrop-blur border border-white/10 shadow-lg">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <h1 class="text-xs font-bold tracking-widest text-white uppercase font-mono">JBSI [TOWN_NAVIGATOR]</h1>
+                    <h1 class="text-xs font-bold tracking-widest text-white uppercase font-mono" id="mode-text">JBSI [DRIVING_MODE]</h1>
                 </div>
                 <div class="text-[10px] text-slate-400 tracking-wider font-mono bg-slate-900/80 px-2 py-1 rounded w-max border border-white/5 mt-1 shadow" id="coords">LOC: 0, 0</div>
             </div>
 
-            <!-- Hint -->
+            <!-- Controls Hint -->
             <div class="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right pointer-events-auto hidden md:block shadow-2xl">
-                <p class="text-[10px] uppercase text-slate-400 tracking-widest mb-2 font-mono font-bold">Drive Controls</p>
+                <p class="text-[10px] uppercase text-slate-400 tracking-widest mb-2 font-mono font-bold">Movement</p>
                 <div class="flex justify-end gap-1 mb-1">
                     <div class="w-8 h-8 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 key-cap" id="key-w">W</div>
                 </div>
@@ -51,17 +50,19 @@
             </div>
         </div>
 
-        <!-- Proximity Action -->
-        <div id="proximity-alert" class="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 transform scale-90 pointer-events-none flex flex-col items-center">
-            <div id="proximity-text" class="bg-white text-slate-900 px-6 py-3.5 rounded-full text-sm font-bold tracking-widest uppercase flex items-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.3)] border-2 border-transparent">
-                <iconify-icon icon="solar:round-alt-arrow-down-linear" width="20" class="animate-bounce text-emerald-600"></iconify-icon>
-                <span>Press ENTER to view</span>
-            </div>
+        <!-- Center Action Buttons -->
+        <div class="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 pointer-events-none w-full">
+            <!-- Enter Button -->
+            <button id="btn-enter-house" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-white text-slate-900 px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 cursor-pointer">
+                <iconify-icon icon="solar:door-open-linear" width="22" class="text-emerald-600 animate-pulse"></iconify-icon>
+                <span id="enter-text">Enter House</span>
+            </button>
         </div>
 
-        <!-- Mobile Controls -->
-        <div class="md:hidden flex justify-between items-end w-full pb-4 pointer-events-auto">
-            <div class="flex gap-3">
+        <!-- Bottom UI -->
+        <div class="flex justify-between items-end w-full pb-4 pointer-events-none">
+            <!-- Mobile Controls -->
+            <div class="md:hidden flex gap-3 pointer-events-auto">
                 <button id="btn-left" class="w-16 h-16 rounded-full bg-slate-900/90 border border-white/10 active:bg-slate-700 backdrop-blur flex items-center justify-center shadow-xl">
                     <iconify-icon icon="solar:alt-arrow-left-linear" width="28" class="text-white"></iconify-icon>
                 </button>
@@ -69,7 +70,17 @@
                     <iconify-icon icon="solar:alt-arrow-right-linear" width="28" class="text-white"></iconify-icon>
                 </button>
             </div>
-            <div class="flex flex-col gap-3">
+            
+            <!-- Exit House Button (Visible only when inside) -->
+            <div class="pointer-events-auto mx-auto md:mx-0 absolute bottom-8 left-1/2 -translate-x-1/2 md:translate-x-0 md:static">
+                <button id="btn-exit-house" class="hidden bg-rose-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-xl hover:bg-rose-700 transition-colors">
+                    <iconify-icon icon="solar:exit-linear" width="20"></iconify-icon>
+                    Exit to Street
+                </button>
+            </div>
+
+            <!-- Mobile Controls Gas/Brake -->
+            <div class="md:hidden flex flex-col gap-3 pointer-events-auto">
                  <button id="btn-gas" class="w-16 h-16 rounded-full bg-slate-900/90 border border-white/10 active:bg-emerald-600 backdrop-blur flex items-center justify-center shadow-xl">
                     <iconify-icon icon="solar:alt-arrow-up-linear" width="28" class="text-white"></iconify-icon>
                 </button>
@@ -83,45 +94,31 @@
     <!-- 3D CANVAS -->
     <div id="canvas-container" class="relative z-0"></div>
 
-    <!-- LABELS -->
-    <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10">
-        <!-- Generated by JS -->
-    </div>
+    <!-- WORLD LABELS -->
+    <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
 
-    <!-- SINGLE DYNAMIC MODAL -->
-    <div id="modal-container" class="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div id="modal-dynamic" class="modal-panel w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden hidden transform scale-95 opacity-0 flex flex-col max-h-[90vh]">
-            <div id="modal-top-bar" class="h-2 w-full bg-emerald-500 shrink-0"></div>
-            
-            <div class="p-8 pb-0 shrink-0 flex items-start justify-between">
-                <div class="flex items-center gap-4">
-                    <div id="modal-icon-bg" class="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-slate-800 text-2xl shadow-sm border border-slate-200">
-                        <iconify-icon id="modal-icon" icon="solar:box-linear"></iconify-icon>
-                    </div>
-                    <div>
-                        <h2 id="modal-title" class="text-3xl font-bold text-slate-900 tracking-tight">Title</h2>
-                        <p id="modal-subtitle" class="text-xs text-emerald-600 mt-1 uppercase tracking-widest font-mono font-bold">Subtitle</p>
-                    </div>
-                </div>
-                <button class="close-modal text-slate-400 hover:text-slate-900 transition-colors">
-                    <iconify-icon icon="solar:close-circle-bold" width="32"></iconify-icon>
-                </button>
+    <!-- DYNAMIC INFO BOARD (INSIDE HOUSE) -->
+    <div id="board-ui" class="board-ui w-[600px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div id="board-top-bar" class="h-2 w-full bg-emerald-500 shrink-0"></div>
+        <div class="p-8 pb-4 shrink-0 flex items-start gap-4">
+            <div id="board-icon-bg" class="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-white text-3xl border border-slate-700">
+                <iconify-icon id="board-icon" icon="solar:box-linear"></iconify-icon>
             </div>
-            
-            <div class="p-8 overflow-y-auto">
-                <p id="modal-desc" class="text-slate-600 leading-relaxed text-[15px] bg-slate-50 p-5 rounded-xl border border-slate-100"></p>
-                
-                <div id="modal-tech-container" class="mt-6 hidden">
-                    <h4 class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Tech Stack</h4>
-                    <div id="modal-tech" class="flex flex-wrap gap-2"></div>
-                </div>
-
-                <div class="mt-8">
-                    <a id="modal-link" href="#" target="_blank" class="hidden w-full sm:w-auto text-center px-8 py-4 rounded-xl font-bold text-white shadow-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                        <span id="modal-link-text">Visit Project</span>
-                        <iconify-icon icon="solar:alt-arrow-right-linear" width="20"></iconify-icon>
-                    </a>
-                </div>
+            <div>
+                <h2 id="board-title" class="text-3xl font-bold text-white tracking-tight">Title</h2>
+                <p id="board-subtitle" class="text-xs text-emerald-400 mt-1 uppercase tracking-widest font-mono font-bold">Subtitle</p>
+            </div>
+        </div>
+        <div class="p-8 pt-0">
+            <p id="board-desc" class="text-slate-300 leading-relaxed text-sm bg-slate-800/50 p-5 rounded-xl border border-slate-700"></p>
+            <div id="board-tech-container" class="mt-6 hidden">
+                <div id="board-tech" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div class="mt-8">
+                <a id="board-link" href="#" target="_blank" class="hidden w-max px-8 py-4 rounded-xl font-bold text-white shadow-lg transition-transform hover:-translate-y-1 flex items-center justify-center gap-3">
+                    <span id="board-link-text">Visit Project</span>
+                    <iconify-icon icon="solar:alt-arrow-right-linear" width="22"></iconify-icon>
+                </a>
             </div>
         </div>
     </div>
@@ -129,384 +126,421 @@
     <script>
         // --- DATA ARCHITECTURE ---
         const buildings = [
-            // --- NORTH DISTRICT: PROJECTS (Z+) ---
-            { id: 'proj-curator', type: 'Project', x: -20, z: 30, tx: -8, tz: 30, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', 
-              desc: 'An autonomous AI media curator using Groq LLMs & DuckDuckGo RAG to generate educational roadmaps and bypass anti-bot systems for media extraction.', 
+            // PROJECTS (North)
+            { id: 'proj-curator', type: 'Project', x: -25, z: 35, tx: -10, tz: 35, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', 
+              desc: 'Autonomous AI media curator using Groq LLMs & DuckDuckGo RAG to generate educational roadmaps and bypass anti-bot systems for media extraction.', 
               tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
-              
-            { id: 'proj-foodzie', type: 'Project', x: 20, z: 30, tx: 8, tz: 30, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', 
-              desc: 'A massive full-stack E-Commerce ecosystem. Includes a Flutter mobile app, Python backend, PostgreSQL database, and integrated Razorpay payments.', 
+            { id: 'proj-foodzie', type: 'Project', x: 25, z: 35, tx: 10, tz: 35, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', 
+              desc: 'Massive full-stack E-Commerce ecosystem. Includes a Flutter mobile app, Python backend, PostgreSQL database, and Razorpay payments.', 
               tech: ['Flutter', 'Python', 'PostgreSQL'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
-              
-            { id: 'proj-stark', type: 'Project', x: -20, z: 60, tx: -8, tz: 60, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI Assistant', 
-              desc: 'An intelligent desktop voice assistant capable of automating system tasks, fetching live intelligence, and executing natural language commands.', 
+            { id: 'proj-stark', type: 'Project', x: -25, z: 65, tx: -10, tz: 65, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', 
+              desc: 'Intelligent desktop voice assistant capable of automating system tasks, fetching live intelligence, and executing natural language commands.', 
               tech: ['Python', 'NLP', 'Voice Recognition'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
-              
-            { id: 'proj-mltree', type: 'Project', x: 20, z: 60, tx: 8, tz: 60, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree Visualizer', 
-              desc: 'An interactive node-based architecture mapping 150+ machine learning algorithms, bridging the gap between theoretical data science and practical application.', 
+            { id: 'proj-mltree', type: 'Project', x: 25, z: 65, tx: 10, tz: 65, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', 
+              desc: 'Interactive node-based architecture mapping 150+ machine learning algorithms, bridging theoretical data science and practical application.', 
               tech: ['D3.js', 'Data Science', 'HTML5'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
-              
-            { id: 'proj-crypto', type: 'Project', x: -20, z: 90, tx: -8, tz: 90, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth Generator', 
-              desc: 'A highly secure cryptographic tool for generating unbreakable passwords using entropy algorithms and strict policy enforcements.', 
+            { id: 'proj-crypto', type: 'Project', x: -25, z: 95, tx: -10, tz: 95, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', 
+              desc: 'Highly secure cryptographic tool for generating unbreakable passwords using entropy algorithms and strict policy enforcements.', 
               tech: ['Cryptography', 'Security', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
-              
-            { id: 'proj-resq', type: 'Project', x: 20, z: 90, tx: 8, tz: 90, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', 
-              desc: 'A machine learning driven emergency response orchestration platform. Optimizes routing and resource allocation for critical situations in real-time.', 
+            { id: 'proj-resq', type: 'Project', x: 25, z: 95, tx: 10, tz: 95, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', 
+              desc: 'Machine learning driven emergency response orchestration platform. Optimizes routing and resource allocation for critical situations in real-time.', 
               tech: ['Python', 'AI Routing', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
 
-            // --- EAST DISTRICT: SKILLS (X+) ---
-            { id: 'skill-ai', type: 'Skill Domain', x: 30, z: -20, tx: 30, tz: -8, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', 
+            // SKILLS (East)
+            { id: 'skill-ai', type: 'Skill Domain', x: 35, z: -25, tx: 35, tz: -10, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', 
               desc: 'Deep expertise in building neural networks, LLM pipelines, and autonomous agents.<br><br><b>Stack:</b> TensorFlow, PyTorch, LangChain, RAG Systems, OpenAI & Groq APIs.', 
               tech: [], link: null },
-              
-            { id: 'skill-backend', type: 'Skill Domain', x: 30, z: 20, tx: 30, tz: 8, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', 
+            { id: 'skill-backend', type: 'Skill Domain', x: 35, z: 25, tx: 35, tz: 10, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', 
               desc: 'Architecting scalable, resilient server-side infrastructure and microservices.<br><br><b>Stack:</b> Python, FastAPI, Node.js, Express, REST & GraphQL.', 
               tech: [], link: null },
-              
-            { id: 'skill-frontend', type: 'Skill Domain', x: 60, z: -20, tx: 60, tz: -8, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', 
+            { id: 'skill-frontend', type: 'Skill Domain', x: 65, z: -25, tx: 65, tz: -10, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', 
               desc: 'Crafting highly interactive, performant, and beautiful user interfaces across web and mobile.<br><br><b>Stack:</b> React, Next.js, Tailwind CSS, Framer Motion, Flutter, WebGL.', 
               tech: [], link: null },
-              
-            { id: 'skill-cloud', type: 'Skill Domain', x: 60, z: 20, tx: 60, tz: 8, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', 
+            { id: 'skill-cloud', type: 'Skill Domain', x: 65, z: 25, tx: 65, tz: 10, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', 
               desc: 'Deploying and maintaining zero-downtime production environments.<br><br><b>Stack:</b> AWS (EC2, S3), Docker, Nginx, CI/CD pipelines, Linux Administration.', 
               tech: [], link: null },
 
-            // --- SOUTH DISTRICT: ABOUT HQ (Z-) ---
-            { id: 'about-hq', type: 'Headquarters', x: 0, z: -40, tx: 0, tz: -25, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'JBSI Headquarters', 
-              desc: 'Welcome to the core of JBSI.<br><br>I am Jaspreet Bhatia, a Full-Stack AI Engineer & Cloud Architect. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.<br><br>This town is a live WebGL representation of my portfolio.', 
-              tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View My Codebase' },
+            // HQ (South)
+            { id: 'about-hq', type: 'Headquarters', x: 0, z: -50, tx: 0, tz: -25, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'JBSI Headquarters', 
+              desc: 'Welcome to the core of JBSI.<br><br>I am Jaspreet Bhatia, a Full-Stack AI Engineer & Cloud Architect. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.<br><br>This town is a live WebGL representation of my portfolio. Step inside any building to view the datasets and schemas.', 
+              tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' },
 
-            // --- WEST DISTRICT: CONTACT (X-) ---
-            { id: 'contact-email', type: 'Uplink', x: -30, z: -20, tx: -30, tz: -8, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', 
-              desc: 'Establish a direct communications channel for massive AI infrastructure projects or intelligent web applications.', 
+            // CONTACT (West)
+            { id: 'contact-email', type: 'Uplink', x: -35, z: -25, tx: -35, tz: -10, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', 
+              desc: 'Establish a direct communications channel for massive AI infrastructure projects or intelligent web applications.<br><br><b>bhatiajaspreet161@gmail.com</b>', 
               tech: [], link: 'mailto:bhatiajaspreet161@gmail.com', linkText: 'Send Transmission' },
-              
-            { id: 'contact-github', type: 'Uplink', x: -30, z: 20, tx: -30, tz: 8, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', 
-              desc: 'Access all open-source repositories, system architectures, and neural networking datasets.', 
+            { id: 'contact-github', type: 'Uplink', x: -35, z: 25, tx: -35, tz: 10, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', 
+              desc: 'Access all open-source repositories, system architectures, and neural networking datasets.<br><br><b>@Jaspreet-Bhatia-SI</b>', 
               tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
-              
-            { id: 'contact-linkedin', type: 'Uplink', x: -60, z: -20, tx: -60, tz: -8, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', 
+            { id: 'contact-linkedin', type: 'Uplink', x: -65, z: -25, tx: -65, tz: -10, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', 
               desc: 'Connect with me on the professional network to track career updates and technical posts.', 
               tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect Now' },
-              
-            { id: 'contact-insta', type: 'Uplink', x: -60, z: 20, tx: -60, tz: 8, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', 
-              desc: 'Behind the scenes of JBSI, hardware setups, and day-to-day operations.', 
-              tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow @jass_bhatia.si' },
+            { id: 'contact-insta', type: 'Uplink', x: -65, z: 25, tx: -65, tz: 10, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', 
+              desc: 'Behind the scenes of JBSI, hardware setups, and day-to-day operations.<br><br><b>@jass_bhatia.si</b>', 
+              tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' }
         ];
 
+        // --- STATE MACHINE ---
+        const state = {
+            mode: 'DRIVING', // DRIVING, TRANSITION, WALKING
+            speed: 0,
+            angle: Math.PI, 
+            keys: { w: false, a: false, s: false, d: false },
+            activeBuilding: null,
+            playerAngle: 0
+        };
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        
-        // SKY & FOG (Daytime)
         const skyColor = new THREE.Color('#87CEEB'); 
         scene.background = skyColor;
-        scene.fog = new THREE.FogExp2(skyColor, 0.008);
+        scene.fog = new THREE.FogExp2(skyColor, 0.006);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
-        // --- LIGHTING & SUN ---
-        const ambientLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7); // Bright daylight
+        // --- LIGHTING ---
+        const ambientLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7); 
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xfff5b6, 1.2); // Warm sun
-        dirLight.position.set(100, 150, 50);
+        const dirLight = new THREE.DirectionalLight(0xfff5b6, 1.2); 
+        dirLight.position.set(150, 200, 100);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
         dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 400;
-        dirLight.shadow.camera.left = -150;
-        dirLight.shadow.camera.right = 150;
-        dirLight.shadow.camera.top = 150;
-        dirLight.shadow.camera.bottom = -150;
+        dirLight.shadow.camera.far = 500;
+        dirLight.shadow.camera.left = -200;
+        dirLight.shadow.camera.right = 200;
+        dirLight.shadow.camera.top = 200;
+        dirLight.shadow.camera.bottom = -200;
         scene.add(dirLight);
 
-        // Visual Sun Sphere
-        const sunGeo = new THREE.SphereGeometry(15, 32, 32);
-        const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff5b6 }); // Pure bright yellow/white
-        const sun = new THREE.Mesh(sunGeo, sunMat);
-        sun.position.set(100, 150, 50);
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(15, 32, 32), new THREE.MeshBasicMaterial({ color: 0xfff5b6 }));
+        sun.position.set(150, 200, 100);
         scene.add(sun);
 
-        // --- ENVIRONMENT: GROUND & ROADS ---
+        // --- ENVIRONMENT ---
         const envGroup = new THREE.Group();
         scene.add(envGroup);
 
-        // Bright Grass Ground
-        const groundGeo = new THREE.PlaneGeometry(800, 800);
-        const groundMat = new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 1.0, metalness: 0.0 }); // Light green grass
-        const ground = new THREE.Mesh(groundGeo, groundMat);
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 1.0 })); 
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
 
-        // Road Material (Asphalt)
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9, metalness: 0.1 }); // Slate 600
-
+        const roadMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 }); 
         function createRoad(w, h, x, z) {
-            const roadGeo = new THREE.PlaneGeometry(w, h);
-            const road = new THREE.Mesh(roadGeo, roadMat);
+            const road = new THREE.Mesh(new THREE.PlaneGeometry(w, h), roadMat);
             road.rotation.x = -Math.PI / 2;
-            road.position.set(x, 0.05, z); // Slightly above ground
+            road.position.set(x, 0.05, z);
             road.receiveShadow = true;
             envGroup.add(road);
         }
-
         function createDashedLine(isHorizontal, length, xStart, zStart) {
-            const dashGeo = new THREE.PlaneGeometry(isHorizontal ? 2 : 0.2, isHorizontal ? 0.2 : 2);
-            const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Yellow
+            const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); 
             const count = Math.floor(length / 4);
             for(let i=0; i<count; i++) {
-                const dash = new THREE.Mesh(dashGeo, dashMat);
+                const dash = new THREE.Mesh(new THREE.PlaneGeometry(isHorizontal ? 2 : 0.2, isHorizontal ? 0.2 : 2), dashMat);
                 dash.rotation.x = -Math.PI / 2;
-                if(isHorizontal) {
-                    dash.position.set(xStart + (i * 4), 0.08, zStart);
-                } else {
-                    dash.position.set(xStart, 0.08, zStart + (i * 4));
-                }
+                dash.position.set(isHorizontal ? xStart + (i * 4) : xStart, 0.08, isHorizontal ? zStart : zStart + (i * 4));
                 envGroup.add(dash);
             }
         }
 
-        // Central Square
         createRoad(24, 24, 0, 0);
-        // North Road (Projects)
-        createRoad(12, 130, 0, 65);
-        createDashedLine(false, 130, 0, 10);
-        // South Road (About)
-        createRoad(12, 80, 0, -40);
-        createDashedLine(false, 80, 0, -80);
-        // East Road (Skills)
-        createRoad(130, 12, 65, 0);
-        createDashedLine(true, 130, 10, 0);
-        // West Road (Contact)
-        createRoad(130, 12, -65, 0);
-        createDashedLine(true, 130, -130, 0);
+        createRoad(16, 140, 0, 70); createDashedLine(false, 140, 0, 12);
+        createRoad(16, 100, 0, -50); createDashedLine(false, 100, 0, -100);
+        createRoad(140, 16, 70, 0); createDashedLine(true, 140, 12, 0);
+        createRoad(140, 16, -70, 0); createDashedLine(true, 140, -140, 0);
 
-        // --- GENERATE REALISTIC HOUSES ---
-        const wallColors = [0xf8fafc, 0xfef3c7, 0xe2e8f0, 0xffedd5, 0xfff1f2]; // White, Beige, Slate, Peach, Rose
-        const roofColors = [0x1e293b, 0x451a03, 0x7c2d12, 0x334155]; // Dark slate, Dark brown, Brick red
+        // --- HOUSES WITH INTERIORS ---
+        const wallColors = [0xf8fafc, 0xfef3c7, 0xe2e8f0, 0xffedd5, 0xfff1f2];
+        const roofColors = [0x1e293b, 0x451a03, 0x7c2d12, 0x334155];
 
         buildings.forEach(b => {
             const isHQ = b.id === 'about-hq';
-            const w = isHQ ? 16 : 10;
-            const d = isHQ ? 12 : 10;
-            const h = isHQ ? 12 : 6;
+            const w = isHQ ? 20 : 14;
+            const d = isHQ ? 20 : 14;
+            const h = isHQ ? 12 : 7;
+            const t = 0.5; // wall thickness
 
             const houseGroup = new THREE.Group();
             houseGroup.position.set(b.x, 0, b.z);
 
-            // Walls
-            const houseColor = isHQ ? 0x1e293b : wallColors[Math.floor(Math.random() * wallColors.length)];
-            const wallMat = new THREE.MeshStandardMaterial({ color: houseColor, roughness: 0.9 }); 
-            const walls = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
-            walls.position.y = h / 2;
-            walls.castShadow = true;
-            walls.receiveShadow = true;
-            houseGroup.add(walls);
+            // Angle to face the road (trigger point)
+            b.angle = Math.atan2(b.tx - b.x, b.tz - b.z);
+            houseGroup.rotation.y = b.angle;
+
+            const houseColor = isHQ ? 0x0f172a : wallColors[Math.floor(Math.random() * wallColors.length)];
+            const wallMat = new THREE.MeshStandardMaterial({ color: houseColor, roughness: 0.9, side: THREE.DoubleSide }); 
+            const interiorFloorMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.8 }); // Grey carpet inside
+
+            // Floor inside
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d), interiorFloorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = 0.1;
+            floor.receiveShadow = true;
+            houseGroup.add(floor);
+
+            // Back Wall
+            const backWall = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), wallMat);
+            backWall.position.set(0, h/2, -d/2);
+            backWall.castShadow = true; backWall.receiveShadow = true;
+            houseGroup.add(backWall);
+
+            // Side Walls
+            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat);
+            leftWall.position.set(-w/2, h/2, 0);
+            leftWall.castShadow = true; leftWall.receiveShadow = true;
+            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), wallMat);
+            rightWall.position.set(w/2, h/2, 0);
+            rightWall.castShadow = true; rightWall.receiveShadow = true;
+            houseGroup.add(leftWall, rightWall);
+
+            // Front Wall (Split for door)
+            const doorW = 3, doorH = 5;
+            const sideW = (w - doorW) / 2;
+            const frontLeft = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat);
+            frontLeft.position.set(-w/2 + sideW/2, h/2, d/2);
+            frontLeft.castShadow = true; frontLeft.receiveShadow = true;
+            
+            const frontRight = new THREE.Mesh(new THREE.BoxGeometry(sideW, h, t), wallMat);
+            frontRight.position.set(w/2 - sideW/2, h/2, d/2);
+            frontRight.castShadow = true; frontRight.receiveShadow = true;
+            
+            const frontTop = new THREE.Mesh(new THREE.BoxGeometry(doorW, h - doorH, t), wallMat);
+            frontTop.position.set(0, doorH + (h - doorH)/2, d/2);
+            frontTop.castShadow = true; frontTop.receiveShadow = true;
+            houseGroup.add(frontLeft, frontRight, frontTop);
+
+            // Windows on front walls
+            const winMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.1, metalness: 0.9 });
+            const winL = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 2, t+0.1), winMat);
+            winL.position.set(-w/2 + sideW/2, h/2, d/2);
+            const winR = new THREE.Mesh(new THREE.BoxGeometry(sideW*0.6, 2, t+0.1), winMat);
+            winR.position.set(w/2 - sideW/2, h/2, d/2);
+            houseGroup.add(winL, winR);
+
+            // Door & Hinge
+            const hinge = new THREE.Group();
+            hinge.position.set(-doorW/2, 0, d/2);
+            const doorMat = new THREE.MeshStandardMaterial({ color: 0x451a03 }); // Wood
+            const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.2), doorMat);
+            door.position.set(doorW/2, doorH/2, 0); 
+            door.castShadow = true;
+            hinge.add(door);
+            houseGroup.add(hinge);
+            b.doorHinge = hinge;
 
             // Roof
             const roofH = isHQ ? 6 : 4;
-            const rColor = isHQ ? 0x0f172a : roofColors[Math.floor(Math.random() * roofColors.length)];
+            const rColor = isHQ ? 0x020617 : roofColors[Math.floor(Math.random() * roofColors.length)];
             const roofMat = new THREE.MeshStandardMaterial({ color: rColor, roughness: 0.9 }); 
-            const roof = new THREE.Mesh(new THREE.ConeGeometry(w/1.3, roofH, 4), roofMat);
-            roof.position.y = h + (roofH / 2);
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(w*0.8, roofH, 4), roofMat);
+            roof.position.set(0, h + roofH/2, 0);
             roof.rotation.y = Math.PI / 4;
             roof.castShadow = true;
             houseGroup.add(roof);
 
-            // Facade (Door & Windows facing the road/trigger zone)
-            const facadeGroup = new THREE.Group();
-            facadeGroup.position.y = 0;
-
-            // Door
-            const doorGeo = new THREE.BoxGeometry(2, 4, 0.2);
-            const doorMat = new THREE.MeshStandardMaterial({ color: 0x451a03 }); // Wood
-            const door = new THREE.Mesh(doorGeo, doorMat);
-            door.position.set(0, 2, d/2 + 0.05); // Place on front edge
-            facadeGroup.add(door);
-
-            // Windows
-            const winGeo = new THREE.BoxGeometry(2, 2, 0.2);
-            const winMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.2, metalness: 0.8 }); // Glass
-            const win1 = new THREE.Mesh(winGeo, winMat);
-            win1.position.set(-3, 3, d/2 + 0.05);
-            const win2 = new THREE.Mesh(winGeo, winMat);
-            win2.position.set(3, 3, d/2 + 0.05);
-            facadeGroup.add(win1, win2);
-
-            if(isHQ) {
-                // extra windows for HQ
-                const win3 = new THREE.Mesh(winGeo, winMat);
-                win3.position.set(-3, 7, d/2 + 0.05);
-                const win4 = new THREE.Mesh(winGeo, winMat);
-                win4.position.set(3, 7, d/2 + 0.05);
-                const win5 = new THREE.Mesh(winGeo, winMat);
-                win5.position.set(0, 7, d/2 + 0.05);
-                facadeGroup.add(win3, win4, win5);
-            }
-
-            // Rotate facade to face trigger point
-            const angle = Math.atan2(b.tx - b.x, b.tz - b.z);
-            facadeGroup.rotation.y = angle;
-            houseGroup.add(facadeGroup);
+            // Information Screen / Board Inside
+            const boardGeo = new THREE.PlaneGeometry(8, 4.5);
+            const boardMat = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black screen
+            const board = new THREE.Mesh(boardGeo, boardMat);
+            board.position.set(0, 4, -d/2 + t + 0.05); // Placed on back wall
+            houseGroup.add(board);
+            b.board = board; // Ref for projecting HTML
 
             envGroup.add(houseGroup);
 
-            // --- TRIGGER ZONE (Driveway / Welcome Mat) ---
-            const ringGeo = new THREE.RingGeometry(3, 3.8, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: b.color, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
+            // --- DRIVEWAY TRIGGER ---
+            const ringGeo = new THREE.RingGeometry(3, 4, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: b.color, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
             const ring = new THREE.Mesh(ringGeo, ringMat);
             ring.rotation.x = -Math.PI / 2;
             ring.position.set(b.tx, 0.1, b.tz);
             scene.add(ring);
 
-            // Light pulse
-            const beaconGeo = new THREE.CylinderGeometry(0.5, 3.8, 6, 16);
-            const beaconMat = new THREE.MeshBasicMaterial({ color: b.color, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
-            const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-            beacon.position.set(b.tx, 3, b.tz);
-            scene.add(beacon);
-            
-            // Add HTML Label Reference
             b.mesh = houseGroup; 
         });
 
-        // --- DECORATIONS (Bright Trees) ---
+        // --- DECORATIONS (Trees) ---
         const treeGeo = new THREE.ConeGeometry(1.5, 5, 8);
-        const treeMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.9 }); // Bright green
+        const treeMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.9 }); 
         const trunkGeo = new THREE.CylinderGeometry(0.3, 0.3, 1.5);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x78350f }); // Brown
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x78350f }); 
 
         for(let i=0; i<400; i++) {
             const x = (Math.random() - 0.5) * 400;
             const z = (Math.random() - 0.5) * 400;
-
-            // Don't spawn on roads or near buildings
-            if(Math.abs(x) < 15 || Math.abs(z) < 15) continue; 
+            if(Math.abs(x) < 20 || Math.abs(z) < 20) continue; 
             let tooClose = false;
-            buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 12) tooClose = true; });
+            buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 15) tooClose = true; });
             if(tooClose) continue;
 
             const treeGrp = new THREE.Group();
             treeGrp.position.set(x, 0, z);
-
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-            trunk.position.y = 0.75;
-            trunk.castShadow = true;
+            trunk.position.y = 0.75; trunk.castShadow = true;
             treeGrp.add(trunk);
-
             const leaves = new THREE.Mesh(treeGeo, treeMat);
-            leaves.position.y = 3.5;
-            leaves.castShadow = true;
+            leaves.position.y = 3.5; leaves.castShadow = true;
             treeGrp.add(leaves);
-
             envGroup.add(treeGrp);
         }
 
-        // --- CAR SETUP (Sports Car / Truck) ---
+        // --- CAR SETUP ---
         const carGroup = new THREE.Group();
-        // Chassis (Red)
-        const chassisGeo = new THREE.BoxGeometry(1.8, 0.6, 3.6);
         const chassisMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3, metalness: 0.6 }); 
-        const carChassis = new THREE.Mesh(chassisGeo, chassisMat);
-        carChassis.position.y = 0.6;
-        carChassis.castShadow = true;
+        const carChassis = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.6, 3.6), chassisMat);
+        carChassis.position.y = 0.6; carChassis.castShadow = true;
         carGroup.add(carChassis);
 
-        // Windows (Dark tinted)
-        const canopyGeo = new THREE.BoxGeometry(1.4, 0.5, 1.8);
         const canopyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 });
-        const canopy = new THREE.Mesh(canopyGeo, canopyMat);
+        const canopy = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 1.8), canopyMat);
         canopy.position.set(0, 1.1, -0.2);
         carGroup.add(canopy);
 
-        // Headlights
-        const hlSpotL = new THREE.SpotLight(0xffffff, 2, 40, 0.4, 0.5, 1);
-        hlSpotL.position.set(-0.6, 0.6, -1.8);
-        hlSpotL.target.position.set(-0.6, 0, -20);
-        carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
-
-        const hlSpotR = new THREE.SpotLight(0xffffff, 2, 40, 0.4, 0.5, 1);
-        hlSpotR.position.set(0.6, 0.6, -1.8);
-        hlSpotR.target.position.set(0.6, 0, -20);
-        carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
-
-        // Wheels
-        const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
         const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
-        wheelGeo.rotateZ(Math.PI / 2);
+        const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16); wheelGeo.rotateZ(Math.PI / 2);
         const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.0, 0.4, 1.2);
         const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.0, 0.4, 1.2);
         const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.0, 0.4, -1.2);
         const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.0, 0.4, -1.2);
         carGroup.add(w1, w2, w3, w4);
-
         scene.add(carGroup);
 
-        // --- DISTRICT LABELS (Floating over roads) ---
+        // --- PLAYER CHARACTER (For Walking Inside) ---
+        const playerGroup = new THREE.Group();
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.8 }); // Blue suit
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16), bodyMat);
+        body.position.y = 0.75; body.castShadow = true;
+        const headMat = new THREE.MeshStandardMaterial({ color: 0xfcbda1, roughness: 0.6 }); // Skin
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), headMat);
+        head.position.y = 1.9; head.castShadow = true;
+        playerGroup.add(body, head);
+        scene.add(playerGroup);
+        playerGroup.visible = false; // Hidden initially
+
+        // --- LABELS (HTML Overlays) ---
         const labelsContainer = document.getElementById('labels-container');
-        const districts = [
-            { text: 'Projects Ave.', x: 0, z: 20 },
-            { text: 'Skills Blvd.', x: 20, z: 0 },
-            { text: 'Contact St.', x: -20, z: 0 },
-            { text: 'HQ District', x: 0, z: -20 }
-        ];
-
-        districts.forEach(d => {
-            const div = document.createElement('div');
-            div.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-800 bg-white/80 uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-slate-300 shadow-md z-0 pointer-events-none transition-opacity duration-300';
-            div.innerText = d.text;
-            labelsContainer.appendChild(div);
-            d.el = div;
-        });
-
-        // Add specific building labels
         buildings.forEach(b => {
             const div = document.createElement('div');
             div.className = 'house-label flex flex-col items-center gap-1';
-            div.innerHTML = `
-                <div class="bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border-b-4" style="border-color: #${b.color.toString(16)}">${b.title}</div>
-            `;
+            div.innerHTML = `<div class="bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border-b-4" style="border-color: #${b.color.toString(16)}">${b.title}</div>`;
             labelsContainer.appendChild(div);
             b.labelEl = div;
         });
 
-        // --- GAME LOGIC ---
-        const state = {
-            speed: 0,
-            angle: Math.PI, 
-            keys: { w: false, a: false, s: false, d: false },
-            activeBuilding: null,
-            modalOpen: false
-        };
+        // --- TRANSITION & UI LOGIC ---
+        const btnEnterHouse = document.getElementById('btn-enter-house');
+        const btnExitHouse = document.getElementById('btn-exit-house');
+        const boardUI = document.getElementById('board-ui');
+        const modeText = document.getElementById('mode-text');
+        
+        let transSeq = [];
+        let transIdx = 0;
 
-        const ACCELERATION = 0.025;
-        const FRICTION = 0.95;
-        const MAX_SPEED = 0.9;
-        const ROTATION_SPEED = 0.05;
+        function beginEnterHouse() {
+            if(!state.activeBuilding || state.mode !== 'DRIVING') return;
+            state.mode = 'TRANSITION';
+            modeText.innerText = 'JBSI [ENTERING]';
+            btnEnterHouse.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+            btnEnterHouse.classList.add('opacity-0', 'scale-90', 'translate-y-4');
+            
+            const b = state.activeBuilding;
+            
+            // Spawn player next to car
+            playerGroup.position.copy(carGroup.position);
+            playerGroup.position.x += 2; 
+            playerGroup.visible = true;
 
-        const alertEl = document.getElementById('proximity-alert');
-        const alertText = document.getElementById('proximity-text').querySelector('span');
-        const coordsEl = document.getElementById('coords');
-        const modalContainer = document.getElementById('modal-container');
-        const modalDynamic = document.getElementById('modal-dynamic');
+            // Target positions
+            const doorWorldPos = new THREE.Vector3(
+                b.x + Math.sin(b.angle) * 9, // Slightly outside the door
+                0, 
+                b.z + Math.cos(b.angle) * 9
+            );
+            const insideWorldPos = new THREE.Vector3(
+                b.x + Math.sin(b.angle) * 2, // Inside the house center
+                0, 
+                b.z + Math.cos(b.angle) * 2
+            );
 
+            transSeq = [
+                { type: 'walk', target: doorWorldPos },
+                { type: 'door', target: Math.PI / 2 },
+                { type: 'walk', target: insideWorldPos },
+                { type: 'done_in' }
+            ];
+            transIdx = 0;
+        }
+
+        function beginExitHouse() {
+            if(state.mode !== 'WALKING') return;
+            state.mode = 'TRANSITION';
+            modeText.innerText = 'JBSI [EXITING]';
+            btnExitHouse.classList.add('hidden');
+            boardUI.classList.remove('active');
+            
+            const b = state.activeBuilding;
+            const doorWorldPos = new THREE.Vector3(
+                b.x + Math.sin(b.angle) * 9, 
+                0, 
+                b.z + Math.cos(b.angle) * 9
+            );
+            const carWorldPos = new THREE.Vector3().copy(carGroup.position);
+            carWorldPos.x += 2;
+
+            transSeq = [
+                { type: 'walk', target: doorWorldPos },
+                { type: 'door', target: 0 },
+                { type: 'walk', target: carWorldPos },
+                { type: 'done_out' }
+            ];
+            transIdx = 0;
+        }
+
+        function populateBoardUI(b) {
+            document.getElementById('board-top-bar').style.backgroundColor = `#${b.color.toString(16)}`;
+            document.getElementById('board-icon').setAttribute('icon', b.icon);
+            document.getElementById('board-icon').style.color = `#${b.color.toString(16)}`;
+            document.getElementById('board-title').innerText = b.title;
+            document.getElementById('board-subtitle').innerText = b.type;
+            document.getElementById('board-subtitle').style.color = `#${b.color.toString(16)}`;
+            document.getElementById('board-desc').innerHTML = b.desc;
+
+            const techCont = document.getElementById('board-tech-container');
+            const techWrapper = document.getElementById('board-tech');
+            if(b.tech && b.tech.length > 0) {
+                techCont.classList.remove('hidden');
+                techWrapper.innerHTML = b.tech.map(t => `<span class="px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono font-bold text-slate-300">${t}</span>`).join('');
+            } else { techCont.classList.add('hidden'); }
+
+            const linkEl = document.getElementById('board-link');
+            if(b.link) {
+                linkEl.href = b.link;
+                document.getElementById('board-link-text').innerText = b.linkText;
+                linkEl.style.backgroundColor = `#${b.color.toString(16)}`;
+                linkEl.classList.remove('hidden');
+            } else { linkEl.classList.add('hidden'); }
+        }
+
+        // --- INPUTS ---
         window.addEventListener('keydown', (e) => {
-            if (state.modalOpen) { if(e.key === 'Escape') closeModal(); return; }
             const k = e.key.toLowerCase();
             if (state.keys.hasOwnProperty(k)) state.keys[k] = true;
             const keyEl = document.getElementById(`key-${k}`);
             if(keyEl) keyEl.classList.add('pressed');
 
-            if (e.key === 'Enter' && state.activeBuilding) openModal(state.activeBuilding);
+            if (e.key === 'Enter') {
+                if (state.mode === 'DRIVING' && state.activeBuilding) beginEnterHouse();
+            }
         });
 
         window.addEventListener('keyup', (e) => {
@@ -515,6 +549,9 @@
             const keyEl = document.getElementById(`key-${k}`);
             if(keyEl) keyEl.classList.remove('pressed');
         });
+
+        btnEnterHouse.addEventListener('click', beginEnterHouse);
+        btnExitHouse.addEventListener('click', beginExitHouse);
 
         const btnMap = { 'btn-gas': 'w', 'btn-brake': 's', 'btn-left': 'a', 'btn-right': 'd' };
         Object.entries(btnMap).forEach(([btnId, key]) => {
@@ -537,22 +574,13 @@
         });
 
         function updateLabels() {
-            // Update District Labels
-            districts.forEach(d => {
-                const pos = new THREE.Vector3(d.x, 0, d.z);
-                const dist = carGroup.position.distanceTo(pos);
-                if(dist > 60 || dist < 5) { d.el.style.opacity = '0'; return; }
-                pos.project(camera);
-                if (pos.z < 1) {
-                    d.el.style.left = `${(pos.x * 0.5 + 0.5) * window.innerWidth}px`;
-                    d.el.style.top = `${(-(pos.y * 0.5) + 0.5) * window.innerHeight}px`;
-                    d.el.style.opacity = '1';
-                } else { d.el.style.opacity = '0'; }
-            });
+            if(state.mode !== 'DRIVING') {
+                buildings.forEach(b => b.labelEl.style.opacity = '0');
+                return;
+            }
 
-            // Update Building Labels
             buildings.forEach(b => {
-                const pos = new THREE.Vector3(b.x, 7, b.z); // Above roof
+                const pos = new THREE.Vector3(b.x, 8, b.z); 
                 const dist = carGroup.position.distanceTo(new THREE.Vector3(b.x, 0, b.z));
                 if(dist > 50) { b.labelEl.style.opacity = '0'; b.labelEl.style.transform = `translate(-50%, -50%) scale(0.8)`; return; }
                 pos.project(camera);
@@ -569,7 +597,7 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            if (!state.modalOpen) {
+            if (state.mode === 'DRIVING') {
                 if (state.keys.w) state.speed += ACCELERATION;
                 if (state.keys.s) state.speed -= ACCELERATION;
                 
@@ -590,130 +618,147 @@
                 nextX = Math.max(-180, Math.min(180, nextX));
                 nextZ = Math.max(-180, Math.min(180, nextZ));
 
-                // Basic Box Collision with Buildings
+                // Collision
                 let collision = false;
                 buildings.forEach(b => {
-                    const isHQ = b.id === 'about-hq';
-                    const radius = isHQ ? 10 : 6;
+                    const radius = b.id === 'about-hq' ? 12 : 8;
                     if(Math.hypot(nextX - b.x, nextZ - b.z) < radius) collision = true;
                 });
 
                 if(!collision) {
                     carGroup.position.x = nextX;
                     carGroup.position.z = nextZ;
-                } else {
-                    state.speed = 0; // Bonk
-                }
+                } else { state.speed = 0; }
 
                 // Chase Camera
-                const idealOffset = new THREE.Vector3(0, 8, 14); 
-                idealOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle);
-                idealOffset.add(carGroup.position);
+                const idealCamera = new THREE.Vector3(0, 8, 16).applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle).add(carGroup.position);
+                camera.position.lerp(idealCamera, 0.1);
+                camera.lookAt(carGroup.position.clone().add(new THREE.Vector3(0,-2,-8)));
 
-                camera.position.lerp(idealOffset, 0.1);
-                const lookAtPos = new THREE.Vector3(0, 0, -10);
-                lookAtPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), state.angle);
-                lookAtPos.add(carGroup.position);
-                camera.lookAt(lookAtPos);
+                // Proximity Trigger
+                let nearby = null;
+                buildings.forEach(b => {
+                    const dist = Math.hypot(carGroup.position.x - b.tx, carGroup.position.z - b.tz);
+                    if (dist < 5) nearby = b;
+                });
+
+                if (nearby !== state.activeBuilding) {
+                    state.activeBuilding = nearby;
+                    if (nearby) {
+                        document.getElementById('enter-text').innerText = `Enter ${nearby.title}`;
+                        btnEnterHouse.classList.remove('opacity-0', 'scale-90', 'translate-y-4');
+                        btnEnterHouse.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                    } else {
+                        btnEnterHouse.classList.add('opacity-0', 'scale-90', 'translate-y-4');
+                        btnEnterHouse.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                    }
+                }
+
+                // Wheels rotate
+                if (Math.abs(state.speed) > 0.01) {
+                    const wheelRot = state.speed * 0.2;
+                    carGroup.children[3].rotation.x += wheelRot;
+                    carGroup.children[4].rotation.x += wheelRot;
+                    carGroup.children[5].rotation.x += wheelRot;
+                    carGroup.children[6].rotation.x += wheelRot;
+                }
+            } 
+            else if (state.mode === 'TRANSITION') {
+                const step = transSeq[transIdx];
+                if (step.type === 'walk') {
+                    playerGroup.position.lerp(step.target, 0.06);
+                    // Smooth lookAt
+                    const targetAngle = Math.atan2(playerGroup.position.x - step.target.x, playerGroup.position.z - step.target.z);
+                    playerGroup.rotation.y = targetAngle;
+
+                    if (playerGroup.position.distanceTo(step.target) < 0.5) transIdx++;
+                } else if (step.type === 'door') {
+                    const b = state.activeBuilding;
+                    b.doorHinge.rotation.y += (step.target - b.doorHinge.rotation.y) * 0.1;
+                    if (Math.abs(b.doorHinge.rotation.y - step.target) < 0.05) transIdx++;
+                } else if (step.type === 'done_in') {
+                    state.mode = 'WALKING';
+                    modeText.innerText = 'JBSI [INTERIOR_MODE]';
+                    state.playerAngle = state.activeBuilding.angle + Math.PI; // Face the back wall board
+                    playerGroup.rotation.y = state.playerAngle;
+                    
+                    populateBoardUI(state.activeBuilding);
+                    boardUI.classList.add('active');
+                    btnExitHouse.classList.remove('hidden');
+                } else if (step.type === 'done_out') {
+                    state.mode = 'DRIVING';
+                    modeText.innerText = 'JBSI [DRIVING_MODE]';
+                    playerGroup.visible = false;
+                    state.activeBuilding = null;
+                }
+
+                // Camera follows player closely
+                const idealCamera = new THREE.Vector3(0, 4, 8).applyAxisAngle(new THREE.Vector3(0,1,0), playerGroup.rotation.y).add(playerGroup.position);
+                camera.position.lerp(idealCamera, 0.08);
+                camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1,0)));
             }
+            else if (state.mode === 'WALKING') {
+                const b = state.activeBuilding;
 
-            // Proximity Check to Trigger Zones
-            let nearby = null;
-            buildings.forEach(b => {
-                const dist = Math.hypot(carGroup.position.x - b.tx, carGroup.position.z - b.tz);
-                if (dist < 4.5) nearby = b;
-            });
+                // Player Movement
+                let nextX = playerGroup.position.x;
+                let nextZ = playerGroup.position.z;
 
-            if (nearby !== state.activeBuilding) {
-                state.activeBuilding = nearby;
-                if (nearby) {
-                    alertText.innerText = `View ${nearby.title}`;
-                    alertEl.classList.remove('opacity-0', 'scale-90', 'translate-y-4');
-                    alertEl.classList.add('opacity-100', 'scale-100', 'translate-y-0');
-                    document.getElementById('proximity-text').style.borderColor = `#${nearby.color.toString(16)}`;
+                if (state.keys.w) { nextX -= Math.sin(state.playerAngle) * 0.15; nextZ -= Math.cos(state.playerAngle) * 0.15; }
+                if (state.keys.s) { nextX += Math.sin(state.playerAngle) * 0.15; nextZ += Math.cos(state.playerAngle) * 0.15; }
+                if (state.keys.a) state.playerAngle += 0.06;
+                if (state.keys.d) state.playerAngle -= 0.06;
+                
+                playerGroup.rotation.y = state.playerAngle;
+
+                // Boundary check inside house (rough box)
+                const isHQ = b.id === 'about-hq';
+                const hw = isHQ ? 9 : 6;
+                const hd = isHQ ? 9 : 6;
+                
+                // Calculate local coordinates of next position relative to house center
+                const dx = nextX - b.x;
+                const dz = nextZ - b.z;
+                // Rotate local coords by -b.angle to align with AABB
+                const cosA = Math.cos(-b.angle);
+                const sinA = Math.sin(-b.angle);
+                const localX = dx * cosA - dz * sinA;
+                const localZ = dx * sinA + dz * cosA;
+
+                if (Math.abs(localX) < hw && Math.abs(localZ) < hd) {
+                    playerGroup.position.x = nextX;
+                    playerGroup.position.z = nextZ;
+                }
+
+                // Camera
+                const idealCamera = new THREE.Vector3(0, 3, 6).applyAxisAngle(new THREE.Vector3(0,1,0), state.playerAngle).add(playerGroup.position);
+                camera.position.lerp(idealCamera, 0.1);
+                camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0,1.5,0)));
+
+                // Project Board UI
+                const boardWorldPos = new THREE.Vector3();
+                b.board.getWorldPosition(boardWorldPos);
+                const dist = camera.position.distanceTo(boardWorldPos);
+                boardWorldPos.project(camera);
+
+                if (boardWorldPos.z < 1) {
+                    boardUI.style.left = `${(boardWorldPos.x * 0.5 + 0.5) * window.innerWidth}px`;
+                    boardUI.style.top = `${(-(boardWorldPos.y * 0.5) + 0.5) * window.innerHeight}px`;
+                    // Scale down based on distance
+                    const scale = Math.max(0.3, Math.min(1.0, 15 / dist));
+                    boardUI.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    boardUI.style.opacity = '1';
                 } else {
-                    alertEl.classList.add('opacity-0', 'scale-90', 'translate-y-4');
-                    alertEl.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                    boardUI.style.opacity = '0';
                 }
             }
 
-            coordsEl.innerText = `LOC: ${Math.round(carGroup.position.x)}, ${Math.round(carGroup.position.z)}`;
+            document.getElementById('coords').innerText = `LOC: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
             updateLabels();
-
-            if (Math.abs(state.speed) > 0.01) {
-                const wheelRot = state.speed * 0.2;
-                carGroup.children[4].rotation.x += wheelRot;
-                carGroup.children[5].rotation.x += wheelRot;
-                carGroup.children[6].rotation.x += wheelRot;
-                carGroup.children[7].rotation.x += wheelRot;
-            }
 
             renderer.render(scene, camera);
         }
 
-        // --- DYNAMIC MODAL LOGIC ---
-        function openModal(b) {
-            state.modalOpen = true;
-            state.speed = 0;
-            state.keys = { w: false, a: false, s: false, d: false };
-            document.querySelectorAll('.key-cap').forEach(el => el.classList.remove('pressed'));
-
-            // Populate Data
-            document.getElementById('modal-top-bar').style.backgroundColor = `#${b.color.toString(16)}`;
-            document.getElementById('modal-icon').setAttribute('icon', b.icon);
-            document.getElementById('modal-icon').style.color = `#${b.color.toString(16)}`;
-            document.getElementById('modal-icon-bg').style.borderColor = `#${b.color.toString(16)}40`;
-            document.getElementById('modal-title').innerText = b.title;
-            document.getElementById('modal-subtitle').innerText = b.type;
-            document.getElementById('modal-subtitle').style.color = `#${b.color.toString(16)}`;
-            document.getElementById('modal-desc').innerHTML = b.desc;
-
-            // Tech Stack
-            const techCont = document.getElementById('modal-tech-container');
-            const techWrapper = document.getElementById('modal-tech');
-            if(b.tech && b.tech.length > 0) {
-                techCont.classList.remove('hidden');
-                techWrapper.innerHTML = b.tech.map(t => `<span class="px-3 py-1 rounded bg-white border border-slate-200 text-xs font-mono font-bold text-slate-600 shadow-sm">${t}</span>`).join('');
-            } else {
-                techCont.classList.add('hidden');
-            }
-
-            // Link
-            const linkEl = document.getElementById('modal-link');
-            if(b.link) {
-                linkEl.href = b.link;
-                document.getElementById('modal-link-text').innerText = b.linkText;
-                linkEl.style.backgroundColor = `#${b.color.toString(16)}`;
-                linkEl.classList.remove('hidden');
-            } else {
-                linkEl.classList.add('hidden');
-            }
-
-            // Show
-            modalContainer.classList.remove('hidden');
-            setTimeout(() => {
-                modalDynamic.classList.remove('hidden');
-                setTimeout(() => {
-                    modalDynamic.classList.remove('opacity-0', 'scale-95');
-                    modalDynamic.classList.add('opacity-100', 'scale-100');
-                }, 10);
-            }, 10);
-        }
-
-        function closeModal() {
-            modalDynamic.classList.remove('opacity-100', 'scale-100');
-            modalDynamic.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => {
-                modalDynamic.classList.add('hidden');
-                modalContainer.classList.add('hidden');
-                state.modalOpen = false;
-            }, 300);
-        }
-
-        document.querySelector('.close-modal').addEventListener('click', closeModal);
-        alertEl.addEventListener('click', () => { if (state.activeBuilding && !state.modalOpen) openModal(state.activeBuilding); });
-
-        // Start
         animate();
     </script>
 </body>
