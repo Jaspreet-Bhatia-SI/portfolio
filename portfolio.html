@@ -316,31 +316,48 @@
             envGroup.add(treeGrp);
         }
 
-        // --- UAZ VEHICLE (Mahindra Thar Style) ---
+        // --- SUPERCAR VEHICLE ---
         const carGroup = new THREE.Group();
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.3 }); // Black Thar
-        const trimMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xd50000, roughness: 0.2, metalness: 0.6 }); // Ferrari Red
+        const blackMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.9 });
         
-        const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 5.0), bodyMat); chassis.position.y = 1.2; chassis.castShadow = true;
-        const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.5, 2.6), bodyMat); cabin.position.set(0, 2.5, 0.4); cabin.castShadow = true;
-        const fFender = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.2, 1.4), trimMat); fFender.position.set(0, 1.0, -1.6);
-        const rFender = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.2, 1.4), trimMat); rFender.position.set(0, 1.0, 1.6);
+        const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 5.0), bodyMat); chassis.position.y = 0.6; chassis.castShadow = true;
+        const hood = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.4, 1.5), bodyMat); hood.position.set(0, 0.9, -1.8); hood.rotation.x = 0.15; hood.castShadow = true;
+        const roof = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.5, 1.6), bodyMat); roof.position.set(0, 1.4, 0.2); roof.castShadow = true;
         
-        const spareTire = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.4, 16), new THREE.MeshStandardMaterial({color:0x111}));
-        spareTire.rotation.z = Math.PI/2; spareTire.rotation.y = Math.PI/2; spareTire.position.set(0, 2.0, 2.7);
+        const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.8, 0.1), glassMat); windshield.position.set(0, 1.15, -0.7); windshield.rotation.x = -0.7;
+        const rearWindow = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 0.1), glassMat); rearWindow.position.set(0, 1.15, 1.1); rearWindow.rotation.x = 0.6; 
 
-        const windshield = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.2, 0.1), new THREE.MeshStandardMaterial({color: 0x111111, roughness:0})); windshield.position.set(0, 2.5, -0.9);
-        carGroup.add(chassis, cabin, fFender, rFender, spareTire, windshield);
+        const spoilerWing = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.1, 0.6), blackMat); spoilerWing.position.set(0, 1.5, 2.2); spoilerWing.castShadow = true;
+        const sPillarL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.4), blackMat); sPillarL.position.set(-0.8, 1.2, 2.2);
+        const sPillarR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.4), blackMat); sPillarR.position.set(0.8, 1.2, 2.2);
 
-        let hlSpotL = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1); hlSpotL.position.set(-0.8, 1.2, -2.5); hlSpotL.target.position.set(-0.8, 0, -30); carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
-        let hlSpotR = new THREE.SpotLight(0xfff0dd, 0, 80, 0.5, 0.5, 1); hlSpotR.position.set(0.8, 1.2, -2.5); hlSpotR.target.position.set(0.8, 0, -30); carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
+        const hlMat = new THREE.MeshBasicMaterial({color: 0xffffff});
+        const hlL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.1), hlMat); hlL.position.set(-0.8, 0.8, -2.5);
+        const hlR = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.1), hlMat); hlR.position.set(0.8, 0.8, -2.5);
+        const tlMat = new THREE.MeshBasicMaterial({color: 0xff0000});
+        const tlL = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.1), tlMat); tlL.position.set(-0.7, 0.7, 2.5);
+        const tlR = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.1), tlMat); tlR.position.set(0.7, 0.7, 2.5);
 
-        const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.6, 16); wheelGeo.rotateZ(Math.PI / 2); const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 1.0 });
-        const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(1.2, 0.6, 1.6); w1.castShadow = true;
-        const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.position.set(-1.2, 0.6, 1.6); w2.castShadow = true;
-        const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.position.set(1.2, 0.6, -1.6); w3.castShadow = true;
-        const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.position.set(-1.2, 0.6, -1.6); w4.castShadow = true;
-        carGroup.add(w1, w2, w3, w4); scene.add(carGroup);
+        carGroup.add(chassis, hood, roof, windshield, rearWindow, spoilerWing, sPillarL, sPillarR, hlL, hlR, tlL, tlR);
+
+        let hlSpotL = new THREE.SpotLight(0xfff0dd, 0, 120, 0.6, 0.5, 1); hlSpotL.position.set(-0.8, 0.8, -2.6); hlSpotL.target.position.set(-0.8, 0, -40); carGroup.add(hlSpotL); carGroup.add(hlSpotL.target);
+        let hlSpotR = new THREE.SpotLight(0xfff0dd, 0, 120, 0.6, 0.5, 1); hlSpotR.position.set(0.8, 0.8, -2.6); hlSpotR.target.position.set(0.8, 0, -40); carGroup.add(hlSpotR); carGroup.add(hlSpotR.target);
+
+        const wheelGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.5, 24); wheelGeo.rotateZ(Math.PI / 2); 
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 1.0, roughness: 0.2 });
+        const tireMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+        function createWheel(x, z) {
+            const wGrp = new THREE.Group();
+            const tire = new THREE.Mesh(wheelGeo, tireMat); tire.castShadow = true; wGrp.add(tire);
+            const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.55, 12).rotateZ(Math.PI/2), rimMat); wGrp.add(rim);
+            wGrp.position.set(x, 0.65, z); return wGrp;
+        }
+        const w1 = createWheel(1.3, 1.5); const w2 = createWheel(-1.3, 1.5); const w3 = createWheel(1.3, -1.5); const w4 = createWheel(-1.3, -1.5);
+        carGroup.add(w1, w2, w3, w4);
+        carGroup.userData.wheels = [w1, w2, w3, w4];
+        scene.add(carGroup);
 
         // --- PLAYER CHARACTER (Articulated Natural Survivor) ---
         const playerGroup = new THREE.Group();
@@ -546,7 +563,7 @@
             });
         }
 
-        const ACCELERATION = 0.025; const FRICTION = 0.95; const MAX_SPEED = 0.9; const ROTATION_SPEED = 0.05;
+        const ACCELERATION = 0.04; const FRICTION = 0.96; const MAX_SPEED = 1.6; const ROTATION_SPEED = 0.055;
 
         function animate() {
             requestAnimationFrame(animate);
@@ -600,8 +617,7 @@
 
                 if (Math.abs(state.speed) > 0.01) {
                     const wheelRot = state.speed * 0.25;
-                    carGroup.children[6].rotation.x += wheelRot; carGroup.children[7].rotation.x += wheelRot;
-                    carGroup.children[8].rotation.x += wheelRot; carGroup.children[9].rotation.x += wheelRot;
+                    if(carGroup.userData.wheels) carGroup.userData.wheels.forEach(w => w.rotation.x += wheelRot);
                 }
 
                 const target = carGroup.position.clone(); target.y += 1.5;
