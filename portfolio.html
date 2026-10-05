@@ -90,83 +90,129 @@
 
     
     <!-- Contacts Toggle Button -->
-    <button id="btn-contacts" class="hidden pointer-events-auto absolute bottom-32 right-6 md:right-8 bg-slate-900/90 backdrop-blur border border-indigo-500/30 p-4 rounded-full shadow-[0_0_30px_rgba(79,70,229,0.4)] text-white hover:bg-slate-800 transition-all hover:scale-110 active:scale-95 z-[90]">
-        <iconify-icon icon="solar:phone-calling-bold" width="28" class="text-indigo-400"></iconify-icon>
+    <button id="btn-contacts" class="hidden pointer-events-auto absolute bottom-32 right-6 md:right-8 bg-white/20 backdrop-blur-md border border-white/40 p-4 rounded-full shadow-[0_4px_30px_rgba(0,0,0,0.1)] text-white hover:bg-white/30 transition-all hover:scale-110 active:scale-95 z-[90]">
+        <iconify-icon icon="solar:smartphone-bold" width="28"></iconify-icon>
     </button>
 
-    <!-- Phone UI Overlay -->
-    <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="relative w-full max-w-[320px] h-[640px] bg-black rounded-[40px] border-[8px] border-slate-800 shadow-[0_0_50px_rgba(79,70,229,0.5)] flex flex-col transform scale-95 transition-transform duration-300 pointer-events-auto" id="phone-frame">
-            <!-- Notch -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-slate-800 rounded-b-xl z-20 flex justify-center items-center gap-2">
-                <div class="w-1.5 h-1.5 rounded-full bg-blue-900/50"></div>
-                <div class="w-12 h-1.5 rounded-full bg-slate-900"></div>
-            </div>
+    <!-- Phone UI Overlay (iOS Style) -->
+    <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
+        <!-- Phone Frame -->
+        <div class="relative w-full max-w-[340px] h-[680px] bg-black rounded-[50px] border-[12px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
             
-            <!-- Screen Content -->
-            <div class="flex-1 bg-gradient-to-b from-indigo-950 to-black rounded-[32px] overflow-hidden flex flex-col items-center pt-16 p-6 relative">
-                <button id="btn-close-phone" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors cursor-pointer z-30">
-                    <iconify-icon icon="solar:close-circle-bold" width="26"></iconify-icon>
-                </button>
-                
-                <!-- Avatar & Status -->
-                <div class="relative">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border-4 border-slate-900 mb-4 flex items-center justify-center shadow-2xl overflow-hidden">
-                        <img src="profile.jpg" class="w-full h-full object-cover opacity-90 mix-blend-luminosity" onerror="this.style.display='none'">
-                        <span class="absolute text-3xl font-bold text-white tracking-widest">JB</span>
-                    </div>
-                    <div class="absolute bottom-4 right-1 w-5 h-5 bg-green-500 border-4 border-slate-900 rounded-full animate-pulse"></div>
-                </div>
-                
-                <h2 class="text-2xl font-bold text-white mb-1">Jaspreet Bhatia</h2>
-                <p class="text-indigo-400 text-sm mb-6 font-mono font-medium tracking-wide bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Software Engineer</p>
+            <!-- Dynamic Island / Notch -->
+            <div class="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30 flex justify-between items-center px-2">
+                <div class="w-2 h-2 rounded-full bg-blue-900/50"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></div>
+            </div>
 
-                <!-- Social Links -->
-                <div class="w-full flex flex-col gap-3 z-30">
-                    <a href="mailto:bhatiajaspreet161@gmail.com" target="_blank" class="flex items-center gap-4 bg-slate-800/50 hover:bg-slate-700/80 p-4 rounded-2xl transition-all border border-white/5 hover:border-red-400/30 group">
-                        <div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="solar:letter-bold" width="22" class="text-red-400"></iconify-icon>
+            <!-- Screen Content (iOS Wallpaper) -->
+            <div class="flex-1 bg-gradient-to-br from-[#2E3192] to-[#1BFFFF] relative flex flex-col font-sans">
+                
+                <!-- Status Bar -->
+                <div class="w-full h-12 pt-2 px-6 flex justify-between items-center text-white text-[13px] font-semibold z-20">
+                    <span id="phone-time">9:41</span>
+                    <div class="flex items-center gap-1.5">
+                        <iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon>
+                        <iconify-icon icon="solar:wifi-bold" width="14"></iconify-icon>
+                        <iconify-icon icon="solar:battery-charge-bold" width="16"></iconify-icon>
+                    </div>
+                </div>
+                
+                <button id="btn-close-phone" class="absolute top-14 right-4 bg-black/20 hover:bg-black/40 text-white rounded-full p-2 backdrop-blur-md transition-colors z-40">
+                    <iconify-icon icon="solar:close-circle-bold" width="22"></iconify-icon>
+                </button>
+
+                <!-- Search Widget -->
+                <div class="mt-6 mx-4 relative z-30">
+                    <div class="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-3 flex items-center gap-3 cursor-text shadow-lg hover:bg-white/30 transition-colors" id="search-widget-btn">
+                        <iconify-icon icon="solar:magnifer-linear" width="20" class="text-white"></iconify-icon>
+                        <span class="text-white/80 text-sm font-medium flex-1 text-left">Search or ask...</span>
+                        <iconify-icon icon="solar:microphone-2-bold" width="20" class="text-white"></iconify-icon>
+                    </div>
+                </div>
+
+                <!-- Apps Grid -->
+                <div class="mt-10 px-6 grid grid-cols-4 gap-y-8 gap-x-4 z-20">
+                    <a href="mailto:bhatiajaspreet161@gmail.com" target="_blank" class="flex flex-col items-center gap-1.5 group">
+                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-b from-[#5ac8fa] to-[#007aff] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                            <iconify-icon icon="solar:letter-bold" width="34" class="text-white"></iconify-icon>
                         </div>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-white text-sm">Email</span>
-                            <span class="text-xs text-slate-400 font-mono line-clamp-1">bhatiajaspreet161@...</span>
-                        </div>
+                        <span class="text-white text-[11px] font-medium drop-shadow-md">Mail</span>
                     </a>
-                    
-                    <a href="https://linkedin.com/in/jaspreet-bhatia-si" target="_blank" class="flex items-center gap-4 bg-slate-800/50 hover:bg-slate-700/80 p-4 rounded-2xl transition-all border border-white/5 hover:border-blue-400/30 group">
-                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:linkedin" width="24" class="text-blue-400"></iconify-icon>
+                    <a href="https://linkedin.com/in/jaspreet-bhatia-si" target="_blank" class="flex flex-col items-center gap-1.5 group">
+                        <div class="w-[60px] h-[60px] rounded-[14px] bg-[#0077b5] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                            <iconify-icon icon="mdi:linkedin" width="40" class="text-white"></iconify-icon>
                         </div>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-white text-sm">LinkedIn</span>
-                            <span class="text-xs text-slate-400 font-mono">jaspreet-bhatia-si</span>
-                        </div>
+                        <span class="text-white text-[11px] font-medium drop-shadow-md">LinkedIn</span>
                     </a>
-                    
-                    <a href="https://instagram.com/jass_bhatia.si" target="_blank" class="flex items-center gap-4 bg-slate-800/50 hover:bg-slate-700/80 p-4 rounded-2xl transition-all border border-white/5 hover:border-pink-400/30 group">
-                        <div class="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:instagram" width="24" class="text-pink-400"></iconify-icon>
+                    <a href="https://instagram.com/jass_bhatia.si" target="_blank" class="flex flex-col items-center gap-1.5 group">
+                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                            <iconify-icon icon="mdi:instagram" width="38" class="text-white"></iconify-icon>
                         </div>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-white text-sm">Instagram</span>
-                            <span class="text-xs text-slate-400 font-mono">@jass_bhatia.si</span>
-                        </div>
+                        <span class="text-white text-[11px] font-medium drop-shadow-md">Instagram</span>
                     </a>
-                    
-                    <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="flex items-center gap-4 bg-slate-800/50 hover:bg-slate-700/80 p-4 rounded-2xl transition-all border border-white/5 hover:border-slate-300/30 group">
-                        <div class="w-10 h-10 rounded-xl bg-slate-600/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:github" width="24" class="text-slate-300"></iconify-icon>
+                    <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="flex flex-col items-center gap-1.5 group">
+                        <div class="w-[60px] h-[60px] rounded-[14px] bg-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                            <iconify-icon icon="mdi:github" width="40" class="text-[#181717]"></iconify-icon>
                         </div>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-white text-sm">GitHub</span>
-                            <span class="text-xs text-slate-400 font-mono">Jaspreet-Bhatia-SI</span>
+                        <span class="text-white text-[11px] font-medium drop-shadow-md">GitHub</span>
+                    </a>
+                    <a href="https://portfolio.foodzie.store" target="_blank" class="flex flex-col items-center gap-1.5 group">
+                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-slate-800 to-black border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                            <iconify-icon icon="solar:cpu-bold" width="36" class="text-purple-400"></iconify-icon>
                         </div>
+                        <span class="text-white text-[11px] font-medium drop-shadow-md">Curator AI</span>
                     </a>
                 </div>
+                
+                <!-- Bottom Dock -->
+                <div class="absolute bottom-6 left-4 right-4 h-[84px] bg-white/20 backdrop-blur-2xl border border-white/30 rounded-[28px] flex items-center justify-around px-2 z-20">
+                    <div class="w-[60px] h-[60px] rounded-[14px] bg-green-500 flex items-center justify-center cursor-pointer shadow-md">
+                        <iconify-icon icon="solar:phone-bold" width="32" class="text-white"></iconify-icon>
+                    </div>
+                    <div class="w-[60px] h-[60px] rounded-[14px] bg-blue-500 flex items-center justify-center cursor-pointer shadow-md">
+                        <iconify-icon icon="solar:chat-round-bold" width="32" class="text-white"></iconify-icon>
+                    </div>
+                    <a href="https://github.com/Jaspreet-Bhatia-SI" target="_blank" class="w-[60px] h-[60px] rounded-[14px] bg-indigo-500 flex items-center justify-center cursor-pointer shadow-md">
+                        <iconify-icon icon="solar:safari-bold" width="36" class="text-white"></iconify-icon>
+                    </a>
+                </div>
+
+                <!-- Spotlight Search Overlay -->
+                <div id="spotlight-overlay" class="absolute inset-0 bg-white/40 backdrop-blur-3xl z-50 transform translate-y-full transition-transform duration-300 flex flex-col pt-12">
+                    <div class="px-4 pb-4">
+                        <div class="flex items-center gap-3 bg-white/60 rounded-xl p-2 px-3 shadow-sm border border-white/50">
+                            <iconify-icon icon="solar:magnifer-linear" width="20" class="text-slate-500"></iconify-icon>
+                            <input type="text" id="spotlight-input" class="bg-transparent flex-1 outline-none text-slate-800 font-medium placeholder-slate-500" placeholder="Search Jaspreet...">
+                            <button id="btn-cancel-search" class="text-blue-600 font-medium text-sm px-1">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto px-4 pb-10" id="spotlight-results">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Suggestions</div>
+                        <div class="bg-white/60 rounded-2xl overflow-hidden border border-white/50 flex flex-col">
+                            <div class="search-item p-3 border-b border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="https://linkedin.com/in/jaspreet-bhatia-si">
+                                <div class="bg-blue-500 text-white p-1.5 rounded-lg"><iconify-icon icon="mdi:linkedin" width="18"></iconify-icon></div>
+                                <span class="font-medium text-slate-800 text-sm">Jaspreet's LinkedIn</span>
+                            </div>
+                            <div class="search-item p-3 border-b border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="https://instagram.com/jass_bhatia.si">
+                                <div class="bg-gradient-to-tr from-[#f09433] to-[#bc1888] text-white p-1.5 rounded-lg"><iconify-icon icon="mdi:instagram" width="18"></iconify-icon></div>
+                                <span class="font-medium text-slate-800 text-sm">Jaspreet's Instagram</span>
+                            </div>
+                            <div class="search-item p-3 border-b border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="mailto:bhatiajaspreet161@gmail.com">
+                                <div class="bg-red-500 text-white p-1.5 rounded-lg"><iconify-icon icon="solar:letter-bold" width="18"></iconify-icon></div>
+                                <span class="font-medium text-slate-800 text-sm">Email Jaspreet</span>
+                            </div>
+                            <div class="search-item p-3 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="https://github.com/Jaspreet-Bhatia-SI">
+                                <div class="bg-slate-800 text-white p-1.5 rounded-lg"><iconify-icon icon="solar:cpu-bold" width="18"></iconify-icon></div>
+                                <span class="font-medium text-slate-800 text-sm">Curator AI Project</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-
     <!-- Virtual Joystick -->
     <div id="joystick-base" class="md:hidden hidden absolute w-24 h-24 rounded-full border border-white/30 bg-black/20 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none shadow-[0_0_20px_rgba(255,255,255,0.1)]">
         <div id="joystick-stick" class="absolute top-1/2 left-1/2 w-10 h-10 rounded-full bg-white/40 transform -translate-x-1/2 -translate-y-1/2 shadow-sm"></div>
@@ -771,6 +817,12 @@ function createNPC(x, z, color, patrolRadius) {
         const btnContacts = document.getElementById('btn-contacts');
         const phoneUI = document.getElementById('phone-ui');
         const phoneFrame = document.getElementById('phone-frame');
+        const timeEl = document.getElementById('phone-time');
+        
+        setInterval(() => {
+            const d = new Date();
+            timeEl.innerText = d.getHours() + ':' + d.getMinutes().toString().padStart(2, '0');
+        }, 1000);
         
         function togglePhone() {
             const isHidden = phoneUI.classList.contains('pointer-events-none');
@@ -778,20 +830,96 @@ function createNPC(x, z, color, patrolRadius) {
                 phoneUI.classList.remove('hidden');
                 requestAnimationFrame(() => {
                     phoneUI.classList.remove('opacity-0', 'pointer-events-none');
-                    phoneFrame.classList.remove('scale-95');
-                    phoneFrame.classList.add('scale-100');
+                    phoneFrame.classList.remove('scale-[0.2]', 'translate-y-32', 'opacity-0');
+                    phoneFrame.classList.add('scale-100', 'translate-y-0', 'opacity-100');
                 });
             } else {
                 phoneUI.classList.add('opacity-0', 'pointer-events-none');
-                phoneFrame.classList.remove('scale-100');
-                phoneFrame.classList.add('scale-95');
-                setTimeout(() => phoneUI.classList.add('hidden'), 300);
+                phoneFrame.classList.remove('scale-100', 'translate-y-0', 'opacity-100');
+                phoneFrame.classList.add('scale-[0.2]', 'translate-y-32', 'opacity-0');
+                setTimeout(() => phoneUI.classList.add('hidden'), 500);
+                document.getElementById('spotlight-overlay').classList.add('translate-y-full');
             }
         }
         btnContacts.addEventListener('click', togglePhone);
         document.getElementById('btn-close-phone').addEventListener('click', togglePhone);
         phoneFrame.addEventListener('mousedown', e => e.stopPropagation());
         phoneFrame.addEventListener('touchstart', e => e.stopPropagation());
+
+        // Spotlight Search Logic
+        const spotlightBtn = document.getElementById('search-widget-btn');
+        const spotlightOverlay = document.getElementById('spotlight-overlay');
+        const spotlightInput = document.getElementById('spotlight-input');
+        const btnCancelSearch = document.getElementById('btn-cancel-search');
+        const spotlightResults = document.getElementById('spotlight-results');
+        
+        spotlightBtn.addEventListener('click', () => {
+            spotlightOverlay.classList.remove('translate-y-full');
+            setTimeout(() => spotlightInput.focus(), 300);
+        });
+        btnCancelSearch.addEventListener('click', () => {
+            spotlightOverlay.classList.add('translate-y-full');
+            spotlightInput.value = '';
+            resetSearch();
+        });
+
+        const defaultSuggestionsHtml = spotlightResults.innerHTML;
+        
+        function resetSearch() {
+            spotlightResults.innerHTML = defaultSuggestionsHtml;
+            document.querySelectorAll('.search-item').forEach(item => {
+                item.addEventListener('click', () => { window.open(item.dataset.url, '_blank'); });
+            });
+        }
+        resetSearch();
+
+        spotlightInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            if(!val) { resetSearch(); return; }
+            
+            const aiResponses = [
+                { match: ['who', 'about', 'info'], text: 'Jaspreet Bhatia (JBSI) is a Software Engineer building highly interactive web apps and 3D experiences.' },
+                { match: ['skills', 'tech', 'stack'], text: 'Proficient in modern web (React, Tailwind), 3D (Three.js), and AI agents.' },
+                { match: ['hire', 'contact', 'reach'], text: 'You can reach out via Email or LinkedIn (see icons below)!' },
+                { match: ['curator', 'ai'], text: 'Curator AI is a flagship project utilizing LLMs for automated content discovery.' }
+            ];
+            
+            let found = false;
+            for(const res of aiResponses) {
+                if(res.match.some(m => val.includes(m))) {
+                    spotlightResults.innerHTML = `
+                        <div class="bg-white/60 rounded-2xl p-4 border border-white/50 shadow-sm mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <iconify-icon icon="solar:magic-stick-3-bold" class="text-purple-500"></iconify-icon>
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">AI Answer</span>
+                            </div>
+                            <p class="text-sm text-slate-800 font-medium leading-relaxed">${res.text}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.open('https://linkedin.com/in/jaspreet-bhatia-si')" class="flex-1 bg-blue-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">LinkedIn</button>
+                            <button onclick="window.open('mailto:bhatiajaspreet161@gmail.com')" class="flex-1 bg-red-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">Email</button>
+                        </div>
+                    `;
+                    found = true; break;
+                }
+            }
+            if(!found) {
+                spotlightResults.innerHTML = `
+                    <div class="text-center text-slate-500 mt-8 font-medium">
+                        <iconify-icon icon="solar:magnifer-linear" width="32" class="mb-2 opacity-50"></iconify-icon>
+                        <p class="text-sm">Press Enter to search Web for "${val}"</p>
+                    </div>
+                `;
+            }
+        });
+        
+        spotlightInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                const val = e.target.value;
+                window.open('https://google.com/search?q=' + encodeURIComponent(val + ' Jaspreet Bhatia'), '_blank');
+            }
+        });
+
 
 
         window.addEventListener('resize', () => {
@@ -1156,13 +1284,11 @@ if (state.mode === 'DRIVING') {
                 const pt = Math.atan2(playerGroup.position.x - npc.grp.position.x, playerGroup.position.z - npc.grp.position.z);
                 const nt = Math.atan2(npc.grp.position.x - playerGroup.position.x, npc.grp.position.z - playerGroup.position.z);
                 
-                // Keep players standing still
                 playerGroup.userData.lLeg.rotation.x = 0; playerGroup.userData.rLeg.rotation.x = 0;
                 playerGroup.userData.lArm.rotation.x = 0; 
                 npc.lLeg.rotation.x = 0; npc.rLeg.rotation.x = 0;
                 npc.lArm.rotation.x = 0;
 
-                // Turn to face each other (shortest angle lerp approx)
                 const dpy = nt - playerGroup.rotation.y;
                 playerGroup.rotation.y += Math.atan2(Math.sin(dpy), Math.cos(dpy)) * 0.1;
                 const dny = pt - npc.grp.rotation.y;
@@ -1171,28 +1297,20 @@ if (state.mode === 'DRIVING') {
                 if(t < 1.5) {
                     playerGroup.userData.rArm.rotation.x += (-Math.PI/2 - playerGroup.userData.rArm.rotation.x) * 0.1;
                     npc.rArm.rotation.x += (-Math.PI/2 - npc.rArm.rotation.x) * 0.1;
-                } else if(t < 5) {
-                    state.shareCard.material.opacity = Math.min(1, (t - 1.5) * 2);
-                    state.shareCard.position.y += 0.005;
-                    state.shareCard.rotation.y += 0.02;
-                } else {
+                } else if (t >= 1.5 && t < 1.55) {
+                    if (!hasContact) {
+                        hasContact = true;
+                        document.getElementById('btn-contacts').classList.remove('hidden');
+                        togglePhone(); 
+                    }
+                } else if (t > 2.5) {
                     playerGroup.userData.rArm.rotation.x += (0 - playerGroup.userData.rArm.rotation.x) * 0.1;
                     npc.rArm.rotation.x += (0 - npc.rArm.rotation.x) * 0.1;
-                    state.shareCard.material.opacity -= 0.05;
-                    if(state.shareCard.material.opacity <= 0) {
-                        scene.remove(state.shareCard);
-                        state.shareCard.geometry.dispose();
-                        state.shareCard.material.dispose();
+                    
+                    if(t > 3.5) {
                         playerGroup.userData.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = false; });
                         npc.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = false; });
                         npc.state = 'idle';
-                        
-                        if (!hasContact) {
-                            hasContact = true;
-                            btnContacts.classList.remove('hidden');
-                            setTimeout(() => { togglePhone(); }, 800);
-                        }
-
                         if (state.wasDrivingBeforeShare) {
                             state.mode = 'DRIVING'; modeText.innerText = 'SURVIVOR [DRIVING]';
                             playerGroup.visible = false;
@@ -1202,7 +1320,6 @@ if (state.mode === 'DRIVING') {
                     }
                 }
                 
-                // Camera logic: allow user to rotate view during sharing!
                 const midX = (playerGroup.position.x + npc.grp.position.x) / 2;
                 const midZ = (playerGroup.position.z + npc.grp.position.z) / 2;
                 const target = new THREE.Vector3(midX, playerGroup.position.y + 1.5, midZ);
