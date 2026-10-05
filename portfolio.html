@@ -288,7 +288,7 @@
             
             const tblGrp = new THREE.Group();
             const tblTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 2.5), new THREE.MeshStandardMaterial({color: 0x221100})); tblTop.position.y = 1.2; tblTop.castShadow = true;
-            const tblLeg = new THREE.Mesh(new THREE.BoxGeometry(3, 1.2, 1.5), new THREE.MeshStandardMaterial({color: 0x111111})); tblLeg.position.y = 0.6; tblLeg.castShadow = true;
+            const tblLeg = new THREE.Mesh(new THREE.BoxGeometry(3, 1.2, 1.5), new THREE.MeshStandardMaterial({color: 0x111111})); tblLeg.position.y = 0.6; tb
             const mag = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.9), new THREE.MeshStandardMaterial({color: 0xffffff})); mag.position.set(-0.6, 1.35, 0); mag.rotation.y = 0.2; mag.castShadow = true;
             const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.4, 12), new THREE.MeshStandardMaterial({color: 0xe0e0e0})); cup.position.set(0.8, 1.5, -0.3); cup.castShadow = true;
             tblGrp.add(tblTop, tblLeg, mag, cup);
@@ -365,7 +365,7 @@
             const skinMat = new THREE.MeshStandardMaterial({color: 0xffccaa});
             const shirtMat = new THREE.MeshStandardMaterial({color: color});
             const pantsMat = new THREE.MeshStandardMaterial({color: 0x333333});
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat); head.position.y = 2.0; head.castShadow = true;
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat); head.position.y = 2.0; 
             const torso = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.0, 0.4), shirtMat); torso.position.y = 1.25; torso.castShadow = true;
             const lArm = new THREE.Group(); lArm.position.set(-0.5, 1.6, 0); const lArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), skinMat); lArmMesh.position.y = -0.3; lArmMesh.castShadow = true; lArm.add(lArmMesh);
             const rArm = new THREE.Group(); rArm.position.set(0.5, 1.6, 0); const rArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), skinMat); rArmMesh.position.y = -0.3; rArmMesh.castShadow = true; rArm.add(rArmMesh);
@@ -395,22 +395,22 @@
         
         const cartBody = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 4), woodLight); cartBody.position.y = 1.5; cartBody.castShadow = true;
         const cartWheelGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 12);
-        const cw1 = new THREE.Mesh(cartWheelGeo, woodDark); w1.rotation.z = Math.PI/2; w1.position.set(-1.6, 0.8, -1); w1.castShadow = true;
-        const cw2 = new THREE.Mesh(cartWheelGeo, woodDark); w2.rotation.z = Math.PI/2; w2.position.set(1.6, 0.8, -1); w2.castShadow = true;
-        const cw3 = new THREE.Mesh(cartWheelGeo, woodDark); w3.rotation.z = Math.PI/2; w3.position.set(-1.6, 0.8, 1); w3.castShadow = true;
-        const cw4 = new THREE.Mesh(cartWheelGeo, woodDark); w4.rotation.z = Math.PI/2; w4.position.set(1.6, 0.8, 1); w4.castShadow = true;
-        const pole = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 3), woodDark); pole.position.set(0, 1.2, 3); pole.castShadow = true;
+        const cw1 = new THREE.Mesh(cartWheelGeo, woodDark); cw1.rotation.z = Math.PI/2; cw1.position.set(-1.6, 0.8, -1); 
+        const cw2 = new THREE.Mesh(cartWheelGeo, woodDark); cw2.rotation.z = Math.PI/2; cw2.position.set(1.6, 0.8, -1); 
+        const cw3 = new THREE.Mesh(cartWheelGeo, woodDark); cw3.rotation.z = Math.PI/2; cw3.position.set(-1.6, 0.8, 1); 
+        const cw4 = new THREE.Mesh(cartWheelGeo, woodDark); cw4.rotation.z = Math.PI/2; cw4.position.set(1.6, 0.8, 1); 
+        const pole = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 3), woodDark); pole.position.set(0, 1.2, 3); 
         
         // Horse
         const horseGrp = new THREE.Group();
         const hBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 2.5), horseMat); hBody.position.set(0, 1.8, 5); hBody.castShadow = true;
-        const hNeck = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 0.6), horseMat); hNeck.position.set(0, 2.5, 6); hNeck.rotation.x = -Math.PI/6; hNeck.castShadow = true;
-        const hHead = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 1.0), horseMat); hHead.position.set(0, 3.2, 6.2); hHead.castShadow = true;
+        const hNeck = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 0.6), horseMat); hNeck.position.set(0, 2.5, 6); hNeck.rotation.x = -Math.PI/6; 
+        const hHead = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 1.0), horseMat); hHead.position.set(0, 3.2, 6.2); 
         const hLegGeo = new THREE.BoxGeometry(0.3, 1.5, 0.3);
-        const hL1 = new THREE.Mesh(hLegGeo, horseMat); hL1.position.set(-0.4, 0.75, 4); hL1.castShadow = true;
-        const hL2 = new THREE.Mesh(hLegGeo, horseMat); hL2.position.set(0.4, 0.75, 4); hL2.castShadow = true;
-        const hL3 = new THREE.Mesh(hLegGeo, horseMat); hL3.position.set(-0.4, 0.75, 5.8); hL3.castShadow = true;
-        const hL4 = new THREE.Mesh(hLegGeo, horseMat); hL4.position.set(0.4, 0.75, 5.8); hL4.castShadow = true;
+        const hL1 = new THREE.Mesh(hLegGeo, horseMat); hL1.position.set(-0.4, 0.75, 4); 
+        const hL2 = new THREE.Mesh(hLegGeo, horseMat); hL2.position.set(0.4, 0.75, 4); 
+        const hL3 = new THREE.Mesh(hLegGeo, horseMat); hL3.position.set(-0.4, 0.75, 5.8); 
+        const hL4 = new THREE.Mesh(hLegGeo, horseMat); hL4.position.set(0.4, 0.75, 5.8); 
         horseGrp.add(hBody, hNeck, hHead, hL1, hL2, hL3, hL4);
 
         cartGrp.add(cartBody, cw1, cw2, cw3, cw4, pole, horseGrp);
@@ -421,7 +421,7 @@
 
         const treeGeo = new THREE.ConeGeometry(2.5, 12, 7); const treeMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 1.0 }); 
         const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 4); const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f }); 
-        for(let i=0; i<400; i++) {
+        for(let i=0; i<200; i++) {
             const x = (Math.random() - 0.5) * 600, z = (Math.random() - 0.5) * 600;
             if(Math.abs(x) < 20 && Math.abs(z) < 200) continue; 
             let tooClose = false; buildings.forEach(b => { if(Math.hypot(x - b.x, z - b.z) < 16) tooClose = true; }); if(tooClose) continue;
@@ -481,7 +481,7 @@
         const pantsMat = new THREE.MeshStandardMaterial({color: 0x4a4f44});
         
         const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), shirtMat); torso.position.y = 2.0; torso.castShadow = true; playerGroup.add(torso);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skinMat); head.position.y = 2.9; head.castShadow = true; playerGroup.add(head);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skinMat); head.position.y = 2.9;  playerGroup.add(head);
         const pack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.0, 0.4), new THREE.MeshStandardMaterial({color:0x222})); pack.position.set(0, 2.0, 0.45); pack.castShadow = true; playerGroup.add(pack);
 
         function createLimb(mat, yOff, len) {
@@ -513,7 +513,7 @@
         document.addEventListener('pointerlockchange', () => { isPointerLocked = (document.pointerLockElement === document.body); });
         document.addEventListener('mousemove', (e) => {
             if (!isPointerLocked || state.mode === 'TRANSITION' || isSitting) return;
-            camTheta -= e.movementX * 0.003; camPhi -= e.movementY * 0.003; lastLookTime = Date.now();
+            camTheta -= (e.movementX || 0) * 0.003; camPhi -= (e.movementY || 0) * 0.003; lastLookTime = Date.now();
             camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi));
         });
 
@@ -725,7 +725,7 @@
         const ACCELERATION = 0.04; const FRICTION = 0.96; const MAX_SPEED = 1.6; const ROTATION_SPEED = 0.055;
 
         function animate() {
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animate); try {
 
             if (state.targetTimeMode) {
                 const t = state.targetTimeMode; const lerpSpd = 0.02;
@@ -926,7 +926,7 @@ if (state.mode === 'DRIVING') {
             }
 
             document.getElementById('coords').innerText = `GRID: ${Math.round(state.mode==='DRIVING'?carGroup.position.x:playerGroup.position.x)}, ${Math.round(state.mode==='DRIVING'?carGroup.position.z:playerGroup.position.z)}`;
-            updateLabels(); cloudsGroup.rotation.y += 0.0003; drawMinimap(); renderer.render(scene, camera);
+            updateLabels(); cloudsGroup.rotation.y += 0.0003; drawMinimap(); renderer.render(scene, camera); } catch(e) { console.error(e); alert("FATAL ERROR: " + e.message); throw e; }
         }
 
         animate();
