@@ -130,30 +130,26 @@
     <script>
         // --- POCHINKI ARCHITECTURE (Extended Layout) ---
         const buildings = [
-            { id: 'proj-curator', type: 'Project', x: -35, z: -50, tx: -15, tz: -50, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline built in Python to autonomously map educational content.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
-            { id: 'proj-foodzie', type: 'Project', x: 35, z: -50, tx: 15, tz: -50, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', desc: 'Massive E-Commerce ecosystem running a Flutter mobile client, Python server, and PostgreSQL database with complex order routing.', tech: ['Flutter', 'Python', 'Postgres'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
-            { id: 'proj-stark', type: 'Project', x: -35, z: -20, tx: -15, tz: -20, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', desc: 'Desktop voice assistant automating OS tasks and pulling live intelligence from the web using NLP.', tech: ['Python', 'NLP'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
-            { id: 'proj-mltree', type: 'Project', x: 35, z: -20, tx: 15, tz: -20, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', desc: 'Interactive node-based architecture mapping 150+ ML algorithms. Bridges theoretical math to application.', tech: ['D3.js', 'Data Science'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
-            { id: 'proj-crypto', type: 'Project', x: -35, z: 10, tx: -15, tz: 10, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', desc: 'Cryptographic tool for secure password generation utilizing system entropy to build unbreakable hashes.', tech: ['Cryptography', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
-            { id: 'proj-resq', type: 'Project', x: 35, z: 10, tx: 15, tz: 10, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', desc: 'ML emergency response optimization. Calculates fastest dynamic routing for critical emergency vehicles.', tech: ['Python', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
+            { id: 'proj-curator', type: 'Project', x: -130, z: -50, tx: -100, tz: -50, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline built in Python.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
+            { id: 'proj-foodzie', type: 'Project', x: -130, z: 0, tx: -100, tz: 0, color: 0xf97316, icon: 'solar:cart-linear', title: 'Foodzie Platform', desc: 'Massive E-Commerce ecosystem running a Flutter mobile client.', tech: ['Flutter', 'Python', 'Postgres'], link: 'https://foodzie.store', linkText: 'Launch Platform' },
+            { id: 'proj-stark', type: 'Project', x: -130, z: 50, tx: -100, tz: 50, color: 0x3b82f6, icon: 'solar:microchip-linear', title: 'Stark AI', desc: 'Desktop voice assistant automating OS tasks.', tech: ['Python', 'NLP'], link: 'https://github.com/Jaspreet-Bhatia-SI/stark-ai', linkText: 'View on GitHub' },
             
-            { id: 'skill-ai', type: 'Skill Domain', x: -35, z: 50, tx: -15, tz: 50, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', desc: 'Deep expertise in training neural networks, designing LLM pipelines, and building autonomous agents that act on web data.', tech: ['TensorFlow', 'PyTorch', 'Agents'], link: null },
-            { id: 'skill-backend', type: 'Skill Domain', x: 35, z: 50, tx: 15, tz: 50, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', desc: 'Scalable server-side infrastructure. Extensive experience architecting REST and GraphQL APIs handling thousands of RPM.', tech: ['Python', 'Node.js', 'Go'], link: null },
-            { id: 'skill-frontend', type: 'Skill Domain', x: -70, z: 50, tx: -70, tz: 30, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', desc: 'Crafting highly interactive, performant, and beautiful interfaces. Expert in DOM manipulation and WebGL 3D rendering.', tech: ['React', 'Three.js', 'Tailwind'], link: null },
-            { id: 'skill-cloud', type: 'Skill Domain', x: 70, z: 50, tx: 70, tz: 30, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', desc: 'Deploying robust cloud architectures. Mastery over AWS ec2/s3, Docker orchestration, and automated CI/CD pipelines.', tech: ['AWS', 'Docker', 'Linux'], link: null },
+            { id: 'proj-mltree', type: 'Project', x: 130, z: -50, tx: 100, tz: -50, color: 0x84cc16, icon: 'solar:network-linear', title: 'ML Tree', desc: 'Interactive node-based architecture mapping 150+ ML algorithms.', tech: ['D3.js', 'Data Science'], link: 'https://jaspreet-bhatia-si.github.io/ml-tree', linkText: 'View Visualization' },
+            { id: 'proj-crypto', type: 'Project', x: 130, z: 0, tx: 100, tz: 0, color: 0xe11d48, icon: 'solar:shield-keyhole-linear', title: 'CryptoAuth', desc: 'Cryptographic tool for secure password generation.', tech: ['Cryptography', 'JS'], link: 'https://jaspreet-bhatia-si.github.io/secure-password-generator', linkText: 'Use Generator' },
+            { id: 'proj-resq', type: 'Project', x: 130, z: 50, tx: 100, tz: 50, color: 0xeab308, icon: 'solar:routing-2-linear', title: 'ResQ AI', desc: 'ML emergency response optimization for critical emergency vehicles.', tech: ['Python', 'Algorithms'], link: 'https://github.com/Jaspreet-Bhatia-SI/ResQ-AI', linkText: 'View on GitHub' },
+            
+            { id: 'skill-ai', type: 'Skill Domain', x: -50, z: -150, tx: -50, tz: -120, color: 0xa855f7, icon: 'solar:brain-linear', title: 'AI & Machine Learning', desc: 'Deep expertise in training neural networks and LLM pipelines.', tech: ['TensorFlow', 'PyTorch'], link: null },
+            { id: 'skill-backend', type: 'Skill Domain', x: 50, z: -150, tx: 50, tz: -120, color: 0x06b6d4, icon: 'solar:server-square-linear', title: 'Backend Architecture', desc: 'Scalable server-side infrastructure and GraphQL APIs.', tech: ['Python', 'Node.js', 'Go'], link: null },
+            
+            { id: 'skill-frontend', type: 'Skill Domain', x: -50, z: 150, tx: -50, tz: 120, color: 0x0ea5e9, icon: 'solar:monitor-smartphone-linear', title: 'Frontend Engineering', desc: 'Crafting highly interactive interfaces in WebGL and React.', tech: ['React', 'Three.js'], link: null },
+            { id: 'skill-cloud', type: 'Skill Domain', x: 50, z: 150, tx: 50, tz: 120, color: 0xf59e0b, icon: 'solar:cloud-storage-linear', title: 'Cloud & DevOps', desc: 'Deploying robust cloud architectures on AWS with Docker.', tech: ['AWS', 'Docker'], link: null },
 
-            { id: 'contact-email', type: 'Uplink', x: -70, z: -50, tx: -70, tz: -30, color: 0xf43f5e, icon: 'solar:letter-linear', title: 'Secure Email', desc: 'Establish a direct communications channel for massive AI infrastructure projects.<br>bhatiajaspreet161@gmail.com', tech: [], link: 'mailto:bhatiajaspreet161@gmail.com', linkText: 'Send Email' },
-            { id: 'contact-github', type: 'Uplink', x: 70, z: -50, tx: 70, tz: -30, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', desc: 'Access all open-source repositories, system architectures, and raw intelligence data. @Jaspreet-Bhatia-SI', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
-            { id: 'contact-linkedin', type: 'Uplink', x: -110, z: -50, tx: -90, tz: -50, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', desc: 'Connect with me professionally to track updates and technical writings.', tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect' },
-            { id: 'contact-insta', type: 'Uplink', x: 110, z: -50, tx: 90, tz: -50, color: 0xec4899, icon: 'mdi:instagram', title: 'Instagram', desc: 'Behind the scenes hardware operations and daily tech logs. @jass_bhatia.si', tech: [], link: 'https://instagram.com/jass_bhatia.si', linkText: 'Follow' },
-
-            { id: 'about-hq', type: 'Safehouse', x: 0, z: -120, tx: 0, tz: -100, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'The Church (HQ)', desc: 'Welcome to the core safehouse of JBSI. I build autonomous agents, scalable SaaS platforms, and enterprise AI solutions.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' },
-    
-        // NEW BUILDINGS
-        { id: 'skill-frontend-new', type: 'Skill', x: -35, z: 150, tx: -15, tz: 150, color: 0x0ea5e9, icon: 'solar:laptop-linear', title: 'Frontend Engineering', desc: 'Expert in React, Vue, Three.js, and modern CSS frameworks like Tailwind.', tech: ['React', 'Three.js', 'Tailwind'], link: '#', linkText: 'Acknowledge' },
-        { id: 'skill-backend-new', type: 'Skill', x: 35, z: 150, tx: 15, tz: 150, color: 0xef4444, icon: 'solar:server-linear', title: 'Backend & Cloud', desc: 'Building scalable microservices with Python (FastAPI/Django), Node.js, and deploying via Docker to AWS/GCP.', tech: ['Python', 'Docker', 'AWS'], link: '#', linkText: 'Acknowledge' },
-        { id: 'skill-mobile', type: 'Skill', x: -35, z: -150, tx: -15, tz: -150, color: 0x8b5cf6, icon: 'solar:smartphone-linear', title: 'Mobile Development', desc: 'Cross-platform app development using Flutter and React Native for iOS and Android.', tech: ['Flutter', 'React Native'], link: '#', linkText: 'Acknowledge' },
-        { id: 'skill-db', type: 'Skill', x: 35, z: -150, tx: 15, tz: -150, color: 0xeab308, icon: 'solar:database-linear', title: 'Database Architecture', desc: 'Designing optimized schemas and complex queries in PostgreSQL, MongoDB, and Redis.', tech: ['PostgreSQL', 'MongoDB', 'Redis'], link: '#', linkText: 'Acknowledge' },
+            { id: 'about-hq', type: 'Safehouse', x: 0, z: -160, tx: 0, tz: -120, color: 0x6366f1, icon: 'solar:buildings-2-bold', title: 'The Church (HQ)', desc: 'Welcome to the core safehouse of JBSI. I build autonomous agents.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'View Open Source' },
+            { id: 'contact-github', type: 'Uplink', x: -80, z: 0, tx: -100, tz: 0, color: 0x64748b, icon: 'mdi:github', title: 'GitHub Hub', desc: 'Access all open-source repositories and raw intelligence data.', tech: [], link: 'https://github.com/Jaspreet-Bhatia-SI', linkText: 'Access Hub' },
+            { id: 'contact-linkedin', type: 'Uplink', x: 80, z: 0, tx: 100, tz: 0, color: 0x3b82f6, icon: 'mdi:linkedin', title: 'LinkedIn Network', desc: 'Connect with me professionally.', tech: [], link: 'https://linkedin.com/in/jaspreet-bhatia-si', linkText: 'Connect' },
+            
+            { id: 'skill-mobile', type: 'Skill', x: -130, z: 100, tx: -100, tz: 100, color: 0x8b5cf6, icon: 'solar:smartphone-linear', title: 'Mobile Development', desc: 'Cross-platform app development using Flutter and React Native.', tech: ['Flutter', 'React Native'], link: '#', linkText: 'Acknowledge' },
+            { id: 'skill-db', type: 'Skill', x: 130, z: 100, tx: 100, tz: 100, color: 0xeab308, icon: 'solar:database-linear', title: 'Database Architecture', desc: 'Designing optimized schemas and complex queries.', tech: ['PostgreSQL', 'Redis'], link: '#', linkText: 'Acknowledge' }
     ];
 
         // --- STATE MACHINE ---
@@ -213,11 +209,12 @@
         const dirtMat = new THREE.MeshStandardMaterial({ color: 0x594a36, roughness: 1.0 });
 
         const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, 400), roadMat); mainRoad.rotation.x = -Math.PI/2; mainRoad.position.set(0, 0.05, 0); mainRoad.receiveShadow = true; envGroup.add(mainRoad);
-        const crossRoad1 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad1.rotation.x = -Math.PI/2; crossRoad1.position.set(0, 0.06, -50); crossRoad1.receiveShadow = true; envGroup.add(crossRoad1);
-        const crossRoad2 = new THREE.Mesh(new THREE.PlaneGeometry(200, 12), dirtMat); crossRoad2.rotation.x = -Math.PI/2; crossRoad2.position.set(0, 0.06, 50); crossRoad2.receiveShadow = true; envGroup.add(crossRoad2);
-        const crossRoad3 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad3.rotation.x = -Math.PI/2; crossRoad3.position.set(0, 0.06, 150); crossRoad3.receiveShadow = true; envGroup.add(crossRoad3);
-        const crossRoad4 = new THREE.Mesh(new THREE.PlaneGeometry(300, 12), dirtMat); crossRoad4.rotation.x = -Math.PI/2; crossRoad4.position.set(0, 0.06, -150); crossRoad4.receiveShadow = true; envGroup.add(crossRoad4);
-
+        
+        // Rectangle Road Loop
+        const topRoad = new THREE.Mesh(new THREE.PlaneGeometry(212, 12), dirtMat); topRoad.rotation.x = -Math.PI/2; topRoad.position.set(0, 0.06, -120); topRoad.receiveShadow = true; envGroup.add(topRoad);
+        const botRoad = new THREE.Mesh(new THREE.PlaneGeometry(212, 12), dirtMat); botRoad.rotation.x = -Math.PI/2; botRoad.position.set(0, 0.06, 120); botRoad.receiveShadow = true; envGroup.add(botRoad);
+        const leftRoad = new THREE.Mesh(new THREE.PlaneGeometry(12, 252), dirtMat); leftRoad.rotation.x = -Math.PI/2; leftRoad.position.set(-100, 0.06, 0); leftRoad.receiveShadow = true; envGroup.add(leftRoad);
+        const rightRoad = new THREE.Mesh(new THREE.PlaneGeometry(12, 252), dirtMat); rightRoad.rotation.x = -Math.PI/2; rightRoad.position.set(100, 0.06, 0); rightRoad.receiveShadow = true; envGroup.add(rightRoad);
 
         // Dynamic Poster Generator
         function createPosterTexture(title, type) {
@@ -381,6 +378,46 @@
         createNPC(-14, 108, 0x3b82f6, 6);
         createNPC(-18, 122, 0x10b981, 3);
         createNPC(10, -118, 0xf59e0b, 5);
+        
+        // MOAR NPCs
+        const colors = [0xef4444, 0x3b82f6, 0x10b981, 0xf59e0b, 0xa855f7, 0xec4899];
+        for(let i=0; i<12; i++) {
+            const rx = (Math.random() > 0.5 ? 1 : -1) * (30 + Math.random() * 80);
+            const rz = (Math.random() - 0.5) * 200;
+            createNPC(rx, rz, colors[i % colors.length], 5 + Math.random() * 10);
+        }
+
+        // HORSE CART
+        const cartGrp = new THREE.Group();
+        const woodDark = new THREE.MeshStandardMaterial({color: 0x4a3219, roughness: 1.0});
+        const woodLight = new THREE.MeshStandardMaterial({color: 0x8b5a2b, roughness: 0.9});
+        const horseMat = new THREE.MeshStandardMaterial({color: 0x5c4033, roughness: 0.8});
+        
+        const cartBody = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 4), woodLight); cartBody.position.y = 1.5; cartBody.castShadow = true;
+        const cartWheelGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 12);
+        const cw1 = new THREE.Mesh(cartWheelGeo, woodDark); w1.rotation.z = Math.PI/2; w1.position.set(-1.6, 0.8, -1); w1.castShadow = true;
+        const cw2 = new THREE.Mesh(cartWheelGeo, woodDark); w2.rotation.z = Math.PI/2; w2.position.set(1.6, 0.8, -1); w2.castShadow = true;
+        const cw3 = new THREE.Mesh(cartWheelGeo, woodDark); w3.rotation.z = Math.PI/2; w3.position.set(-1.6, 0.8, 1); w3.castShadow = true;
+        const cw4 = new THREE.Mesh(cartWheelGeo, woodDark); w4.rotation.z = Math.PI/2; w4.position.set(1.6, 0.8, 1); w4.castShadow = true;
+        const pole = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 3), woodDark); pole.position.set(0, 1.2, 3); pole.castShadow = true;
+        
+        // Horse
+        const horseGrp = new THREE.Group();
+        const hBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 2.5), horseMat); hBody.position.set(0, 1.8, 5); hBody.castShadow = true;
+        const hNeck = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 0.6), horseMat); hNeck.position.set(0, 2.5, 6); hNeck.rotation.x = -Math.PI/6; hNeck.castShadow = true;
+        const hHead = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 1.0), horseMat); hHead.position.set(0, 3.2, 6.2); hHead.castShadow = true;
+        const hLegGeo = new THREE.BoxGeometry(0.3, 1.5, 0.3);
+        const hL1 = new THREE.Mesh(hLegGeo, horseMat); hL1.position.set(-0.4, 0.75, 4); hL1.castShadow = true;
+        const hL2 = new THREE.Mesh(hLegGeo, horseMat); hL2.position.set(0.4, 0.75, 4); hL2.castShadow = true;
+        const hL3 = new THREE.Mesh(hLegGeo, horseMat); hL3.position.set(-0.4, 0.75, 5.8); hL3.castShadow = true;
+        const hL4 = new THREE.Mesh(hLegGeo, horseMat); hL4.position.set(0.4, 0.75, 5.8); hL4.castShadow = true;
+        horseGrp.add(hBody, hNeck, hHead, hL1, hL2, hL3, hL4);
+
+        cartGrp.add(cartBody, cw1, cw2, cw3, cw4, pole, horseGrp);
+        cartGrp.position.set(30, 0, -30);
+        cartGrp.rotation.y = -Math.PI/4;
+        envGroup.add(cartGrp);
+
 
         const treeGeo = new THREE.ConeGeometry(2.5, 12, 7); const treeMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 1.0 }); 
         const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 4); const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f }); 
@@ -663,9 +700,11 @@
             minimapCtx.translate(-px, -pz);
 
             minimapCtx.fillStyle = '#3d3d3d'; minimapCtx.fillRect(-8, -400, 16, 800);
-            minimapCtx.fillStyle = '#594a36'; minimapCtx.fillRect(-150, -56, 300, 12); minimapCtx.fillRect(-100, 44, 200, 12);
-            minimapCtx.fillRect(-150, 144, 300, 12); minimapCtx.fillRect(-150, -156, 300, 12);
-
+            minimapCtx.fillStyle = '#594a36'; 
+            minimapCtx.fillRect(-106, -126, 212, 12); // top
+            minimapCtx.fillRect(-106, 114, 212, 12); // bot
+            minimapCtx.fillRect(-106, -126, 12, 252); // left
+            minimapCtx.fillRect(94, -126, 12, 252); // right
 
             buildings.forEach(b => {
                 const isHQ = b.id === 'about-hq';
