@@ -95,7 +95,7 @@
     <!-- Phone UI Overlay (iOS Style) -->
     <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
         <!-- Phone Frame Wrapper for perfect scaling -->
-        <div id="phone-scale-wrapper" class="flex items-center justify-center w-full h-full pointer-events-none" style="transform: scale(min(0.85, calc(90vw / 350), calc(90svh / 700))); transform-origin: center center;">
+        <div id="phone-scale-wrapper" class="flex items-center justify-center w-full h-full pointer-events-none" style="transform-origin: center center;">
             <!-- Phone Frame -->
             <div class="relative w-[320px] h-[640px] shrink-0 bg-black rounded-[44px] border-[10px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
             
@@ -1011,8 +1011,14 @@ function createNPC(x, z, color, patrolRadius) {
         function resizePhone() {
             const wrapper = document.getElementById('phone-scale-wrapper');
             if (wrapper) {
-                const scale = Math.min(1, (window.innerWidth * 0.95) / 350, (window.innerHeight * 0.9) / 680);
+                // Remove JS scaling to rely entirely on CSS svh which handles mobile navbars better
+                // Or just use a very safe bounding box
+                const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const w = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+                const scale = Math.min(1, (w * 0.95) / 350, (h * 0.85) / 660);
                 wrapper.style.transform = `scale(${scale})`;
+            }
+        })`;
             }
         }
         window.addEventListener('resize', resizePhone);
