@@ -95,7 +95,7 @@
     <!-- Phone UI Overlay (iOS Style) -->
     <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
         <!-- Phone Frame Wrapper for perfect scaling -->
-        <div id="phone-scale-wrapper" class="flex items-center justify-center w-full h-full pointer-events-none">
+        <div id="phone-scale-wrapper" class="flex items-center justify-center w-full h-full pointer-events-none" style="transform: scale(min(1, calc(95vw / 350), calc(90vh / 680))); transform-origin: center center;">
             <!-- Phone Frame -->
             <div class="relative w-[320px] h-[640px] shrink-0 bg-black rounded-[44px] border-[10px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
             
@@ -140,35 +140,35 @@
                         <span class="text-white text-[11px] font-medium drop-shadow-md">Mail</span>
                     </div>
                     
-                    <div onclick="window.open('https://linkedin.com/in/jaspreet-bhatia-si', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div onclick="event.stopPropagation(); window.open('https://linkedin.com/in/jaspreet-bhatia-si', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-[#0077b5] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="mdi:linkedin" width="40" class="text-white"></iconify-icon>
                         </div>
                         <span class="text-white text-[11px] font-medium drop-shadow-md">LinkedIn</span>
                     </div>
                     
-                    <div onclick="window.open('https://instagram.com/jass_bhatia.si', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div onclick="event.stopPropagation(); window.open('https://instagram.com/jass_bhatia.si', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="mdi:instagram" width="38" class="text-white"></iconify-icon>
                         </div>
                         <span class="text-white text-[11px] font-medium drop-shadow-md">Instagram</span>
                     </div>
                     
-                    <div onclick="window.open('https://github.com/Jaspreet-Bhatia-SI', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div onclick="event.stopPropagation(); window.open('https://github.com/Jaspreet-Bhatia-SI', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="mdi:github" width="40" class="text-[#181717]"></iconify-icon>
                         </div>
                         <span class="text-white text-[11px] font-medium drop-shadow-md">GitHub</span>
                     </div>
                     
-                    <div onclick="window.open('https://curator.foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div onclick="event.stopPropagation(); window.open('https://curator.foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-slate-800 to-black border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="solar:cpu-bold" width="36" class="text-purple-400"></iconify-icon>
                         </div>
                         <span class="text-white text-[11px] font-medium drop-shadow-md">Curator AI</span>
                     </div>
                     
-                    <div onclick="window.open('https://foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div onclick="event.stopPropagation(); window.open('https://foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-orange-500 to-red-600 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="solar:shop-bold" width="36" class="text-white"></iconify-icon>
                         </div>
@@ -196,10 +196,10 @@
                     <div onclick="window.open('mailto:bhatiajaspreet161@gmail.com', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-green-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
                         <iconify-icon icon="solar:phone-bold" width="32" class="text-white"></iconify-icon>
                     </div>
-                    <div onclick="window.open('https://linkedin.com/in/jaspreet-bhatia-si', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-blue-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
+                    <div onclick="event.stopPropagation(); window.open('https://linkedin.com/in/jaspreet-bhatia-si', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-blue-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
                         <iconify-icon icon="solar:chat-round-bold" width="32" class="text-white"></iconify-icon>
                     </div>
-                    <div onclick="window.open('https://github.com/Jaspreet-Bhatia-SI', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-indigo-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
+                    <div onclick="event.stopPropagation(); window.open('https://github.com/Jaspreet-Bhatia-SI', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-indigo-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
                         <iconify-icon icon="solar:safari-bold" width="36" class="text-white"></iconify-icon>
                     </div>
                 </div>
@@ -314,7 +314,7 @@ window.onerror = function(msg, url, line, col, error) {
     errDiv.innerText = "GLOBAL ERROR: " + msg + " at line " + line;
     document.body.appendChild(errDiv);
 };
-try {
+try { (() => {
         // --- POCHINKI ARCHITECTURE (Extended Layout) ---
         const buildings = [
             { id: 'proj-curator', type: 'Project', x: -130, z: -50, tx: -100, tz: -50, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline built in Python.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
@@ -868,7 +868,7 @@ function createNPC(x, z, color, patrolRadius) {
         btnReadMag.addEventListener('click', toggleSit);
         document.getElementById('btn-close-mag').addEventListener('click', toggleSit);
         
-        let hasContact = false;
+        
         
         const phoneUI = document.getElementById('phone-ui');
         const phoneFrame = document.getElementById('phone-frame');
@@ -978,7 +978,7 @@ function createNPC(x, z, color, patrolRadius) {
                             <p class="text-sm text-slate-800 font-medium leading-relaxed">${res.text}</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="window.open('https://linkedin.com/in/jaspreet-bhatia-si')" class="flex-1 bg-blue-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">LinkedIn</button>
+                            <button onclick="event.stopPropagation(); window.open('https://linkedin.com/in/jaspreet-bhatia-si')" class="flex-1 bg-blue-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">LinkedIn</button>
                             <button onclick="window.open('mailto:bhatiajaspreet161@gmail.com')" class="flex-1 bg-red-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">Email</button>
                         </div>
                     `;
@@ -1380,10 +1380,8 @@ if (state.mode === 'DRIVING') {
                     playerGroup.userData.rArm.rotation.x += (-Math.PI/2 - playerGroup.userData.rArm.rotation.x) * 0.1;
                     npc.rArm.rotation.x += (-Math.PI/2 - npc.rArm.rotation.x) * 0.1;
                 } else if (t >= 1.5 && t < 1.55) {
-                    if (!hasContact) {
-                        hasContact = true;
-                        
-                        togglePhone(); 
+                    if (t >= 1.5 && t < 1.55 && state.shareTimer - 0.02 < 1.5) {
+                        togglePhone();
                     }
                 } else if (t > 2.5) {
                     playerGroup.userData.rArm.rotation.x += (0 - playerGroup.userData.rArm.rotation.x) * 0.1;
@@ -1525,7 +1523,7 @@ if (state.mode === 'DRIVING') {
         }
 
         animate();
-    } catch(e) { 
+    })(); } catch(e) { 
     const errDiv = document.createElement('div');
     errDiv.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;padding:20px;font-size:16px;word-break:break-all;";
     errDiv.innerText = "INIT ERROR: " + e.stack;
@@ -1548,7 +1546,12 @@ if (state.mode === 'DRIVING') {
         const galleryGrid = document.getElementById('gallery-grid');
 
         if(btnOpenCamera) {
-            btnOpenCamera.addEventListener('click', async () => {
+            btnOpenCamera.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert("Camera requires HTTPS or a secure context (like localhost).");
+                    return;
+                }
                 cameraApp.classList.remove('translate-y-full');
                 try {
                     window.cameraStream = await navigator.mediaDevices.getUserMedia({ 
