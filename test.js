@@ -1,373 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JBSI Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #7b8b70; overflow: hidden; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-        #canvas-container { width: 100%; height: 100%; display: block; }
-        .key-cap { box-shadow: 0 4px 0 #0f172a; transition: all 0.1s; }
-        .key-cap:active, .key-cap.pressed { transform: translateY(4px); box-shadow: 0 0 0 #0f172a; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    </style>
-</head>
-<body class="bg-[#7b8b70] text-slate-300 antialiased h-screen w-screen overflow-hidden">
-
-    <div class="landscape-prompt portrait:flex hidden fixed inset-0 z-[999] bg-[#1a1c18] flex-col items-center justify-center text-white p-8 text-center">
-        <iconify-icon icon="solar:smartphone-rotate-2-linear" width="64" class="text-orange-500 mb-4 animate-bounce"></iconify-icon>
-        <h2 class="text-xl font-bold tracking-widest uppercase mb-2">Rotate Device</h2>
-        <p class="text-sm text-slate-400">Survival mode requires landscape orientation for dual-stick controls.</p>
-    </div>
-
-    <!-- UI LAYER -->
-    <div class="fixed inset-0 z-40 pointer-events-none flex flex-col justify-between p-4 sm:p-8">
-        
-        <div class="flex justify-between items-start w-full">
-            <div class="flex flex-col gap-1 pointer-events-auto">
-                <div class="flex items-center gap-2 bg-[#1c221a]/90 p-2.5 rounded-lg backdrop-blur border border-white/10 shadow-lg">
-                    <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
-                    <h1 class="text-xs font-bold tracking-widest text-orange-400 uppercase font-mono" id="mode-text">SURVIVOR [DRIVING]</h1>
-                </div>
-                <div class="text-[10px] text-slate-400 tracking-wider font-mono bg-[#1c221a]/90 px-2 py-1 rounded w-max border border-white/5 mt-1 shadow" id="coords">GRID: 0, 0</div>
-            </div>
-
-            <button id="btn-time-cycle" class="pointer-events-auto absolute top-6 left-1/2 -translate-x-1/2 bg-[#1c221a]/90 backdrop-blur border border-white/10 px-5 py-2.5 rounded-full shadow-2xl text-white hover:bg-[#2c352a] transition-all flex items-center justify-center gap-2 group cursor-pointer hover:scale-105 active:scale-95">
-                <iconify-icon id="icon-time" icon="solar:sun-bold" width="20" class="text-amber-400 group-hover:rotate-180 transition-transform duration-500"></iconify-icon>
-                <span class="text-[10px] font-bold tracking-widest uppercase" id="time-text">Day</span>
-            </button>
-
-            
-            <!-- TOP RIGHT WRAPPER -->
-            <div class="flex flex-col items-end gap-4 pointer-events-auto">
-                <!-- MINIMAP -->
-                <div id="minimap-wrapper" class="relative w-28 h-28 md:w-40 md:h-40 bg-[#1c221a]/80 backdrop-blur-md border-2 border-white/20 rounded-full overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300">
-                    <canvas id="minimap-canvas" width="160" height="160" class="absolute inset-0 w-full h-full"></canvas>
-                    
-                </div>
-                <div class="bg-[#1c221a]/90 backdrop-blur-md border border-white/10 rounded-xl p-3 max-w-[200px] text-right hidden md:block shadow-2xl">
-                <p class="text-[10px] uppercase text-orange-400/80 tracking-widest mb-3 font-mono font-bold">Controls</p>
-                <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Look</span><iconify-icon icon="solar:mouse-linear" width="22" class="text-slate-300"></iconify-icon></div>
-                <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Share</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-t">T</div></div>
-                <div class="flex items-center justify-end gap-2 mb-2"><span class="text-xs font-bold text-slate-400">Read</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-e">E</div></div>
-                <div class="flex items-center justify-end gap-2 mb-3"><span class="text-xs font-bold text-slate-400">Action</span><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-white key-cap" id="key-f">F</div></div>
-                <div class="flex items-center justify-end gap-1 mb-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-w">W</div></div>
-                <div class="flex items-center justify-end gap-1"><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-a">A</div><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-s">S</div><div class="w-7 h-7 rounded bg-[#2c352a] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 key-cap" id="key-d">D</div></div>
-            </div>
-            </div>
-        </div>
-
-        <!-- Center Prompts -->
-        <div class="absolute top-[70%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 pointer-events-none w-full z-50">
-            <button id="btn-enter-house" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-orange-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(234,88,12,0.4)] hover:bg-orange-500 active:scale-95 cursor-pointer border border-orange-400/50">
-                <iconify-icon icon="solar:door-open-linear" width="22" class="animate-pulse"></iconify-icon>
-                <span id="enter-text"><span class="hidden md:inline">Press [F] to </span>Loot</span>
-            </button>
-            <button id="btn-read-mag" class="pointer-events-auto opacity-0 transition-all duration-300 transform scale-90 bg-emerald-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(16,185,129,0.4)] hover:bg-emerald-500 active:scale-95 cursor-pointer border border-emerald-400/50">
-                <iconify-icon icon="solar:book-linear" width="22" class="animate-pulse"></iconify-icon>
-                <span><span class="hidden md:inline">Press [E] to </span>Read Magazine</span>
-            </button>
-            <button id="btn-share" class="pointer-events-auto hidden opacity-0 transition-all duration-300 transform scale-90 bg-indigo-600 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_10px_40px_rgba(79,70,229,0.4)] hover:bg-indigo-500 active:scale-95 cursor-pointer border border-indigo-400/50">
-                <iconify-icon icon="solar:smartphone-update-linear" width="22" class="animate-pulse"></iconify-icon>
-                <span><span class="hidden md:inline">Press [T] to </span>Share Contact</span>
-            </button>
-
-        </div>
-
-        <div class="flex justify-center items-end w-full pb-4 pointer-events-none z-50">
-            <button id="btn-exit-house" class="hidden pointer-events-auto bg-[#1c221a]/90 border border-white/20 text-white px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-xl hover:bg-slate-800 transition-colors">
-                <iconify-icon icon="solar:exit-linear" width="20"></iconify-icon>
-                <span class="hidden md:inline">Press [F] to </span>Exit
-            </button>
-        </div>
-    </div>
-
-    
-    <!-- Contacts Toggle Button -->
-    
-
-    <!-- Phone UI Overlay (iOS Style) -->
-    <div id="phone-ui" class="hidden fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
-        <!-- Phone Frame Wrapper for perfect scaling -->
-        <div id="phone-scale-wrapper" class="flex items-center justify-center w-full h-full pointer-events-none" style="transform: scale(min(0.85, calc(90vw / 350), calc(90svh / 700))); transform-origin: center center;">
-            <!-- Phone Frame -->
-            <div class="relative w-[320px] h-[640px] shrink-0 bg-black rounded-[44px] border-[10px] border-black shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transform scale-[0.2] translate-y-32 opacity-0 transition-all duration-500 pointer-events-auto overflow-hidden" id="phone-frame">
-            
-            <!-- Dynamic Island / Notch -->
-            <div class="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30 flex justify-between items-center px-2">
-                <div class="w-2 h-2 rounded-full bg-blue-900/50"></div>
-                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></div>
-            </div>
-
-            <!-- Screen Content (iOS Wallpaper) -->
-            <div class="flex-1 bg-gradient-to-br from-[#2E3192] to-[#1BFFFF] relative flex flex-col font-sans">
-                
-                <!-- Status Bar -->
-                <div class="w-full h-12 pt-2 px-6 flex justify-between items-center text-white text-[13px] font-semibold z-20">
-                    <span id="phone-time">9:41</span>
-                    <div class="flex items-center gap-1.5">
-                        <iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon>
-                        <iconify-icon icon="solar:wifi-bold" width="14"></iconify-icon>
-                        <iconify-icon icon="solar:battery-charge-bold" width="16"></iconify-icon>
-                    </div>
-                </div>
-                
-                <button id="btn-close-phone" class="absolute top-14 right-4 bg-black/20 hover:bg-black/40 text-white rounded-full p-2 backdrop-blur-md transition-colors z-40">
-                    <iconify-icon icon="solar:close-circle-bold" width="22"></iconify-icon>
-                </button>
-
-                <!-- Search Widget -->
-                <div class="mt-5 mx-4 relative z-30">
-                    <div class="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-3 flex items-center gap-3 cursor-text shadow-lg hover:bg-white/30 transition-colors" id="search-widget-btn">
-                        <iconify-icon icon="solar:magnifer-linear" width="20" class="text-white"></iconify-icon>
-                        <span class="text-white/80 text-sm font-medium flex-1 text-left">Search or ask...</span>
-                        <iconify-icon icon="solar:microphone-2-bold" width="20" class="text-white"></iconify-icon>
-                    </div>
-                </div>
-
-                <!-- Apps Grid -->
-                <div class="mt-8 px-5 grid grid-cols-4 gap-y-8 gap-x-3 z-20">
-                    <div onclick="window.open('mailto:bhatiajaspreet161@gmail.com', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-b from-[#5ac8fa] to-[#007aff] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="solar:letter-bold" width="34" class="text-white"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Mail</span>
-                    </div>
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://linkedin.com/in/jaspreet-bhatia-si', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-[#0077b5] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="mdi:linkedin" width="40" class="text-white"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">LinkedIn</span>
-                    </div>
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://instagram.com/jass_bhatia.si', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="mdi:instagram" width="38" class="text-white"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Instagram</span>
-                    </div>
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://github.com/Jaspreet-Bhatia-SI', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="mdi:github" width="40" class="text-[#181717]"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">GitHub</span>
-                    </div>
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://curator.foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-slate-800 to-black border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="solar:cpu-bold" width="36" class="text-purple-400"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Curator AI</span>
-                    </div>
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-tr from-[#ff9a9e] to-[#fecfef] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden relative">
-                            <iconify-icon icon="solar:hamburger-menu-bold" width="34" class="text-rose-500"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Foodzie</span>
-                    </div>
-
-                    <div onclick="event.stopPropagation(); openCameraApp()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-[#d1d5db] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform relative">
-                            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 rounded-[14px]"></div>
-                            <iconify-icon icon="solar:camera-bold" width="36" class="text-[#374151] z-10"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Camera</span>
-                    </div>
-
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-orange-500 to-red-600 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="solar:shop-bold" width="36" class="text-white"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Foodzie</span>
-                    </div>
-
-                    <div id="btn-open-camera" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-gray-300 to-gray-400 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                            <iconify-icon icon="solar:camera-bold" width="36" class="text-slate-800"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Camera</span>
-                    </div>
-                    
-                    <div id="btn-open-gallery" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-white border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden relative">
-                            <div class="absolute inset-0 bg-gradient-to-tr from-yellow-400 via-orange-500 to-pink-500 opacity-20"></div>
-                            <iconify-icon icon="solar:gallery-bold" width="36" class="text-transparent bg-clip-text bg-gradient-to-br from-yellow-400 via-red-500 to-indigo-500 relative z-10"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Photos</span>
-                    </div>
-                </div>
-                
-                <!-- Bottom Dock -->
-                <div class="absolute bottom-6 left-4 right-4 h-[84px] bg-white/20 backdrop-blur-2xl border border-white/30 rounded-[28px] flex items-center justify-around px-2 z-20">
-                    <div onclick="window.open('mailto:bhatiajaspreet161@gmail.com', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-green-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
-                        <iconify-icon icon="solar:phone-bold" width="32" class="text-white"></iconify-icon>
-                    </div>
-                    <div onclick="event.stopPropagation(); window.open('https://linkedin.com/in/jaspreet-bhatia-si', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-blue-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
-                        <iconify-icon icon="solar:chat-round-bold" width="32" class="text-white"></iconify-icon>
-                    </div>
-                    <div onclick="event.stopPropagation(); window.open('https://github.com/Jaspreet-Bhatia-SI', '_blank')" class="w-[60px] h-[60px] rounded-[14px] bg-indigo-500 flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform">
-                        <iconify-icon icon="solar:safari-bold" width="36" class="text-white"></iconify-icon>
-                    </div>
-                </div>
-
-                <!-- Camera App Overlay -->
-                <div id="camera-app" class="absolute inset-0 bg-black z-50 transform translate-y-full transition-transform duration-300 flex flex-col">
-                    <div class="h-16 flex items-center px-4 pt-4 bg-gradient-to-b from-black/80 to-transparent absolute top-0 w-full z-10">
-                        <button id="btn-close-camera" class="text-white hover:text-slate-300 transition-colors"><iconify-icon icon="solar:alt-arrow-left-linear" width="28"></iconify-icon></button>
-                    </div>
-                    <video id="camera-feed" class="w-full h-full object-cover" autoplay playsinline muted></video>
-                    <div id="camera-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-100 z-20"></div>
-                    <div class="h-32 bg-black/80 absolute bottom-0 w-full flex items-center justify-center z-10">
-                        <button id="btn-capture" class="w-16 h-16 rounded-full border-[4px] border-white flex items-center justify-center cursor-pointer active:scale-95 transition-transform">
-                            <div class="w-[52px] h-[52px] bg-white rounded-full"></div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Gallery App Overlay -->
-                <div id="gallery-app" class="absolute inset-0 bg-white z-50 transform translate-y-full transition-transform duration-300 flex flex-col">
-                    <div class="h-16 flex items-center justify-between px-4 pt-4 bg-white/90 backdrop-blur border-b border-slate-200 z-10">
-                        <button id="btn-close-gallery" class="text-blue-500 flex items-center font-medium active:opacity-50"><iconify-icon icon="solar:alt-arrow-left-linear" width="24" class="mr-1"></iconify-icon> Home</button>
-                        <span class="font-bold text-slate-800 text-[15px]">Photos</span>
-                        <div class="w-[70px]"></div>
-                    </div>
-                    <div id="gallery-grid" class="flex-1 overflow-y-auto grid grid-cols-3 gap-1 content-start bg-white p-1">
-                        <!-- photos will appear here -->
-                    </div>
-                </div>
-
-                <!-- Spotlight Search Overlay -->
-                <div id="spotlight-overlay" class="absolute inset-0 bg-white/40 backdrop-blur-3xl z-50 transform translate-y-full transition-transform duration-300 flex flex-col pt-12">
-                    <div class="px-4 pb-4">
-                        <div class="flex items-center gap-3 bg-white/60 rounded-xl p-2 px-3 shadow-sm border border-white/50">
-                            <iconify-icon icon="solar:magnifer-linear" width="20" class="text-slate-500"></iconify-icon>
-                            <input type="text" id="spotlight-input" class="bg-transparent flex-1 outline-none text-slate-800 font-medium placeholder-slate-500" placeholder="Search Jaspreet...">
-                            <button id="btn-cancel-search" class="text-blue-600 font-medium text-sm px-1">Cancel</button>
-                        </div>
-                    </div>
-                    <div class="flex-1 overflow-y-auto px-4 pb-10" id="spotlight-results">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Suggestions</div>
-                        <div class="bg-white/60 rounded-2xl overflow-hidden border border-white/50 flex flex-col">
-                            <div class="search-item p-3 border-b border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="https://linkedin.com/in/jaspreet-bhatia-si">
-                                <div class="bg-blue-500 text-white p-1.5 rounded-lg"><iconify-icon icon="mdi:linkedin" width="18"></iconify-icon></div>
-                                <span class="font-medium text-slate-800 text-sm">Jaspreet's LinkedIn</span>
-                            </div>
-                            <div class="search-item p-3 border-b border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="https://instagram.com/jass_bhatia.si">
-                                <div class="bg-gradient-to-tr from-[#f09433] to-[#bc1888] text-white p-1.5 rounded-lg"><iconify-icon icon="mdi:instagram" width="18"></iconify-icon></div>
-                                <span class="font-medium text-slate-800 text-sm">Jaspreet's Instagram</span>
-                            </div>
-                            <div class="search-item p-3 border-b border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="mailto:bhatiajaspreet161@gmail.com">
-                                <div class="bg-red-500 text-white p-1.5 rounded-lg"><iconify-icon icon="solar:letter-bold" width="18"></iconify-icon></div>
-                                <span class="font-medium text-slate-800 text-sm">Email Jaspreet</span>
-                            </div>
-                            <div class="search-item p-3 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors" data-url="https://github.com/Jaspreet-Bhatia-SI">
-                                <div class="bg-slate-800 text-white p-1.5 rounded-lg"><iconify-icon icon="solar:cpu-bold" width="18"></iconify-icon></div>
-                                <span class="font-medium text-slate-800 text-sm">Curator AI Project</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-    <!-- Virtual Joystick -->
-    <div id="joystick-base" class="md:hidden hidden absolute w-24 h-24 rounded-full border border-white/30 bg-black/20 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-        <div id="joystick-stick" class="absolute top-1/2 left-1/2 w-10 h-10 rounded-full bg-white/40 transform -translate-x-1/2 -translate-y-1/2 shadow-sm"></div>
-    </div>
-    <div id="crosshair" class="hidden md:block fixed top-1/2 left-1/2 w-1.5 h-1.5 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none shadow-[0_0_4px_rgba(0,0,0,1)] mix-blend-difference"></div>
-
-    <!-- MAGAZINE UI (FULLSCREEN OVERLAY) -->
-    <div id="magazine-ui" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 pointer-events-auto transition-opacity duration-300 opacity-0">
-        <div class="relative w-full max-w-5xl max-h-[85vh] md:h-[80vh] bg-[#f4ebd8] rounded-md shadow-2xl flex flex-col md:flex-row overflow-y-auto md:overflow-hidden text-slate-900 shadow-[0_0_100px_rgba(0,0,0,0.8)] book-texture">
-            <!-- Spine shadow -->
-            <div class="absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 bg-gradient-to-r from-transparent via-black/10 to-transparent z-10 hidden md:block"></div>
-            
-            <div class="w-full md:w-1/2 p-6 md:p-12 border-b md:border-b-0 md:border-r border-[#d4c8a9]/50 flex flex-col justify-center bg-gradient-to-br from-[#f4ebd8] to-[#e6dcc6]">
-                <div class="mb-4 text-orange-700">
-                    <iconify-icon id="mag-icon" icon="solar:box-linear" width="48" class="md:w-[64px]"></iconify-icon>
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold font-serif mb-4 leading-tight text-[#2c1e16]" id="mag-title">Project Title</h2>
-                <div class="h-1 w-20 bg-orange-600 mb-6"></div>
-                <p class="text-sm uppercase tracking-widest text-orange-600 font-bold mb-6 font-mono" id="mag-type">Type</p>
-                <div id="mag-tech" class="flex flex-wrap gap-2 mt-auto"></div>
-            </div>
-            
-            <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col bg-gradient-to-bl from-[#f4ebd8] to-[#e6dcc6]">
-                <p class="text-base md:text-xl font-serif leading-relaxed text-[#3d2b1f] first-letter:text-4xl md:first-letter:text-5xl first-letter:font-bold first-letter:text-orange-700 first-letter:mr-1 first-letter:float-left" id="mag-desc">Description goes here.</p>
-                
-                <div class="mt-auto pt-12 flex justify-between items-center">
-                    <div class="font-mono text-xs text-slate-500 uppercase tracking-widest">JBSI Archive</div>
-                    <a id="mag-link" href="#" target="_blank" class="bg-[#2c1e16] text-[#f4ebd8] px-8 py-4 rounded uppercase font-bold text-sm tracking-widest hover:bg-orange-700 transition-colors shadow-lg">Execute</a>
-                </div>
-            </div>
-            
-            <button id="btn-close-mag" class="fixed sm:absolute top-4 right-4 md:top-6 md:right-6 text-[#2c1e16]/50 hover:text-[#2c1e16] transition-colors p-2 bg-black/10 md:bg-black/5 rounded-full z-10 backdrop-blur-sm">
-                <iconify-icon icon="solar:close-circle-bold" width="36"></iconify-icon>
-            </button>
-        </div>
-    </div>
-
-    <!-- 3D CANVAS -->
-    <div id="canvas-container" class="relative z-0"></div>
-    <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
-
-    
-    <!-- Camera App Modal -->
-    <div id="camera-modal" class="hidden fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
-        <div class="relative w-full h-full max-w-md bg-black pointer-events-auto flex flex-col">
-            <!-- Header -->
-            <div class="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/80 to-transparent z-10 flex items-start justify-between px-6 pt-12">
-                <button onclick="closeCameraApp()" class="text-white hover:bg-white/20 p-2 rounded-full transition-colors">
-                    <iconify-icon icon="solar:arrow-left-outline" width="28"></iconify-icon>
-                </button>
-            </div>
-            
-            <!-- Viewfinder -->
-            <div class="flex-1 relative bg-gray-900 w-full overflow-hidden flex items-center justify-center">
-                <video id="camera-feed" class="w-full h-full object-cover" autoplay playsinline></video>
-                <canvas id="camera-canvas" class="hidden"></canvas>
-                <!-- Flash Effect -->
-                <div id="camera-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none"></div>
-            </div>
-
-            <!-- Controls -->
-            <div class="h-40 bg-black w-full flex items-center justify-center gap-12 pb-6">
-                <!-- Shutter -->
-                <button onclick="takePicture()" class="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center p-1 hover:scale-95 transition-transform focus:outline-none">
-                    <div class="w-full h-full bg-white rounded-full"></div>
-                </button>
-            </div>
-            
-            <!-- Result preview -->
-            <div id="camera-preview-container" class="hidden absolute bottom-44 left-6 border-2 border-white rounded-xl overflow-hidden w-20 h-28 shadow-lg cursor-pointer hover:scale-105 transition-transform" onclick="downloadPicture()">
-                <img id="camera-preview" class="w-full h-full object-cover" src="" />
-                <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
-                    <iconify-icon icon="solar:download-minimalistic-bold" class="text-white" width="24"></iconify-icon>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<script>
 window.onerror = function(msg, url, line, col, error) { 
     const errDiv = document.createElement('div');
     errDiv.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;padding:20px;font-size:16px;word-break:break-all;";
     errDiv.innerText = "GLOBAL ERROR: " + msg + " at line " + line;
     document.body.appendChild(errDiv);
 };
-try { (() => {
+try {
         // --- POCHINKI ARCHITECTURE (Extended Layout) ---
         const buildings = [
             { id: 'proj-curator', type: 'Project', x: -130, z: -50, tx: -100, tz: -50, color: 0x10b981, icon: 'solar:robot-linear', title: 'Curator AI', desc: 'Autonomous AI media curator. Groq LLMs & RAG pipeline built in Python.', tech: ['FastAPI', 'React', 'Docker'], link: 'https://curator.foodzie.store', linkText: 'Launch Web App' },
@@ -761,81 +398,6 @@ function createNPC(x, z, color, patrolRadius) {
             labelsContainer.appendChild(div); b.labelEl = div;
         });
 
-        
-        // --- CAMERA APP LOGIC ---
-        let cameraStream = null;
-        async function openCameraApp() {
-            const modal = document.getElementById('camera-modal');
-            const video = document.getElementById('camera-feed');
-            modal.classList.remove('hidden');
-            // Give time for layout
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-                video.srcObject = cameraStream;
-            } catch (err) {
-                console.error("Camera access denied or failed", err);
-                alert("Camera access is required. Please grant permissions.");
-            }
-        }
-        window.openCameraApp = openCameraApp;
-
-        function closeCameraApp() {
-            const modal = document.getElementById('camera-modal');
-            modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(t => t.stop());
-                    cameraStream = null;
-                }
-            }, 300);
-        }
-        window.closeCameraApp = closeCameraApp;
-
-        function takePicture() {
-            const video = document.getElementById('camera-feed');
-            const canvas = document.getElementById('camera-canvas');
-            const flash = document.getElementById('camera-flash');
-            
-            if (!video.videoWidth) return;
-            
-            // Flash effect
-            flash.style.transition = 'none';
-            flash.style.opacity = '1';
-            setTimeout(() => {
-                flash.style.transition = 'opacity 0.4s ease-out';
-                flash.style.opacity = '0';
-            }, 50);
-
-            // Capture
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Preview
-            const imgUrl = canvas.toDataURL('image/jpeg');
-            const preview = document.getElementById('camera-preview');
-            const container = document.getElementById('camera-preview-container');
-            
-            preview.src = imgUrl;
-            container.classList.remove('hidden');
-        }
-        window.takePicture = takePicture;
-
-        function downloadPicture() {
-            const preview = document.getElementById('camera-preview');
-            if (!preview.src) return;
-            const a = document.createElement('a');
-            a.href = preview.src;
-            a.download = 'jbsi_portfolio_photo_' + Date.now() + '.jpg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-        window.downloadPicture = downloadPicture;
-
         // --- INPUT HANDLING ---
         document.body.addEventListener('click', (e) => {
             const pUI = document.getElementById('phone-ui');
@@ -996,7 +558,7 @@ function createNPC(x, z, color, patrolRadius) {
         btnReadMag.addEventListener('click', toggleSit);
         document.getElementById('btn-close-mag').addEventListener('click', toggleSit);
         
-        
+        let hasContact = false;
         
         const phoneUI = document.getElementById('phone-ui');
         const phoneFrame = document.getElementById('phone-frame');
@@ -1106,7 +668,7 @@ function createNPC(x, z, color, patrolRadius) {
                             <p class="text-sm text-slate-800 font-medium leading-relaxed">${res.text}</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="event.stopPropagation(); window.open('https://linkedin.com/in/jaspreet-bhatia-si')" class="flex-1 bg-blue-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">LinkedIn</button>
+                            <button onclick="window.open('https://linkedin.com/in/jaspreet-bhatia-si')" class="flex-1 bg-blue-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">LinkedIn</button>
                             <button onclick="window.open('mailto:bhatiajaspreet161@gmail.com')" class="flex-1 bg-red-500 text-white p-2 rounded-xl text-xs font-bold shadow-sm">Email</button>
                         </div>
                     `;
@@ -1336,6 +898,27 @@ function createNPC(x, z, color, patrolRadius) {
             playerGroup.userData.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = true; });
             state.activeNPC.rArm.children.forEach(c => { if(c.geometry === phoneGeo) c.visible = true; });
 
+            // Create Contact Card
+            const cardCanvas = document.createElement('canvas'); cardCanvas.width = 512; cardCanvas.height = 256;
+            const ctx = cardCanvas.getContext('2d');
+            ctx.fillStyle = '#1e241c'; ctx.fillRect(0,0,512,256);
+            ctx.fillStyle = '#4f46e5'; ctx.fillRect(0,0,512,16);
+            ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 8; ctx.strokeRect(4,4,504,248);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 36px "Courier New"'; ctx.fillText('Jaspreet Bhatia (JBSI)', 20, 60);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '28px "Courier New"'; ctx.fillText('Software Engineer', 20, 100);
+            ctx.fillStyle = '#4ade80'; ctx.font = '22px "Courier New"'; 
+            ctx.fillText('bhatiajaspreet161@gmail.com', 20, 150);
+            ctx.fillText('linkedin.com/in/jaspreet-bhatia-si', 20, 190);
+            ctx.fillText('Instagram: @jass_bhatia.si', 20, 230);
+            
+            const cardTex = new THREE.CanvasTexture(cardCanvas);
+            const cardMat = new THREE.MeshBasicMaterial({map: cardTex, side: THREE.DoubleSide, transparent: true, opacity: 0});
+            state.shareCard = new THREE.Mesh(new THREE.PlaneGeometry(3, 1.5), cardMat);
+            
+            const midX = (playerGroup.position.x + state.activeNPC.grp.position.x) / 2;
+            const midZ = (playerGroup.position.z + state.activeNPC.grp.position.z) / 2;
+            state.shareCard.position.set(midX, 1.5, midZ);
+            scene.add(state.shareCard);
             btnShare.classList.add('hidden', 'opacity-0');
         });
 
@@ -1487,8 +1070,10 @@ if (state.mode === 'DRIVING') {
                     playerGroup.userData.rArm.rotation.x += (-Math.PI/2 - playerGroup.userData.rArm.rotation.x) * 0.1;
                     npc.rArm.rotation.x += (-Math.PI/2 - npc.rArm.rotation.x) * 0.1;
                 } else if (t >= 1.5 && t < 1.55) {
-                    if (t >= 1.5 && t < 1.55 && state.shareTimer - 0.02 < 1.5) {
-                        togglePhone();
+                    if (!hasContact) {
+                        hasContact = true;
+                        
+                        togglePhone(); 
                     }
                 } else if (t > 2.5) {
                     playerGroup.userData.rArm.rotation.x += (0 - playerGroup.userData.rArm.rotation.x) * 0.1;
@@ -1630,7 +1215,7 @@ if (state.mode === 'DRIVING') {
         }
 
         animate();
-    })(); } catch(e) { 
+    } catch(e) { 
     const errDiv = document.createElement('div');
     errDiv.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;padding:20px;font-size:16px;word-break:break-all;";
     errDiv.innerText = "INIT ERROR: " + e.stack;
@@ -1653,12 +1238,7 @@ if (state.mode === 'DRIVING') {
         const galleryGrid = document.getElementById('gallery-grid');
 
         if(btnOpenCamera) {
-            btnOpenCamera.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert("Camera requires HTTPS or a secure context (like localhost).");
-                    return;
-                }
+            btnOpenCamera.addEventListener('click', async () => {
                 cameraApp.classList.remove('translate-y-full');
                 try {
                     window.cameraStream = await navigator.mediaDevices.getUserMedia({ 
@@ -1731,6 +1311,3 @@ if (state.mode === 'DRIVING') {
                 galleryApp.classList.add('translate-y-full');
             });
         }
-    </script>
-</body>
-</html>
