@@ -169,22 +169,6 @@
                     </div>
                     
                     <div onclick="event.stopPropagation(); window.open('https://foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-tr from-[#ff9a9e] to-[#fecfef] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden relative">
-                            <iconify-icon icon="solar:hamburger-menu-bold" width="34" class="text-rose-500"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Foodzie</span>
-                    </div>
-
-                    <div onclick="event.stopPropagation(); openCameraApp()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                        <div class="w-[60px] h-[60px] rounded-[14px] bg-[#d1d5db] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform relative">
-                            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 rounded-[14px]"></div>
-                            <iconify-icon icon="solar:camera-bold" width="36" class="text-[#374151] z-10"></iconify-icon>
-                        </div>
-                        <span class="text-white text-[11px] font-medium drop-shadow-md">Camera</span>
-                    </div>
-
-                    
-                    <div onclick="event.stopPropagation(); window.open('https://foodzie.store', '_blank')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
                         <div class="w-[60px] h-[60px] rounded-[14px] bg-gradient-to-br from-orange-500 to-red-600 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                             <iconify-icon icon="solar:shop-bold" width="36" class="text-white"></iconify-icon>
                         </div>
@@ -1011,11 +995,9 @@ function createNPC(x, z, color, patrolRadius) {
         function resizePhone() {
             const wrapper = document.getElementById('phone-scale-wrapper');
             if (wrapper) {
-                // Remove JS scaling to rely entirely on CSS svh which handles mobile navbars better
-                // Or just use a very safe bounding box
                 const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
                 const w = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-                const scale = Math.min(1, (w * 0.95) / 350, (h * 0.85) / 660);
+                const scale = Math.min(1, (w * 0.90) / 360, (h * 0.90) / 720);
                 wrapper.style.transform = `scale(${scale})`;
             }
         })`;
